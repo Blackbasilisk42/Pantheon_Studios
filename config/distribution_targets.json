@@ -1,0 +1,23 @@
+[
+  {
+    "name": "local_dry_run",
+    "channel": "local",
+    "kind": "dry_run",
+    "active": true,
+    "jitter_enabled": false,
+    "jitter_min": 0,
+    "jitter_max": 0,
+    "format": "markdown"
+  },
+  {
+    "name": "public_feed_stub",
+    "channel": "rss",
+    "kind": "webhook",
+    "active": false,
+    "url": "https://example.com/pantheon-feed",
+    "jitter_enabled": true,
+    "jitter_min": 2,
+    "jitter_max": 7,
+    "format": "rss"
+  }
+]

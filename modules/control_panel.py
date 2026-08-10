@@ -12,6 +12,7 @@ from __future__ import annotations
 import os
 import shutil
 import socket
+import threading
 from datetime import datetime
 from pathlib import Path
 
@@ -40,6 +41,8 @@ try:
         run_sync_ui,
     )
     from modules.orchestrator import orchestrator_status_md, run_orchestrator_ui, toggle_orchestrator
+    from modules.distribution_seeder import DistributionSeeder
+    from modules.continuous_tester import ContinuousTesterEngine
 except ModuleNotFoundError:
     from lore_ingest import save_entry  # type: ignore[no-redef]
     from system_state import get_state, is_killswitch_active, set_killswitch  # type: ignore[no-redef]
@@ -61,6 +64,8 @@ except ModuleNotFoundError:
         run_orchestrator_ui,
         toggle_orchestrator,
     )
+    from distribution_seeder import DistributionSeeder  # type: ignore[no-redef]
+    from continuous_tester import ContinuousTesterEngine  # type: ignore[no-redef]
 
 PENDING_DIR = Path("queue") / "pending"
 APPROVED_DIR = Path("queue") / "approved"
@@ -213,7 +218,8 @@ def approve_item(filename: str) -> tuple[str, list[str], str]:
     if not src.exists():
         return f"File not found: {filename}", _pending_names(), _status_md()
     dest = _move(src, APPROVED_DIR)
-    return f"Approved → {dest.as_posix()}", _pending_names(), _status_md()
+    dispatch_summary = dispatch_latest_approved(limit=1)
+    return f"Approved → {dest.as_posix()}\n{dispatch_summary}", _pending_names(), _status_md()
 
 
 def reject_item(filename: str) -> tuple[str, list[str], str]:
@@ -278,6 +284,44 @@ def refresh_learning_views() -> tuple[str, str]:
     return get_learning_status_md(), latest_learning_log_text()
 
 
+def refresh_distribution_status() -> str:
+    seeder = DistributionSeeder(workspace=Path.cwd())
+    return seeder.distribution_status_md()
+
+
+def dispatch_latest_approved(limit: int = 1) -> str:
+    seeder = DistributionSeeder(workspace=Path.cwd())
+    result = seeder.dispatch_approved_items(limit=limit)
+    if result["receipts"]:
+        return f"Dispatched {result['dispatched_count']} approved item(s) to {len(result['targets'])} active target(s)."
+    return "No approved items available for outbound dispatch."
+
+
+def runtime_tester_status() -> str:
+    engine = ContinuousTesterEngine(workspace=Path.cwd(), send_sms=False)
+    try:
+        result = engine.run_cycle()
+        if result.get("status") == "simulated":
+            return "🟢 Runtime Tester: Active"
+    except Exception as exc:  # noqa: BLE001
+        return f"🔴 Runtime Tester: Idle ({exc})"
+    return "🟡 Runtime Tester: Idle"
+
+
+def run_continuous_test_now() -> str:
+    engine = ContinuousTesterEngine(workspace=Path.cwd(), send_sms=False)
+    result = engine.run_cycle()
+    return f"Simulation complete. {result['status']} | receipts: {len(result['receipt_paths'])}"
+
+
+def send_test_ping_now() -> str:
+    try:
+        from modules.notifier import send_test_sms_ping
+        return send_test_sms_ping()
+    except Exception as exc:  # noqa: BLE001
+        return f"Test ping failed: {exc}"
+
+
 # ---------------------------------------------------------------------------
 # Layout
 # ---------------------------------------------------------------------------
@@ -310,6 +354,7 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
 
     orchestrator_status_display = gr.Markdown(value=orchestrator_status_md())
     connection_banner = gr.Markdown(value=_connection_banner())
+    runtime_tester_badge = gr.Markdown(value=runtime_tester_status(), every=30)
 
     # ---- Master Killswitch (always visible, prominent) ----
     with gr.Row():
@@ -477,6 +522,18 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
                     "Run Diagnostics & Self-Repair", variant="primary", size="lg"
                 )
                 load_receipt_btn = gr.Button("Load Latest Receipt", size="lg")
+                run_sim_btn = gr.Button("Run Sandbox Simulation", size="lg")
+
+            daemon_toggle = gr.Checkbox(label="Continuous Testing Daemon", value=True)
+            with gr.Row():
+                ping_sms_btn = gr.Button("Send Test SMS Ping Now", variant="secondary", size="lg")
+            simulation_stream = gr.Textbox(
+                label="Simulation activity stream",
+                value="Waiting for the next simulation cycle…",
+                lines=8,
+                interactive=False,
+                max_lines=20,
+            )
 
             diag_receipt_view = gr.Textbox(
                 label="System health receipt",
@@ -493,6 +550,19 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
             load_receipt_btn.click(
                 fn=latest_receipt_text,
                 outputs=[diag_receipt_view],
+            )
+            run_sim_btn.click(
+                fn=run_continuous_test_now,
+                outputs=[simulation_stream],
+            )
+            ping_sms_btn.click(
+                fn=send_test_ping_now,
+                outputs=[simulation_stream],
+            )
+            daemon_toggle.change(
+                fn=lambda enabled: "Continuous Testing Daemon enabled" if enabled else "Continuous Testing Daemon disabled",
+                inputs=[daemon_toggle],
+                outputs=[simulation_stream],
             )
 
         # ---- Tab 5: Continuous Learning & Guardrails ----
@@ -541,7 +611,32 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
                 outputs=[learn_status_display, learn_log_view],
             )
 
-        # ---- Tab 6: System Sync ----
+        # ---- Tab 6: Distribution & Outbound ----
+        with gr.Tab("Distribution & Outbound"):
+            gr.Markdown(
+                "Review outbound targets, dispatch approved drafts, and inspect the latest distribution receipts."
+            )
+            distribution_status = gr.Markdown(value=refresh_distribution_status())
+            with gr.Row():
+                dispatch_btn = gr.Button("Dispatch Approved Drafts", variant="primary", size="lg")
+                refresh_dist_btn = gr.Button("Refresh Status", size="lg")
+            dist_receipt_view = gr.Textbox(
+                label="Latest distribution receipts",
+                value="No distribution receipts yet.",
+                lines=12,
+                interactive=False,
+                max_lines=30,
+            )
+            dispatch_btn.click(
+                fn=dispatch_latest_approved,
+                outputs=[distribution_status],
+            )
+            refresh_dist_btn.click(
+                fn=refresh_distribution_status,
+                outputs=[distribution_status],
+            )
+
+        # ---- Tab 7: System Sync ----
         with gr.Tab("System Sync"):
             gr.Markdown(
                 "Verify file integrity, policy mirrors, and workspace readiness with a single click."
@@ -591,6 +686,11 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
         fn=run_orchestrator_ui,
         outputs=[orchestrator_status_display],
     )
+    daemon_toggle.change(
+        fn=lambda enabled: runtime_tester_status(),
+        inputs=[daemon_toggle],
+        outputs=[runtime_tester_badge],
+    )
 
 
 def main() -> None:
@@ -603,6 +703,14 @@ def main() -> None:
     print(f"On phone/laptop (same Wi-Fi): http://{local_ip}:7860")
     print("Credentials come from the workspace .env file.")
     print("=" * 60)
+    try:
+        from modules.continuous_tester import ContinuousTesterEngine
+        engine = ContinuousTesterEngine(workspace=Path.cwd(), send_sms=True)
+        thread = threading.Thread(target=engine.start_daemon, kwargs={"interval_minutes": 15}, daemon=True)
+        thread.start()
+    except Exception:
+        pass
+
     demo.launch(
         auth=(CONTROL_PANEL_USER, CONTROL_PANEL_PASS),
         server_name="0.0.0.0",

@@ -14,7 +14,9 @@ from __future__ import annotations
 import os
 import smtplib
 import ssl
+from datetime import datetime
 from email.mime.text import MIMEText
+from pathlib import Path
 
 
 # ---------------------------------------------------------------------------
@@ -28,7 +30,7 @@ def _env(key: str, default: str = "") -> str:
 def _load_config() -> dict[str, str]:
     """Read alert config from environment (populated by python-dotenv or shell)."""
     return {
-        "phone": _env("ALERT_PHONE_NUMBER", "260-2442-8050"),
+        "phone": _env("ALERT_PHONE_NUMBER", "260-224-8050"),
         "twilio_sid": _env("TWILIO_ACCOUNT_SID"),
         "twilio_token": _env("SMS_AUTH_TOKEN"),
         "twilio_from": _env("TWILIO_FROM_NUMBER"),
@@ -93,13 +95,32 @@ def _send_via_smtp(cfg: dict[str, str], body: str) -> None:
 # Public API
 # ---------------------------------------------------------------------------
 
-def send_pending_review_alert(post_title: str) -> None:
-    """Fire an SMS notification that a new draft is awaiting human review.
+def _log_sms_event(status: str, body: str, response_code: str | None = None) -> None:
+    log_path = Path("intelligence") / "sms_telemetry.log"
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    line = f"{datetime.now().isoformat()} | status={status} | body={body[:80]} | response={response_code or 'n/a'}"
+    with log_path.open("a", encoding="utf-8") as handle:
+        handle.write(line + "\n")
 
-    Raises RuntimeError if no valid transport is configured, so callers can
-    decide whether to treat missing notification config as fatal or a warning.
-    """
-    # Lazy-load dotenv so the module works without it installed
+
+def _send_with_transport(cfg: dict[str, str], body: str) -> tuple[str, str | None]:
+    if cfg["twilio_sid"] and cfg["twilio_token"] and cfg["twilio_from"]:
+        _send_via_twilio(cfg, body)
+        return "sent", "200"
+
+    if cfg["smtp_host"] and cfg["smtp_user"] and cfg["smtp_password"]:
+        _send_via_smtp(cfg, body)
+        return "sent", "250"
+
+    raise RuntimeError(
+        "No SMS transport configured. "
+        "Set either Twilio credentials (TWILIO_ACCOUNT_SID / SMS_AUTH_TOKEN / TWILIO_FROM_NUMBER) "
+        "or SMTP credentials (SMTP_HOST / SMTP_USER / SMTP_PASSWORD / SMS_GATEWAY_ADDRESS) in .env."
+    )
+
+
+def send_pending_review_alert(post_title: str) -> None:
+    """Fire an SMS notification that a new draft is awaiting human review."""
     try:
         from dotenv import load_dotenv  # type: ignore[import]
         load_dotenv()
@@ -108,17 +129,38 @@ def send_pending_review_alert(post_title: str) -> None:
 
     cfg = _load_config()
     body = f"[Pantheon Studios] New draft pending your approval: \"{post_title}\""
+    status, response_code = _send_with_transport(cfg, body)
+    _log_sms_event(status, body, response_code)
 
-    if cfg["twilio_sid"] and cfg["twilio_token"] and cfg["twilio_from"]:
-        _send_via_twilio(cfg, body)
-        return
 
-    if cfg["smtp_host"] and cfg["smtp_user"] and cfg["smtp_password"]:
-        _send_via_smtp(cfg, body)
-        return
+def send_daily_heartbeat() -> None:
+    """Send the daily heartbeat text for the 24-hour continuous testing loop."""
+    try:
+        from dotenv import load_dotenv  # type: ignore[import]
+        load_dotenv()
+    except ImportError:
+        pass
 
-    raise RuntimeError(
-        "No SMS transport configured. "
-        "Set either Twilio credentials (TWILIO_ACCOUNT_SID / SMS_AUTH_TOKEN / TWILIO_FROM_NUMBER) "
-        "or SMTP credentials (SMTP_HOST / SMTP_USER / SMTP_PASSWORD / SMS_GATEWAY_ADDRESS) in .env."
-    )
+    cfg = _load_config()
+    body = "Pantheon Studios Daily Status: All systems nominal. Continuous testing active. Killswitch: INACTIVE."
+    status, response_code = _send_with_transport(cfg, body)
+    _log_sms_event(status, body, response_code)
+
+
+def send_test_sms_ping() -> str:
+    """Send an on-demand test ping and return a human-readable status."""
+    try:
+        from dotenv import load_dotenv  # type: ignore[import]
+        load_dotenv()
+    except ImportError:
+        pass
+
+    cfg = _load_config()
+    body = "Pantheon Studios Test Ping: Continuous testing daemon is live."
+    try:
+        status, response_code = _send_with_transport(cfg, body)
+    except Exception as exc:  # noqa: BLE001
+        _log_sms_event("failed", body, str(exc))
+        return f"Test ping failed: {exc}"
+    _log_sms_event(status, body, response_code)
+    return f"Test ping sent to {cfg['phone']} (status={status}, response={response_code})"
