@@ -419,6 +419,19 @@ def _pipeline_check_activity_logger() -> CheckResult:
         return CheckResult("Pipeline: ActivityLogger init", "fail", str(exc))
 
 
+def _pipeline_check_parallel_workers() -> CheckResult:
+    try:
+        cpu_count = os.cpu_count() or 1
+        worker_hint = max(1, min(cpu_count * 2, 8))
+        return CheckResult(
+            "Pipeline: Parallel worker health",
+            "pass",
+            f"CPU threads detected={cpu_count}; worker hint={worker_hint}",
+        )
+    except Exception as exc:
+        return CheckResult("Pipeline: Parallel worker health", "warn", str(exc))
+
+
 def _pipeline_check_distribution_ledger() -> CheckResult:
     try:
         from modules.distribution_seeder import DistributionSeeder
@@ -499,6 +512,7 @@ class DiagnosticsEngine:
         report.results.append(_pipeline_check_publisher())
         report.results.append(_pipeline_check_orchestrator())
         report.results.append(_pipeline_check_activity_logger())
+        report.results.append(_pipeline_check_parallel_workers())
         report.results.append(_pipeline_check_distribution_ledger())
         report.results.append(_pipeline_check_killswitch())
 

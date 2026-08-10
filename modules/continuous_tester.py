@@ -150,6 +150,24 @@ class ContinuousTesterEngine:
             "sandbox": sandbox,
         }
 
+    def start_background_loop(self, interval_minutes: int = 15, stop_event: threading.Event | None = None) -> threading.Thread:
+        stop_event = stop_event or threading.Event()
+
+        def _runner() -> None:
+            while not stop_event.is_set():
+                try:
+                    if is_killswitch_active():
+                        self._append_telemetry(f"{datetime.now().isoformat()} daemon_halted killswitch")
+                        break
+                    self.run_cycle()
+                except Exception as exc:  # noqa: BLE001
+                    self._append_telemetry(f"{datetime.now().isoformat()} daemon_error {exc}")
+                stop_event.wait(interval_minutes * 60)
+
+        thread = threading.Thread(target=_runner, name="pantheon-continuous-tester", daemon=True)
+        thread.start()
+        return thread
+
     def start_daemon(self, interval_minutes: int = 15, stop_event: threading.Event | None = None) -> None:
         stop_event = stop_event or threading.Event()
         while not stop_event.is_set():

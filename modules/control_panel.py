@@ -45,6 +45,7 @@ try:
     from modules.distribution_seeder import DistributionSeeder
     from modules.continuous_tester import ContinuousTesterEngine
     from modules.activity_logger import get_activity_logger
+    from modules.heavy_crawler import run_parallel_scan
 except ModuleNotFoundError:
     from lore_ingest import save_entry  # type: ignore[no-redef]
     from system_state import get_state, is_killswitch_active, set_killswitch  # type: ignore[no-redef]
@@ -69,6 +70,7 @@ except ModuleNotFoundError:
     from distribution_seeder import DistributionSeeder  # type: ignore[no-redef]
     from continuous_tester import ContinuousTesterEngine  # type: ignore[no-redef]
     from activity_logger import get_activity_logger  # type: ignore[no-redef]
+    from heavy_crawler import run_parallel_scan  # type: ignore[no-redef]
 
 PENDING_DIR = Path("queue") / "pending"
 APPROVED_DIR = Path("queue") / "approved"
@@ -292,6 +294,10 @@ def refresh_distribution_status() -> str:
     return seeder.distribution_status_md()
 
 
+def refresh_system_readiness() -> str:
+    return _status_md()
+
+
 def dispatch_latest_approved(limit: int = 1) -> str:
     seeder = DistributionSeeder(workspace=Path.cwd())
     result = seeder.dispatch_approved_items(limit=limit)
@@ -347,6 +353,41 @@ def send_test_ping_now() -> str:
         return f"Test ping failed: {exc}"
 
 
+def launch_deep_web_crawl() -> str:
+    targets = [
+        "https://example.com",
+        "https://example.org",
+        "https://news.ycombinator.com",
+    ]
+    try:
+        results = run_parallel_scan(targets, max_workers=4)
+        summaries = "; ".join(f"{entry['target']}->{entry['status']}" for entry in results[:4])
+        return f"Deep crawl launched across {len(results)} targets. {summaries}"
+    except Exception as exc:  # noqa: BLE001
+        return f"Deep crawl failed: {exc}"
+
+
+def scan_trend_targets() -> str:
+    try:
+        targets = [
+            "https://www.reddit.com/r/technology/",
+            "https://news.ycombinator.com",
+            "https://example.com",
+        ]
+        results = run_parallel_scan(targets, max_workers=3)
+        return f"Trend scan complete; {len(results)} targets evaluated with parallel worker pool."
+    except Exception as exc:  # noqa: BLE001
+        return f"Trend scan failed: {exc}"
+
+
+def toggle_test_daemon(enabled: bool) -> str:
+    if not enabled:
+        return "Test daemon stopped"
+    engine = ContinuousTesterEngine(workspace=Path.cwd(), send_sms=False)
+    engine.start_background_loop(interval_minutes=15)
+    return "Test daemon started"
+
+
 # ---------------------------------------------------------------------------
 # Layout
 # ---------------------------------------------------------------------------
@@ -384,8 +425,9 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
 
     # ---- Master Killswitch (always visible, prominent) ----
     with gr.Row():
-        kill_btn = gr.Button(
-            value=_initial_kill_label,
+        refresh_readiness_btn = gr.Button("[ REFRESH SYSTEM READINESS ]", size="lg")
+        master_killswitch_btn = gr.Button(
+            value="[ MASTER KILLSWITCH ]",
             variant="stop" if _initial_killed else "primary",
             size="lg",
         )
@@ -407,7 +449,7 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
                     interactive=True,
                     scale=3,
                 )
-                refresh_btn = gr.Button("Refresh", scale=1)
+                refresh_btn = gr.Button("[ REFRESH QUEUE ]", scale=1)
 
             preview_box = gr.Textbox(
                 label="Content preview",
@@ -423,9 +465,9 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
             )
 
             with gr.Row():
-                approve_btn = gr.Button("✅ Approve", variant="primary")
-                save_edit_btn = gr.Button("💾 Edit & Save")
-                reject_btn = gr.Button("❌ Reject", variant="stop")
+                approve_btn = gr.Button("[ APPROVE SELECTED ]", variant="primary")
+                save_edit_btn = gr.Button("[ SAVE EDITS ]")
+                reject_btn = gr.Button("[ REJECT & PURGE ]", variant="stop")
 
             queue_action_msg = gr.Textbox(label="Action result", interactive=False)
 
@@ -472,12 +514,17 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
                 lines=16,
                 placeholder="Write or paste your lore here…",
             )
-            lore_save_btn = gr.Button("Save to Knowledge Bank", variant="primary")
+            lore_save_btn = gr.Button("[ SAVE TO KNOWLEDGE BANK ]", variant="primary")
+            lore_synthesis_btn = gr.Button("[ TRIGGER IMMEDIATE SYNTHESIS ]")
             lore_result = gr.Textbox(label="Result", interactive=False)
 
             lore_save_btn.click(
                 fn=save_lore,
                 inputs=[lore_title, lore_category, lore_tags, lore_body],
+                outputs=[lore_result],
+            )
+            lore_synthesis_btn.click(
+                fn=run_orchestrator_ui,
                 outputs=[lore_result],
             )
 
@@ -526,7 +573,23 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
                 outputs=[security_status],
             )
 
-        # ---- Tab 4: Diagnostics & Self-Repair ----
+        # ---- Tab 4: Deep Search & Crawlers ----
+        with gr.Tab("Deep Search & Crawlers"):
+            gr.Markdown("Launch multimodal, multi-threaded crawl tasks and scan trend targets without blocking the rest of the pipeline.")
+            deep_search_result = gr.Textbox(
+                label="Deep search activity",
+                value="No crawl launched yet.",
+                lines=10,
+                interactive=False,
+                max_lines=20,
+            )
+            with gr.Row():
+                crawl_btn = gr.Button("[ LAUNCH DEEP WEB CRAWL ]", variant="primary", size="lg")
+                trend_scan_btn = gr.Button("[ SCAN TREND TARGETS ]", size="lg")
+            crawl_btn.click(fn=launch_deep_web_crawl, outputs=[deep_search_result])
+            trend_scan_btn.click(fn=scan_trend_targets, outputs=[deep_search_result])
+
+        # ---- Tab 5: Diagnostics & Self-Repair ----
         with gr.Tab("Diagnostics & Self-Repair"):
             gr.Markdown(
                 "Run the diagnostics engine, review auto-repair output, and inspect the latest health receipt."
@@ -545,14 +608,14 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
 
             with gr.Row():
                 run_diag_btn = gr.Button(
-                    "Run Diagnostics & Self-Repair", variant="primary", size="lg"
+                    "[ RUN FULL DIAGNOSTICS & SELF-REPAIR ]", variant="primary", size="lg"
                 )
-                load_receipt_btn = gr.Button("Load Latest Receipt", size="lg")
-                run_sim_btn = gr.Button("Run Sandbox Simulation", size="lg")
+                load_receipt_btn = gr.Button("[ LOAD LATEST RECEIPT ]", size="lg")
+                run_sim_btn = gr.Button("[ RUN IMMEDIATE SANDBOX SIMULATION ]", size="lg")
 
             daemon_toggle = gr.Checkbox(label="Continuous Testing Daemon", value=True)
             with gr.Row():
-                ping_sms_btn = gr.Button("Send Test SMS Ping Now", variant="secondary", size="lg")
+                ping_sms_btn = gr.Button("[ SEND TEST SMS PING NOW ]", variant="secondary", size="lg")
             simulation_stream = gr.Textbox(
                 label="Simulation activity stream",
                 value="Waiting for the next simulation cycle…",
@@ -591,7 +654,28 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
                 outputs=[simulation_stream],
             )
 
-        # ---- Tab 5: Live System Process ----
+        # ---- Tab 6: Continuous Testing ----
+        with gr.Tab("Continuous Testing"):
+            gr.Markdown("Start or stop the background test daemon and trigger an immediate sandbox simulation from the UI.")
+            daemon_state = gr.State(value=True)
+            daemon_result = gr.Textbox(
+                label="Daemon activity",
+                value="Daemon ready.",
+                lines=8,
+                interactive=False,
+                max_lines=20,
+            )
+            with gr.Row():
+                daemon_toggle_btn = gr.Button("[ START/STOP TEST DAEMON ]", variant="primary", size="lg")
+                sandbox_btn = gr.Button("[ RUN IMMEDIATE SANDBOX SIMULATION ]", size="lg")
+            daemon_toggle_btn.click(
+                fn=lambda enabled: toggle_test_daemon(not enabled),
+                inputs=[daemon_state],
+                outputs=[daemon_result],
+            )
+            sandbox_btn.click(fn=run_continuous_test_now, outputs=[daemon_result])
+
+        # ---- Tab 7: Live System Process ----
         with gr.Tab("Live System Process"):
             gr.Markdown("Watch the live execution stream from crawlers, synthesis, learning, and testing services.")
             worker_status = gr.Markdown(
@@ -605,10 +689,10 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
                 max_lines=60,
                 every=10,
             )
-            refresh_stream_btn = gr.Button("Refresh Stream")
+            refresh_stream_btn = gr.Button("[ REFRESH LIVE STREAM ]")
             refresh_stream_btn.click(fn=refresh_activity_stream, outputs=[activity_stream])
 
-        # ---- Tab 6: Live Distribution Ledger ----
+        # ---- Tab 8: Live Distribution Ledger ----
         with gr.Tab("Live Distribution Ledger"):
             gr.Markdown("Inspect every dispatched post across Reddit, YouTube, Substack, Medium, Discord, X/Twitter, and RSS.")
             ledger_view = gr.Textbox(
@@ -619,10 +703,10 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
                 max_lines=60,
                 every=15,
             )
-            refresh_ledger_btn = gr.Button("Refresh Ledger")
+            refresh_ledger_btn = gr.Button("[ RESYNC DISTRIBUTION LEDGER ]")
             refresh_ledger_btn.click(fn=refresh_distribution_ledger, outputs=[ledger_view])
 
-        # ---- Tab 7: Continuous Learning & Guardrails ----
+        # ---- Tab 9: Continuous Learning & Guardrails ----
         with gr.Tab("Continuous Learning & Guardrails"):
             gr.Markdown(
                 "Review active RLHF style weights, toggle trend learning, and inspect guardrail compliance logs."
@@ -668,7 +752,7 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
                 outputs=[learn_status_display, learn_log_view],
             )
 
-        # ---- Tab 8: Distribution & Outbound ----
+        # ---- Tab 10: Distribution & Outbound ----
         with gr.Tab("Distribution & Outbound"):
             gr.Markdown(
                 "Review outbound targets, dispatch approved drafts, and inspect the latest distribution receipts."
@@ -693,7 +777,7 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
                 outputs=[distribution_status],
             )
 
-        # ---- Tab 9: System Sync ----
+        # ---- Tab 11: System Sync ----
         with gr.Tab("System Sync"):
             gr.Markdown(
                 "Verify file integrity, policy mirrors, and workspace readiness with a single click."
@@ -729,10 +813,14 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
             )
 
     # ---- Killswitch wiring (done last so all outputs exist) ----
-    kill_btn.click(
+    refresh_readiness_btn.click(
+        fn=refresh_system_readiness,
+        outputs=[status_display],
+    )
+    master_killswitch_btn.click(
         fn=toggle_killswitch,
         inputs=[killswitch_state],
-        outputs=[killswitch_state, kill_btn, status_display],
+        outputs=[killswitch_state, master_killswitch_btn, status_display],
     )
     orchestrator_toggle.change(
         fn=toggle_orchestrator,

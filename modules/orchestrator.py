@@ -13,6 +13,7 @@ import json
 import os
 import re
 import sys
+from concurrent.futures import ProcessPoolExecutor
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -53,6 +54,25 @@ class OrchestrationState:
     last_status: str | None = None
     drafts_staged: int = 0
     alerts_sent: int = 0
+
+
+def _score_text_payload(payload: tuple[str, str]) -> tuple[int, int]:
+    title, content = payload
+    lower = f"{title} {content}".lower()
+    score = 0
+    if len(content.split()) >= 40:
+        score += 10
+    if len(re.findall(r"\b(faction|keeper|archive|eclipse|bridge|star|city|capital|lantern|gate|river)\b", lower)) >= 3:
+        score += 20
+    if len(re.findall(r"\b(character|world|rule|note|timeline|plot|story|journal|spirit)\b", lower)) >= 2:
+        score += 15
+    if len(re.findall(r"\b(guard|fear|sacred|relic|journal|spirit|watch|moon|keepers)\b", lower)) >= 3:
+        score += 20
+    return score, len(content.split())
+
+
+def _score_chunk(chunk: list[dict[str, Any]]) -> int:
+    return sum(_score_text_payload((str(item.get("title", "")), str(item.get("content", ""))))[0] for item in chunk)
 
 
 class OrchestratorEngine:
@@ -122,6 +142,12 @@ class OrchestratorEngine:
             score += 20
         if len(combined.split()) >= 100:
             score += 15
+
+        if len(records) >= 4:
+            chunks = [records[i:i + 3] for i in range(0, len(records), 3)]
+            with ProcessPoolExecutor(max_workers=max(1, min(4, len(chunks)))) as executor:
+                chunk_scores = list(executor.map(_score_chunk, chunks))
+            score += sum(chunk_scores)
 
         ready = score >= 60
         reason = "Sufficient context available for a release draft" if ready else "Context remains fragmented or incomplete"
