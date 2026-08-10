@@ -9,11 +9,18 @@ Opens on http://127.0.0.1:7860 — localhost only, never exposed externally.
 
 from __future__ import annotations
 
+import os
 import shutil
 from datetime import datetime
 from pathlib import Path
 
 import gradio as gr
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass  # python-dotenv optional for environment loading
 
 try:
     from modules.lore_ingest import save_entry
@@ -54,6 +61,14 @@ REJECTED_DIR = Path("queue") / "rejected"
 
 for _d in (PENDING_DIR, APPROVED_DIR, REJECTED_DIR):
     _d.mkdir(parents=True, exist_ok=True)
+
+
+# ---------------------------------------------------------------------------
+# Authentication
+# ---------------------------------------------------------------------------
+
+CONTROL_PANEL_USER = os.getenv("CONTROL_PANEL_USER", "admin")
+CONTROL_PANEL_PASS = os.getenv("CONTROL_PANEL_PASS", "pantheon_admin")
 
 
 # ---------------------------------------------------------------------------
@@ -434,6 +449,7 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
 
 def main() -> None:
     demo.launch(
+        auth=(CONTROL_PANEL_USER, CONTROL_PANEL_PASS),
         server_name="127.0.0.1",  # localhost only — never bind to 0.0.0.0
         server_port=7860,
         share=False,
