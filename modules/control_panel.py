@@ -482,7 +482,7 @@ LORE_CATEGORIES = [
 _initial_killed = is_killswitch_active()
 _initial_kill_label = "🔴 KILLSWITCH — DEACTIVATE" if _initial_killed else "🟢 KILLSWITCH — ACTIVATE"
 
-with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
+with gr.Blocks(title="Pantheon Studios Control Panel", theme=gr.themes.Base()) as demo:
     gr.HTML(HUD_BANNER_HTML)
     gr.Markdown(
         "> **Secure LAN access** — this panel can be reached from other devices on the same local network. "
