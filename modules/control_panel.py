@@ -133,14 +133,40 @@ CSS_THEME = """
   opacity: 0.16;
   mask-image: linear-gradient(180deg, rgba(0,0,0,0.65), rgba(0,0,0,0));
 }
+body, p, span, h1, h2, h3, label, table, td, th, .prose, .gradio-container, .gradio-container .gradio-markdown, .gradio-container .gradio-textbox, .gradio-container .gradio-dropdown, .gradio-container .gradio-checkbox, .gradio-container .gradio-slider, .gradio-container .gr-box {
+  color: #e2e8f0 !important;
+}
 body, .gradio-container, .gradio-container .gradio-markdown, .gradio-container .gradio-textbox, .gradio-container .gradio-dropdown, .gradio-container .gradio-checkbox, .gradio-container .gradio-slider {
-  color: #eafcff;
+  color: #e2e8f0 !important;
 }
 h1, h2, h3, .hud-title {
   font-family: 'Orbitron', sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.22em;
-  text-shadow: 0 0 10px rgba(0,243,255,0.45);
+  color: #ffffff !important;
+  text-shadow: 0 0 10px #00f3ff;
+}
+.hud-title {
+  color: #ffffff !important;
+  text-shadow: 0 0 10px #00f3ff;
+}
+.gradio-container .gradio-markdown, .gradio-container .gradio-markdown p, .gradio-container .gradio-markdown span, .gradio-container .gradio-markdown table, .gradio-container .gradio-markdown td, .gradio-container .gradio-markdown th {
+  color: #d1f4ff !important;
+}
+.gradio-container .gradio-textbox, .gradio-container .gradio-dropdown, .gradio-container .gradio-checkbox, .gradio-container .gradio-slider, .gradio-container .gradio-button, .gradio-container .gradio-label {
+  color: #a5f3fc !important;
+}
+.gradio-container .gradio-label, .gradio-container label, .gradio-container .block label, .gradio-container .gradio-dropdown .wrap, .gradio-container .gradio-dropdown .options, .gradio-container .gradio-dropdown .option {
+  color: #a5f3fc !important;
+}
+.gradio-container table th {
+  color: #b0ecfb !important;
+}
+.gradio-container table td, .gradio-container table tr {
+  color: #ffffff !important;
+}
+.gradio-container .gradio-container .prose, .gradio-container .prose {
+  color: #d1f4ff !important;
 }
 .hud-card, .gradio-container .gr-box, .gradio-container .gr-form, .gradio-container .block, .gradio-container .tabitem, .gradio-container .tabs {
   background: rgba(14, 20, 36, 0.84) !important;
