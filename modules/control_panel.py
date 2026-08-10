@@ -117,7 +117,30 @@ REJECTED_DIR = Path("queue") / "rejected"
 CSS_THEME = """
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Fira+Code:wght@400;500;700&display=swap');
 
-:root { color-scheme: dark; }
+:root, .dark, body {
+  color-scheme: dark;
+  --body-text-color: #ffffff !important;
+  --body-text-color-subdued: #a5f3fc !important;
+  --body-text-color-subdued-dark: #a5f3fc !important;
+  --block-label-text-color: #00f3ff !important;
+  --block-label-text-color-dark: #00f3ff !important;
+  --table-cell-text-color: #ffffff !important;
+  --table-cell-text-color-dark: #ffffff !important;
+  --input-text-color: #ffffff !important;
+  --input-text-color-dark: #ffffff !important;
+  --checkbox-label-text-color: #d1f4ff !important;
+  --block-title-text-color: #00f3ff !important;
+  --subdued-text-color: #a5f3fc !important;
+}
+* { color-scheme: dark; }
+p, span, label, td, th, div, input, textarea, select, button, blockquote, code, pre, .prose *, .prose {
+  color: #e2e8f0 !important;
+  text-shadow: none !important;
+}
+h1, h2, h3, h4, .block-title, label span {
+  color: #00f3ff !important;
+  font-weight: 600 !important;
+}
 .gradio-container {
   background: radial-gradient(circle at top left, rgba(0,243,255,0.08), transparent 24%), linear-gradient(180deg, #06080e 0%, #0b0f19 100%);
   font-family: 'Orbitron', sans-serif;
@@ -157,13 +180,17 @@ h1, h2, h3, .hud-title {
   color: #a5f3fc !important;
 }
 .gradio-container .gradio-label, .gradio-container label, .gradio-container .block label, .gradio-container .gradio-dropdown .wrap, .gradio-container .gradio-dropdown .options, .gradio-container .gradio-dropdown .option {
-  color: #a5f3fc !important;
+  color: #00f3ff !important;
 }
 .gradio-container table th {
-  color: #b0ecfb !important;
+  color: #00f3ff !important;
 }
 .gradio-container table td, .gradio-container table tr {
   color: #ffffff !important;
+}
+.gradio-container textarea, .gradio-container .hud-terminal, .gradio-container .gradio-textbox textarea {
+  color: #ffffff !important;
+  background: #090d16 !important;
 }
 .gradio-container .gradio-container .prose, .gradio-container .prose {
   color: #d1f4ff !important;
