@@ -155,24 +155,24 @@ def _patch_control_panel_gradio_api() -> bool:
     updated = original
 
     updated = updated.replace(
-        'with gr.Blocks(title="Pantheon Studios Control Panel", css=CSS_THEME) as demo:',
-        'with gr.Blocks(title="Pantheon Studios Control Panel", theme=gr.themes.Base()) as demo:',
-    )
-    updated = updated.replace(
         'with gr.Blocks(title="Pantheon Studios Control Panel") as demo:',
+        'with gr.Blocks(title="Pantheon Studios Control Panel", css=CSS_THEME, theme=gr.themes.Base()) as demo:',
+    )
+    updated = updated.replace(
+        'with gr.Blocks(title="Pantheon Studios Control Panel", css=CSS_THEME) as demo:',
+        'with gr.Blocks(title="Pantheon Studios Control Panel", css=CSS_THEME, theme=gr.themes.Base()) as demo:',
+    )
+    updated = updated.replace(
         'with gr.Blocks(title="Pantheon Studios Control Panel", theme=gr.themes.Base()) as demo:',
+        'with gr.Blocks(title="Pantheon Studios Control Panel", css=CSS_THEME, theme=gr.themes.Base()) as demo:',
     )
     updated = updated.replace(
-        '        theme=gr.themes.Base(),\n',
-        '',
-    )
-    updated = updated.replace(
-        '        show_error=True,\n        theme=gr.themes.Base(),\n',
         '        show_error=True,\n        css=CSS_THEME,\n',
+        '        show_error=True,\n',
     )
     updated = updated.replace(
-        '        show_error=True,\n        theme=gr.themes.Base(),\n    )',
         '        show_error=True,\n        css=CSS_THEME,\n    )',
+        '        show_error=True,\n    )',
     )
 
     if updated != original:

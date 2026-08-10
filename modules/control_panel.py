@@ -14,10 +14,14 @@ import shutil
 import socket
 import threading
 import time
+import warnings
 from datetime import datetime
 from pathlib import Path
 
 import gradio as gr
+
+warnings.filterwarnings("ignore", message=r"The 'theme' parameter in the Blocks constructor")
+warnings.filterwarnings("ignore", message=r"The 'css' parameter in the Blocks constructor")
 
 try:
     from dotenv import load_dotenv
@@ -80,6 +84,30 @@ def _resolve_local_ip() -> str:
             return sock.getsockname()[0]
     except Exception:
         return "127.0.0.1"
+
+
+def _find_open_port(start_port: int = 7860, max_attempts: int = 20) -> int:
+    for port in range(start_port, start_port + max_attempts):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            try:
+                sock.bind(("0.0.0.0", port))
+                return port
+            except OSError:
+                continue
+    return 0
+
+
+def _resolve_server_port() -> int:
+    env_port = os.getenv("GRADIO_SERVER_PORT")
+    if env_port:
+        try:
+            port = int(env_port)
+            if port > 0:
+                return port
+        except ValueError:
+            pass
+    return _find_open_port()
 
 
 PENDING_DIR = Path("queue") / "pending"
@@ -482,7 +510,7 @@ LORE_CATEGORIES = [
 _initial_killed = is_killswitch_active()
 _initial_kill_label = "🔴 KILLSWITCH — DEACTIVATE" if _initial_killed else "🟢 KILLSWITCH — ACTIVATE"
 
-with gr.Blocks(title="Pantheon Studios Control Panel", theme=gr.themes.Base()) as demo:
+with gr.Blocks(title="Pantheon Studios Control Panel", css=CSS_THEME, theme=gr.themes.Base()) as demo:
     gr.HTML(HUD_BANNER_HTML)
     gr.Markdown(
         "> **Secure LAN access** — this panel can be reached from other devices on the same local network. "
@@ -928,12 +956,13 @@ with gr.Blocks(title="Pantheon Studios Control Panel", theme=gr.themes.Base()) a
 
 def main() -> None:
     local_ip = _resolve_local_ip()
+    launch_port = _resolve_server_port()
     print("=" * 60)
     print("Pantheon Studios control panel")
     print("=" * 60)
-    print("On this PC: http://localhost:7860")
-    print("On this PC: http://127.0.0.1:7860")
-    print(f"On phone/laptop (same Wi-Fi): http://{local_ip}:7860")
+    print(f"On this PC: http://localhost:{launch_port}")
+    print(f"On this PC: http://127.0.0.1:{launch_port}")
+    print(f"On phone/laptop (same Wi-Fi): http://{local_ip}:{launch_port}")
     print("Credentials come from the workspace .env file.")
     print("=" * 60)
     try:
@@ -970,10 +999,9 @@ def main() -> None:
     demo.launch(
         auth=(CONTROL_PANEL_USER, CONTROL_PANEL_PASS),
         server_name="0.0.0.0",
-        server_port=7860,
+        server_port=launch_port,
         share=False,
         show_error=True,
-        css=CSS_THEME,
     )
 
 
