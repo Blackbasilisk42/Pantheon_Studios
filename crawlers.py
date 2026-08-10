@@ -16,9 +16,9 @@ import re
 
 import requests
 from bs4 import BeautifulSoup
+from modules.crawler_engine import CrawlerEngine
 
 
-USER_AGENT = "PantheonStudiosAI-Learner/2.0"
 TIMEOUT_SECONDS = 20
 
 
@@ -48,14 +48,10 @@ def normalize_whitespace(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
-def fetch_page(url: str) -> requests.Response:
-    headers = {
-        "User-Agent": USER_AGENT,
-        "Accept": "text/html,application/xhtml+xml",
-    }
-    response = requests.get(url, headers=headers, timeout=TIMEOUT_SECONDS)
-    response.raise_for_status()
-    return response
+def fetch_page(url: str) -> tuple[requests.Response, dict[str, str], float]:
+    engine = CrawlerEngine(timeout_seconds=TIMEOUT_SECONDS)
+    crawl_response = engine.fetch(url)
+    return crawl_response.response, crawl_response.used_headers, crawl_response.delay_seconds
 
 
 def analyze_html(url: str, response: requests.Response) -> CrawlReport:
@@ -101,7 +97,7 @@ def analyze_html(url: str, response: requests.Response) -> CrawlReport:
     )
 
 
-def render_report(report: CrawlReport) -> str:
+def render_report(report: CrawlReport, used_headers: dict[str, str], delay_seconds: float) -> str:
     keyword_lines = "\n".join(
         f"- {word}: {count}" for word, count in report.top_keywords
     ) or "- No strong keywords detected"
@@ -112,7 +108,8 @@ def render_report(report: CrawlReport) -> str:
 - URL: {report.url}
 - Fetched At: {report.fetched_at}
 - HTTP Status: {report.status_code}
-- User-Agent: {USER_AGENT}
+- User-Agent: {used_headers.get('User-Agent', 'unknown')}
+- Request Delay (seconds): {delay_seconds:.2f}
 
 ## Metrics
 - Word Count: {report.word_count}
@@ -129,7 +126,12 @@ def render_report(report: CrawlReport) -> str:
 """
 
 
-def save_report(report: CrawlReport, workspace: Path) -> Path:
+def save_report(
+    report: CrawlReport,
+    workspace: Path,
+    used_headers: dict[str, str],
+    delay_seconds: float,
+) -> Path:
     filename = f"intelligence_log_{slugify(report.title)}.md"
     path = workspace / filename
 
@@ -138,7 +140,7 @@ def save_report(report: CrawlReport, workspace: Path) -> Path:
         path = workspace / f"intelligence_log_{slugify(report.title)}_{suffix}.md"
         suffix += 1
 
-    path.write_text(render_report(report), encoding="utf-8")
+    path.write_text(render_report(report, used_headers, delay_seconds), encoding="utf-8")
     return path
 
 
@@ -157,7 +159,7 @@ def main() -> None:
         return
 
     try:
-        response = fetch_page(target_url)
+        response, used_headers, delay_seconds = fetch_page(target_url)
         report = analyze_html(target_url, response)
     except requests.RequestException as exc:
         print(f"Fetch failed: {exc}")
@@ -166,7 +168,7 @@ def main() -> None:
         print(f"Unexpected crawler error: {exc}")
         return
 
-    output_path = save_report(report, Path.cwd())
+    output_path = save_report(report, Path.cwd(), used_headers, delay_seconds)
     print(f"Intelligence report created: {output_path.name}")
 
 

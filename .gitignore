@@ -1,0 +1,29 @@
+# Local secrets
+.env
+.env.*
+
+# Private studio data
+lore/*
+queue/*
+intelligence/*
+
+# Keep queue and intelligence folders in place
+!queue/pending/
+!queue/approved/
+!queue/rejected/
+!queue/pending/.gitkeep
+!queue/approved/.gitkeep
+!queue/rejected/.gitkeep
+!intelligence/.gitkeep
+
+# Python cache/build artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+
+# Logs
+*.log
+logs/
