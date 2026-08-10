@@ -186,17 +186,19 @@ LORE_CATEGORIES = [
 _initial_killed = is_killswitch_active()
 _initial_kill_label = "🔴 KILLSWITCH — DEACTIVATE" if _initial_killed else "🟢 KILLSWITCH — ACTIVATE"
 
-with gr.Blocks(title="Pantheon Studios Control Panel", theme=gr.themes.Base()) as demo:
+with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
     gr.Markdown("# Pantheon Studios — Control Panel")
     gr.Markdown(
         "> **Local only** — this interface is never accessible outside your machine. "
         "Nothing is sent or published without your explicit approval."
     )
 
-    # ---- Readiness badge wiring ----
     # ---- Readiness badge (live, auto-refreshes every 30 s) ----
     with gr.Row():
         readiness_badge = gr.Markdown(value=readiness_badge_md, every=30)
+
+    # ---- State management ----
+    killswitch_state = gr.State(value=_initial_killed)
 
     # ---- Status bar (always visible) ----
     with gr.Row():
@@ -436,6 +438,7 @@ def main() -> None:
         server_port=7860,
         share=False,
         show_error=True,
+        theme=gr.themes.Base(),
     )
 
 
