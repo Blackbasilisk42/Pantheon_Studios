@@ -72,6 +72,16 @@ except ModuleNotFoundError:
     from activity_logger import get_activity_logger  # type: ignore[no-redef]
     from heavy_crawler import run_parallel_scan  # type: ignore[no-redef]
 
+
+def _resolve_local_ip() -> str:
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+            sock.connect(("8.8.8.8", 80))
+            return sock.getsockname()[0]
+    except Exception:
+        return "127.0.0.1"
+
+
 PENDING_DIR = Path("queue") / "pending"
 APPROVED_DIR = Path("queue") / "approved"
 REJECTED_DIR = Path("queue") / "rejected"
@@ -188,36 +198,6 @@ for _d in (PENDING_DIR, APPROVED_DIR, REJECTED_DIR):
 
 CONTROL_PANEL_USER = os.getenv("CONTROL_PANEL_USER", "admin")
 CONTROL_PANEL_PASS = os.getenv("CONTROL_PANEL_PASS", "@Sammyzzz3Jimbo21")
-
-
-def _resolve_local_ip() -> str:
-    candidates: list[str] = []
-
-    try:
-        hostname = socket.gethostname()
-        for family, _, _, _, sockaddr in socket.getaddrinfo(hostname, None, type=socket.SOCK_DGRAM):
-            if family == socket.AF_INET:
-                ip = sockaddr[0]
-                if ip and not ip.startswith("127.") and ip not in candidates:
-                    candidates.append(ip)
-    except OSError:
-        pass
-
-    try:
-        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
-            sock.connect(("8.8.8.8", 80))
-            ip = sock.getsockname()[0]
-            if ip and not ip.startswith("127.") and ip not in candidates:
-                candidates.append(ip)
-    except OSError:
-        pass
-
-    for ip in candidates:
-        if ip not in {"127.0.0.1", "0.0.0.0"}:
-            return ip
-
-    return "127.0.0.1"
-
 
 # ---------------------------------------------------------------------------
 # Helpers
