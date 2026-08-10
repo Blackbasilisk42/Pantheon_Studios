@@ -39,6 +39,7 @@ try:
         readiness_badge_md,
         run_sync_ui,
     )
+    from modules.orchestrator import orchestrator_status_md, run_orchestrator_ui, toggle_orchestrator
 except ModuleNotFoundError:
     from lore_ingest import save_entry  # type: ignore[no-redef]
     from system_state import get_state, is_killswitch_active, set_killswitch  # type: ignore[no-redef]
@@ -54,6 +55,11 @@ except ModuleNotFoundError:
         latest_sync_report_text,
         readiness_badge_md,
         run_sync_ui,
+    )
+    from orchestrator import (  # type: ignore[no-redef]
+        orchestrator_status_md,
+        run_orchestrator_ui,
+        toggle_orchestrator,
     )
 
 PENDING_DIR = Path("queue") / "pending"
@@ -302,6 +308,7 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
     with gr.Row():
         status_display = gr.Markdown(value=_status_md(), every=10)
 
+    orchestrator_status_display = gr.Markdown(value=orchestrator_status_md())
     connection_banner = gr.Markdown(value=_connection_banner())
 
     # ---- Master Killswitch (always visible, prominent) ----
@@ -311,6 +318,7 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
             variant="stop" if _initial_killed else "primary",
             size="lg",
         )
+        orchestrator_toggle = gr.Checkbox(label="Autonomous Orchestrator", value=True)
 
     gr.Markdown("---")
 
@@ -393,7 +401,7 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
                 lines=16,
                 placeholder="Write or paste your lore here…",
             )
-            lore_save_btn = gr.Button("Save to Lore", variant="primary")
+            lore_save_btn = gr.Button("Save to Knowledge Bank", variant="primary")
             lore_result = gr.Textbox(label="Result", interactive=False)
 
             lore_save_btn.click(
@@ -573,6 +581,15 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
         fn=toggle_killswitch,
         inputs=[killswitch_state],
         outputs=[killswitch_state, kill_btn, status_display],
+    )
+    orchestrator_toggle.change(
+        fn=toggle_orchestrator,
+        inputs=[orchestrator_toggle],
+        outputs=[orchestrator_status_display],
+    )
+    orchestrator_toggle.change(
+        fn=run_orchestrator_ui,
+        outputs=[orchestrator_status_display],
     )
 
 

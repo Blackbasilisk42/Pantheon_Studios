@@ -156,6 +156,7 @@ REQUIRED_FILES = [
     "modules/distribution_seeder.py",
     "modules/approval_gate.py",
     "modules/notifier.py",
+    "modules/orchestrator.py",
     "publishers/base_publisher.py",
 ]
 
@@ -396,6 +397,16 @@ def _pipeline_check_publisher() -> CheckResult:
         return CheckResult("Pipeline: Publisher init", "fail", str(exc))
 
 
+def _pipeline_check_orchestrator() -> CheckResult:
+    try:
+        from modules.orchestrator import OrchestratorEngine
+        engine = OrchestratorEngine()
+        assert hasattr(engine, "run_cycle")
+        return CheckResult("Pipeline: Orchestrator init", "pass", "OrchestratorEngine OK")
+    except Exception as exc:
+        return CheckResult("Pipeline: Orchestrator init", "fail", str(exc))
+
+
 def _pipeline_check_killswitch() -> CheckResult:
     try:
         from modules.system_state import abort_if_killed, is_killswitch_active, set_killswitch
@@ -464,6 +475,7 @@ class DiagnosticsEngine:
         report.results.append(_pipeline_check_seeder())
         report.results.append(_pipeline_check_notifier())
         report.results.append(_pipeline_check_publisher())
+        report.results.append(_pipeline_check_orchestrator())
         report.results.append(_pipeline_check_killswitch())
 
         # Persist receipt

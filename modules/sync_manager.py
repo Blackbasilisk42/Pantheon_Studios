@@ -65,6 +65,7 @@ PIPELINE_MODULES = [
     "modules.notifier",
     "modules.learning_engine",
     "modules.diagnostics",
+    "modules.orchestrator",
     "publishers.anonymous_feed_publisher",
 ]
 
