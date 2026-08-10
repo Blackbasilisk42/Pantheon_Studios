@@ -9,8 +9,10 @@ import requests
 
 try:
     from modules.security_manager import SecurityManager
+    from modules.system_state import abort_if_killed
 except ModuleNotFoundError:
-    from security_manager import SecurityManager
+    from security_manager import SecurityManager  # type: ignore[no-redef]
+    from system_state import abort_if_killed  # type: ignore[no-redef]
 
 
 @dataclass
@@ -30,6 +32,7 @@ class CrawlerEngine:
         self.security = security or SecurityManager()
 
     def fetch(self, url: str) -> CrawlResponse:
+        abort_if_killed()
         headers = self.security.random_browser_headers()
         delay = self.security.wait_with_jitter(min_seconds=2, max_seconds=7)
         response = requests.get(url, headers=headers, timeout=self.timeout_seconds)

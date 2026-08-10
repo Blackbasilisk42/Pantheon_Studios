@@ -10,8 +10,12 @@ import re
 
 try:
     from modules.security_manager import SecurityManager
+    from modules.notifier import send_pending_review_alert
+    from modules.system_state import abort_if_killed
 except ModuleNotFoundError:
-    from security_manager import SecurityManager
+    from security_manager import SecurityManager  # type: ignore[no-redef]
+    from notifier import send_pending_review_alert  # type: ignore[no-redef]
+    from system_state import abort_if_killed  # type: ignore[no-redef]
 
 
 PENDING_DIR = Path("queue") / "pending"
@@ -108,6 +112,7 @@ This draft is for human review and approval before any external distribution.
         return artifacts
 
     def stage_pending(self) -> list[Path]:
+        abort_if_killed()
         created: list[Path] = []
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
@@ -117,6 +122,10 @@ This draft is for human review and approval before any external distribution.
             output = self.pending_dir / filename
             output.write_text(sanitized.rstrip() + "\n", encoding="utf-8")
             created.append(output)
+            try:
+                send_pending_review_alert(artifact.title)
+            except Exception as exc:  # noqa: BLE001 — notification failure must not block staging
+                print(f"[notifier] Warning: could not send SMS alert for '{artifact.title}': {exc}")
 
         return created
 

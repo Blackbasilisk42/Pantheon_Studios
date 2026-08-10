@@ -1,0 +1,13 @@
+# Pantheon Studios — Python dependencies
+
+# Web control panel
+gradio>=4.0,<6.0
+
+# HTTP crawling
+requests>=2.31
+
+# SMS notifications
+twilio>=8.0
+
+# Environment config
+python-dotenv>=1.0

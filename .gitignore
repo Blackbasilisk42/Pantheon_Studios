@@ -1,11 +1,19 @@
-# Local secrets
+# Local secrets — never commit actual credentials
 .env
-.env.*
+.env.local
+
+# Runtime state files — generated at runtime, not source-controlled
+.system_state.json
+.learning_state.json
 
 # Private studio data
 lore/*
 queue/*
 intelligence/*
+
+# Track the authority rules doc and env template alongside code
+!lore/immutable_rules.md
+!.env.example
 
 # Keep queue and intelligence folders in place
 !queue/pending/

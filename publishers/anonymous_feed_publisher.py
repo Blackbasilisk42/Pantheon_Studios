@@ -8,8 +8,10 @@ import re
 
 try:
     from publishers.base_publisher import BasePublisher, PublishItem
+    from modules.system_state import abort_if_killed
 except ModuleNotFoundError:
-    from base_publisher import BasePublisher, PublishItem
+    from base_publisher import BasePublisher, PublishItem  # type: ignore[no-redef]
+    from modules.system_state import abort_if_killed  # type: ignore[no-redef]
 
 
 APPROVED_DIR = Path("queue") / "approved"
@@ -54,6 +56,7 @@ class AnonymousFeedPublisher(BasePublisher):
         )
 
     def publish(self, item: PublishItem) -> Path:
+        abort_if_killed()
         self._ensure_public_policy()
         filename = f"{slugify(item.title)}.md"
         destination = self.output_dir / filename

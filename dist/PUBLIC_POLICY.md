@@ -1,4 +1,4 @@
-# Public Policy
+# Privacy and Copyright Policy
 
 [Fair enough—let's skip relying on Copilot's agent context for this one and get the exact text straight into your hands.
 
@@ -89,6 +89,9 @@ Pantheon Studios frequently releases sanitized media kits, trend briefs, and pre
 Pantheon Studios reserves the right to modify, amend, or update this policy document at any time without prior notice. The current version published within official distribution channels represents the binding governance standard.
 If you want, I can also generate:]
 
-Paste the approved public-facing policy text here.
+Paste Pantheon Studios private privacy and copyright policy text here.
 
-This file is referenced by generated media kits for legal context.
+## Notes
+- This is a system-wide policy file for the full workspace.
+- Keep this file local-only unless explicitly approved.
+- Align with dist/PUBLIC_POLICY.md before public distribution.

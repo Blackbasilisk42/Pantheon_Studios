@@ -8,6 +8,7 @@ from pathlib import Path
 import re
 
 from publishers.base_publisher import BasePublisher, PublishItem
+from modules.system_state import abort_if_killed
 
 
 def slugify(text: str, max_length: int = 80) -> str:
@@ -26,6 +27,7 @@ class LocalMarkdownPublisher(BasePublisher):
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
     def publish(self, item: PublishItem) -> Path:
+        abort_if_killed()
         filename = f"{slugify(item.title)}.md"
         path = self.output_dir / filename
 
