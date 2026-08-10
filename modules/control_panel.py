@@ -72,13 +72,33 @@ CONTROL_PANEL_USER = os.getenv("CONTROL_PANEL_USER", "admin")
 CONTROL_PANEL_PASS = os.getenv("CONTROL_PANEL_PASS", "@Sammyzzz3Jimbo21")
 
 
-def _local_ip() -> str:
+def _resolve_local_ip() -> str:
+    candidates: list[str] = []
+
+    try:
+        hostname = socket.gethostname()
+        for family, _, _, _, sockaddr in socket.getaddrinfo(hostname, None, type=socket.SOCK_DGRAM):
+            if family == socket.AF_INET:
+                ip = sockaddr[0]
+                if ip and not ip.startswith("127.") and ip not in candidates:
+                    candidates.append(ip)
+    except OSError:
+        pass
+
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
             sock.connect(("8.8.8.8", 80))
-            return sock.getsockname()[0]
+            ip = sock.getsockname()[0]
+            if ip and not ip.startswith("127.") and ip not in candidates:
+                candidates.append(ip)
     except OSError:
-        return "127.0.0.1"
+        pass
+
+    for ip in candidates:
+        if ip not in {"127.0.0.1", "0.0.0.0"}:
+            return ip
+
+    return "127.0.0.1"
 
 
 # ---------------------------------------------------------------------------
@@ -120,9 +140,10 @@ def _status_md() -> str:
 
 
 def _connection_banner() -> str:
-    ip = _local_ip()
+    ip = _resolve_local_ip()
     return (
-        f"🌐 Connect from another device on the same LAN at http://{ip}:7860\n"
+        f"🌐 On this PC: http://localhost:7860 or http://127.0.0.1:7860\n"
+        f"📱 On phone/laptop (same Wi-Fi): http://{ip}:7860\n"
         f"🔐 Sign in with the credentials stored in the workspace .env file."
     )
 
@@ -556,10 +577,15 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
 
 
 def main() -> None:
-    local_ip = _local_ip()
-    print("Pantheon Studios control panel starting...")
-    print(f"Connect from another device on the same LAN at http://{local_ip}:7860")
-    print("Use the credentials from the workspace .env file to sign in.")
+    local_ip = _resolve_local_ip()
+    print("=" * 60)
+    print("Pantheon Studios control panel")
+    print("=" * 60)
+    print("On this PC: http://localhost:7860")
+    print("On this PC: http://127.0.0.1:7860")
+    print(f"On phone/laptop (same Wi-Fi): http://{local_ip}:7860")
+    print("Credentials come from the workspace .env file.")
+    print("=" * 60)
     demo.launch(
         auth=(CONTROL_PANEL_USER, CONTROL_PANEL_PASS),
         server_name="0.0.0.0",
