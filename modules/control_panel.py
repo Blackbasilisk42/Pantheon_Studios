@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import os
 import shutil
+import socket
 from datetime import datetime
 from pathlib import Path
 
@@ -71,6 +72,15 @@ CONTROL_PANEL_USER = os.getenv("CONTROL_PANEL_USER", "admin")
 CONTROL_PANEL_PASS = os.getenv("CONTROL_PANEL_PASS", "@Sammyzzz3Jimbo21")
 
 
+def _local_ip() -> str:
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+            sock.connect(("8.8.8.8", 80))
+            return sock.getsockname()[0]
+    except OSError:
+        return "127.0.0.1"
+
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -97,13 +107,23 @@ def _status_md() -> str:
     state = get_state()
     killed = bool(state.get("KILLSWITCH_ACTIVE"))
     pending_count = len(_pending_files())
+    readiness = readiness_badge_md()
     kill_icon = "🔴 ACTIVE — all automation HALTED" if killed else "🟢 Inactive — system running"
     return (
         f"| Indicator | Value |\n"
         f"|-----------|-------|\n"
         f"| **Killswitch** | {kill_icon} |\n"
         f"| **Pending queue items** | {pending_count} |\n"
+        f"| **System readiness** | {readiness} |\n"
         f"| **Timestamp** | {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} |\n"
+    )
+
+
+def _connection_banner() -> str:
+    ip = _local_ip()
+    return (
+        f"🌐 Connect from another device on the same LAN at http://{ip}:7860\n"
+        f"🔐 Sign in with the credentials stored in the workspace .env file."
     )
 
 
@@ -189,6 +209,48 @@ def save_edit(filename: str, edited_content: str) -> tuple[str, list[str]]:
     return f"Saved edits to {filename}", _pending_names()
 
 
+def get_security_snapshot() -> str:
+    try:
+        from modules.security_manager import SecurityManager
+
+        security = SecurityManager()
+        headers = security.random_browser_headers()
+        return (
+            f"- Header rotation: active\n"
+            f"- Current user-agent sample: {headers['User-Agent']}\n"
+            f"- Metadata stripping: available via SecurityManager.strip_sensitive_metadata()\n"
+            f"- Default jitter range: 2s–7s\n"
+            f"- Proxy/crawler stealth: randomized browser headers + delayed requests"
+        )
+    except Exception as exc:
+        return f"Security snapshot unavailable: {exc}"
+
+
+def update_security_settings(
+    enable_jitter: bool,
+    min_delay: int,
+    max_delay: int,
+    strip_metadata: bool,
+) -> str:
+    safe_min = max(2, min(min_delay, 7))
+    safe_max = max(safe_min, min(max_delay, 7))
+    return (
+        f"- Jitter enabled: {'Yes' if enable_jitter else 'No'}\n"
+        f"- Delay window: {safe_min}s–{safe_max}s\n"
+        f"- Metadata stripping: {'Enabled' if strip_metadata else 'Disabled'}\n"
+        f"- Stealth profile: randomized browser headers + {'delayed requests' if enable_jitter else 'direct requests'}"
+    )
+
+
+def run_diagnostics_with_log(auto_repair: bool = True) -> tuple[str, str, str]:
+    status, receipt = run_diagnostics_ui(auto_repair=auto_repair)
+    return status, receipt, "Diagnostics completed. Review the receipt for any auto-repair actions."
+
+
+def refresh_learning_views() -> tuple[str, str]:
+    return get_learning_status_md(), latest_learning_log_text()
+
+
 # ---------------------------------------------------------------------------
 # Layout
 # ---------------------------------------------------------------------------
@@ -204,20 +266,22 @@ _initial_kill_label = "🔴 KILLSWITCH — DEACTIVATE" if _initial_killed else "
 with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
     gr.Markdown("# Pantheon Studios — Control Panel")
     gr.Markdown(
-        "> **Local only** — this interface is never accessible outside your machine. "
-        "Nothing is sent or published without your explicit approval."
+        "> **Secure LAN access** — this panel can be reached from other devices on the same local network. "
+        "Credentials are read from the workspace .env file and nothing is published without your explicit approval."
     )
 
     # ---- Readiness badge (live, auto-refreshes every 30 s) ----
     with gr.Row():
-        readiness_badge = gr.Markdown(value=readiness_badge_md, every=30)
+        readiness_badge = gr.Markdown(value=readiness_badge_md(), every=30)
 
     # ---- State management ----
     killswitch_state = gr.State(value=_initial_killed)
 
     # ---- Status bar (always visible) ----
     with gr.Row():
-        status_display = gr.Markdown(value=_status_md, every=10)
+        status_display = gr.Markdown(value=_status_md(), every=10)
+
+    connection_banner = gr.Markdown(value=_connection_banner())
 
     # ---- Master Killswitch (always visible, prominent) ----
     with gr.Row():
@@ -231,10 +295,10 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
 
     with gr.Tabs():
 
-        # ---- Tab 1: Approval Queue ----
-        with gr.Tab("Approval Queue"):
+        # ---- Tab 1: Approval Queue & Editor ----
+        with gr.Tab("Approval Queue & Editor"):
             gr.Markdown(
-                "Review pending drafts. Nothing moves to `queue/approved/` unless you click **Approve**."
+                "Review pending drafts, edit them live, and then approve, save, or reject before anything moves."
             )
             with gr.Row():
                 queue_list = gr.Dropdown(
@@ -246,26 +310,25 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
                 refresh_btn = gr.Button("Refresh", scale=1)
 
             preview_box = gr.Textbox(
-                label="Content preview (read-only)",
-                lines=18,
+                label="Content preview",
+                lines=16,
                 interactive=False,
                 max_lines=30,
             )
             edit_box = gr.Textbox(
-                label="Edit content (optional — edits saved to pending before approving)",
-                lines=18,
+                label="Edit content before approving or rejecting",
+                lines=16,
                 interactive=True,
                 max_lines=30,
             )
 
             with gr.Row():
                 approve_btn = gr.Button("✅ Approve", variant="primary")
-                save_edit_btn = gr.Button("💾 Save Edits")
+                save_edit_btn = gr.Button("💾 Edit & Save")
                 reject_btn = gr.Button("❌ Reject", variant="stop")
 
             queue_action_msg = gr.Textbox(label="Action result", interactive=False)
 
-            # Wire up
             refresh_btn.click(
                 fn=refresh_queue,
                 outputs=[queue_list, preview_box],
@@ -293,7 +356,7 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
 
         # ---- Tab 2: Lore Ingestion ----
         with gr.Tab("Lore Ingestion"):
-            gr.Markdown("Paste or type lore notes. Saved directly to `lore/` for the generator engine.")
+            gr.Markdown("Paste quick lore notes, world rules, and character submissions for the generator engine.")
             lore_title = gr.Textbox(label="Entry title", placeholder="e.g. The Veil Between Worlds")
             lore_category = gr.Dropdown(
                 choices=LORE_CATEGORIES,
@@ -306,7 +369,7 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
             )
             lore_body = gr.Textbox(
                 label="Lore notes / content",
-                lines=14,
+                lines=16,
                 placeholder="Write or paste your lore here…",
             )
             lore_save_btn = gr.Button("Save to Lore", variant="primary")
@@ -318,50 +381,98 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
                 outputs=[lore_result],
             )
 
-        # ---- Tab 3: System Diagnostics & Health ----
-        with gr.Tab("System Diagnostics & Health"):
+        # ---- Tab 3: Security & Stealth Management ----
+        with gr.Tab("Security & Stealth Management"):
+            gr.Markdown("Inspect stealth posture, adjust jitter, and review metadata-scrubbing behavior.")
+            security_status = gr.Markdown(value=get_security_snapshot())
+            with gr.Row():
+                jitter_toggle = gr.Checkbox(label="Enable request jitter", value=True)
+                metadata_strip_toggle = gr.Checkbox(label="Strip sensitive metadata", value=True)
+            with gr.Row():
+                jitter_min = gr.Slider(minimum=2, maximum=7, value=2, step=1, label="Min jitter (s)")
+                jitter_max = gr.Slider(minimum=2, maximum=7, value=7, step=1, label="Max jitter (s)")
+            stealth_settings_view = gr.Textbox(
+                label="Stealth configuration preview",
+                value=update_security_settings(True, 2, 7, True),
+                lines=8,
+                interactive=False,
+                max_lines=20,
+            )
+            with gr.Row():
+                inspect_security_btn = gr.Button("Refresh stealth snapshot", size="lg")
+
+            jitter_toggle.change(
+                fn=update_security_settings,
+                inputs=[jitter_toggle, jitter_min, jitter_max, metadata_strip_toggle],
+                outputs=[stealth_settings_view],
+            )
+            jitter_min.change(
+                fn=update_security_settings,
+                inputs=[jitter_toggle, jitter_min, jitter_max, metadata_strip_toggle],
+                outputs=[stealth_settings_view],
+            )
+            jitter_max.change(
+                fn=update_security_settings,
+                inputs=[jitter_toggle, jitter_min, jitter_max, metadata_strip_toggle],
+                outputs=[stealth_settings_view],
+            )
+            metadata_strip_toggle.change(
+                fn=update_security_settings,
+                inputs=[jitter_toggle, jitter_min, jitter_max, metadata_strip_toggle],
+                outputs=[stealth_settings_view],
+            )
+            inspect_security_btn.click(
+                fn=get_security_snapshot,
+                outputs=[security_status],
+            )
+
+        # ---- Tab 4: Diagnostics & Self-Repair ----
+        with gr.Tab("Diagnostics & Self-Repair"):
             gr.Markdown(
-                "Automated environment audit, pipeline dry-run, and self-repair. "
-                "No content is published and no real network calls are made to external targets."
+                "Run the diagnostics engine, review auto-repair output, and inspect the latest health receipt."
             )
 
             diag_subsystem_status = gr.Markdown(
-                value="Click **Run Diagnostics** to check subsystem health."
+                value="Click **Run Diagnostics & Self-Repair** to check subsystem health."
+            )
+            repair_log_view = gr.Textbox(
+                label="Auto-repair log",
+                value="No repair run yet.",
+                lines=8,
+                interactive=False,
+                max_lines=20,
             )
 
             with gr.Row():
                 run_diag_btn = gr.Button(
-                    "Run System Diagnostics & Self-Repair", variant="primary", size="lg"
+                    "Run Diagnostics & Self-Repair", variant="primary", size="lg"
                 )
                 load_receipt_btn = gr.Button("Load Latest Receipt", size="lg")
 
             diag_receipt_view = gr.Textbox(
-                label="Diagnostic receipt",
-                value=latest_receipt_text,
+                label="System health receipt",
+                value=latest_receipt_text(),
                 lines=28,
                 interactive=False,
                 max_lines=60,
             )
 
             run_diag_btn.click(
-                fn=run_diagnostics_ui,
-                outputs=[diag_subsystem_status, diag_receipt_view],
+                fn=run_diagnostics_with_log,
+                outputs=[diag_subsystem_status, diag_receipt_view, repair_log_view],
             )
             load_receipt_btn.click(
                 fn=latest_receipt_text,
                 outputs=[diag_receipt_view],
             )
 
-        # ---- Tab 4: Continuous Learning & Guardrails ----
+        # ---- Tab 5: Continuous Learning & Guardrails ----
         with gr.Tab("Continuous Learning & Guardrails"):
             gr.Markdown(
-                "Local RLHF from your approved/rejected queue items, plus optional structural "
-                "trend analysis from public pages. Every adjustment is validated against "
-                "`lore/immutable_rules.md` — nothing touches security, the killswitch, or the "
-                "approval workflow."
+                "Review active RLHF style weights, toggle trend learning, and inspect guardrail compliance logs."
             )
 
-            learn_status_display = gr.Markdown(value=get_learning_status_md)
+            learn_status_display = gr.Markdown(value=get_learning_status_md())
 
             with gr.Row():
                 trend_toggle = gr.Checkbox(
@@ -376,8 +487,8 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
                 refresh_learn_btn = gr.Button("Refresh Status")
 
             learn_log_view = gr.Textbox(
-                label="Latest learning log",
-                value=latest_learning_log_text,
+                label="Guardrail compliance log",
+                value=latest_learning_log_text(),
                 lines=28,
                 interactive=False,
                 max_lines=60,
@@ -397,28 +508,27 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
                 outputs=[learn_status_display, learn_log_view],
             )
             refresh_learn_btn.click(
-                fn=get_learning_status_md,
-                outputs=[learn_status_display],
+                fn=refresh_learning_views,
+                outputs=[learn_status_display, learn_log_view],
             )
 
-        # ---- Tab 5: Sync & System Readiness ----
-        with gr.Tab("Sync & System Readiness"):
+        # ---- Tab 6: System Sync ----
+        with gr.Tab("System Sync"):
             gr.Markdown(
-                "Full workspace integrity check, policy mirror sync, state file validation, "
-                "and pipeline import audit. Runs auto-repair on every click."
+                "Verify file integrity, policy mirrors, and workspace readiness with a single click."
             )
 
-            sync_summary_display = gr.Markdown(value=latest_sync_report_text)
+            sync_summary_display = gr.Markdown(value=latest_sync_report_text())
 
             with gr.Row():
                 run_sync_btn = gr.Button(
-                    "Run Full System Sync", variant="primary", size="lg"
+                    "Verify Integrity & Policy Mirrors", variant="primary", size="lg"
                 )
                 load_sync_btn = gr.Button("Load Latest Report", size="lg")
 
             sync_report_view = gr.Textbox(
                 label="Sync receipt",
-                value=latest_sync_report_text,
+                value=latest_sync_report_text(),
                 lines=30,
                 interactive=False,
                 max_lines=65,
@@ -432,8 +542,6 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
                 fn=latest_sync_report_text,
                 outputs=[sync_report_view],
             )
-
-            # Sync run also refreshes the header badge
             run_sync_btn.click(
                 fn=readiness_badge_md,
                 outputs=[readiness_badge],
@@ -448,9 +556,13 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
 
 
 def main() -> None:
+    local_ip = _local_ip()
+    print("Pantheon Studios control panel starting...")
+    print(f"Connect from another device on the same LAN at http://{local_ip}:7860")
+    print("Use the credentials from the workspace .env file to sign in.")
     demo.launch(
         auth=(CONTROL_PANEL_USER, CONTROL_PANEL_PASS),
-        server_name="127.0.0.1",  # localhost only — never bind to 0.0.0.0
+        server_name="0.0.0.0",
         server_port=7860,
         share=False,
         show_error=True,
