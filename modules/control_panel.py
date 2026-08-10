@@ -68,7 +68,7 @@ for _d in (PENDING_DIR, APPROVED_DIR, REJECTED_DIR):
 # ---------------------------------------------------------------------------
 
 CONTROL_PANEL_USER = os.getenv("CONTROL_PANEL_USER", "admin")
-CONTROL_PANEL_PASS = os.getenv("CONTROL_PANEL_PASS", "pantheon_admin")
+CONTROL_PANEL_PASS = os.getenv("CONTROL_PANEL_PASS", "@Sammyzzz3Jimbo21")
 
 
 # ---------------------------------------------------------------------------
