@@ -76,6 +76,108 @@ PENDING_DIR = Path("queue") / "pending"
 APPROVED_DIR = Path("queue") / "approved"
 REJECTED_DIR = Path("queue") / "rejected"
 
+CSS_THEME = """
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Fira+Code:wght@400;500;700&display=swap');
+
+:root { color-scheme: dark; }
+.gradio-container {
+  background: radial-gradient(circle at top left, rgba(0,243,255,0.08), transparent 24%), linear-gradient(180deg, #06080e 0%, #0b0f19 100%);
+  font-family: 'Orbitron', sans-serif;
+  padding: 16px;
+}
+.gradio-container::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(rgba(0,243,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(0,243,255,0.08) 1px, transparent 1px);
+  background-size: 28px 28px;
+  opacity: 0.16;
+  mask-image: linear-gradient(180deg, rgba(0,0,0,0.65), rgba(0,0,0,0));
+}
+body, .gradio-container, .gradio-container .gradio-markdown, .gradio-container .gradio-textbox, .gradio-container .gradio-dropdown, .gradio-container .gradio-checkbox, .gradio-container .gradio-slider {
+  color: #eafcff;
+}
+h1, h2, h3, .hud-title {
+  font-family: 'Orbitron', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  text-shadow: 0 0 10px rgba(0,243,255,0.45);
+}
+.hud-card, .gradio-container .gr-box, .gradio-container .gr-form, .gradio-container .block, .gradio-container .tabitem, .gradio-container .tabs {
+  background: rgba(14, 20, 36, 0.84) !important;
+  border: 1px solid rgba(0,243,255,0.42) !important;
+  box-shadow: 0 0 12px rgba(0,243,255,0.15), inset 0 0 8px rgba(0,243,255,0.08) !important;
+  border-radius: 16px;
+}
+.gradio-container .gradio-button {
+  background: linear-gradient(135deg, #092635 0%, #0f8f9b 100%) !important;
+  color: #f7ffff !important;
+  border: 1px solid rgba(0,243,255,0.55) !important;
+  box-shadow: 0 0 10px rgba(0,243,255,0.22) !important;
+  border-radius: 999px !important;
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+.gradio-container .gradio-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 16px rgba(0,243,255,0.36) !important;
+}
+.hud-btn-killswitch {
+  background: linear-gradient(135deg, #26070c 0%, #ff3366 100%) !important;
+  box-shadow: 0 0 14px rgba(255,51,102,0.38) !important;
+}
+.hud-btn-success {
+  background: linear-gradient(135deg, #062e1f 0%, #00ff88 100%) !important;
+  box-shadow: 0 0 10px rgba(0,255,136,0.28) !important;
+}
+.hud-terminal {
+  background: #050b12 !important;
+  color: #78ffb2 !important;
+  font-family: 'Fira Code', monospace !important;
+  border: 1px solid rgba(0,243,255,0.35) !important;
+  box-shadow: inset 0 0 12px rgba(0,243,255,0.12) !important;
+}
+.hud-banner {
+  padding: 16px 20px;
+  border-radius: 18px;
+  background: linear-gradient(90deg, rgba(7,16,28,0.95), rgba(12,25,41,0.9));
+  border: 1px solid rgba(0,243,255,0.5);
+  box-shadow: 0 0 20px rgba(0,243,255,0.18);
+}
+.hud-badge {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(0,255,136,0.14);
+  color: #7bffb1;
+  border: 1px solid rgba(0,255,136,0.36);
+  box-shadow: 0 0 8px rgba(0,255,136,0.18);
+}
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: rgba(4,8,14,0.8); }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #0f8f9b, #00f3ff);
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+"""
+
+HUD_BANNER_HTML = """
+<div class='hud-banner'>
+  <div style='display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;'>
+    <div>
+      <div class='hud-title' style='font-size:1.35rem; margin:0;'>PANTHEON STUDIOS — MISSION CONTROL HUD</div>
+      <div style='font-size:0.9rem; color:#88d8ff; margin-top:6px;'>Multi-threaded orchestration • secure LAN access • autonomous synthesis</div>
+    </div>
+    <div style='display:flex; align-items:center; gap:10px; flex-wrap:wrap;'>
+      <span class='hud-badge'>● SYSTEM ONLINE / MULTI-THREADED</span>
+      <span style='font-family:"Fira Code", monospace; color:#7af7ff;'>http://{local_ip}:7860</span>
+      <span class='hud-badge'>AUTHORIZED ACCESS</span>
+    </div>
+  </div>
+</div>
+""".format(local_ip=_resolve_local_ip())
+
 for _d in (PENDING_DIR, APPROVED_DIR, REJECTED_DIR):
     _d.mkdir(parents=True, exist_ok=True)
 
@@ -400,36 +502,37 @@ LORE_CATEGORIES = [
 _initial_killed = is_killswitch_active()
 _initial_kill_label = "🔴 KILLSWITCH — DEACTIVATE" if _initial_killed else "🟢 KILLSWITCH — ACTIVATE"
 
-with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
-    gr.Markdown("# Pantheon Studios — Control Panel")
+with gr.Blocks(title="Pantheon Studios Control Panel", css=CSS_THEME) as demo:
+    gr.HTML(HUD_BANNER_HTML)
     gr.Markdown(
         "> **Secure LAN access** — this panel can be reached from other devices on the same local network. "
-        "Credentials are read from the workspace .env file and nothing is published without your explicit approval."
+        "Credentials are read from the workspace .env file and nothing is published without your explicit approval.",
+        elem_classes=["hud-card"],
     )
 
     # ---- Readiness badge (live, auto-refreshes every 30 s) ----
     with gr.Row():
-        readiness_badge = gr.Markdown(value=readiness_badge_md(), every=30)
+        readiness_badge = gr.Markdown(value=readiness_badge_md(), every=30, elem_classes=["hud-card"])
 
     # ---- State management ----
     killswitch_state = gr.State(value=_initial_killed)
 
     # ---- Status bar (always visible) ----
     with gr.Row():
-        status_display = gr.Markdown(value=_status_md(), every=10)
+        status_display = gr.Markdown(value=_status_md(), every=10, elem_classes=["hud-card"])
 
-    orchestrator_status_display = gr.Markdown(value=orchestrator_status_md())
-    runtime_tester_badge = gr.Markdown(value=runtime_tester_status(), every=30)
-    connection_banner = gr.Markdown(value=_connection_banner())
-    runtime_tester_badge = gr.Markdown(value=runtime_tester_status(), every=30)
+    orchestrator_status_display = gr.Markdown(value=orchestrator_status_md(), elem_classes=["hud-card"])
+    runtime_tester_badge = gr.Markdown(value=runtime_tester_status(), every=30, elem_classes=["hud-card"])
+    connection_banner = gr.Markdown(value=_connection_banner(), elem_classes=["hud-card"])
 
     # ---- Master Killswitch (always visible, prominent) ----
     with gr.Row():
-        refresh_readiness_btn = gr.Button("[ REFRESH SYSTEM READINESS ]", size="lg")
+        refresh_readiness_btn = gr.Button("[ REFRESH SYSTEM READINESS ]", size="lg", elem_classes=["hud-btn-success"])
         master_killswitch_btn = gr.Button(
             value="[ MASTER KILLSWITCH ]",
             variant="stop" if _initial_killed else "primary",
             size="lg",
+            elem_classes=["hud-btn-killswitch"],
         )
         orchestrator_toggle = gr.Checkbox(label="Autonomous Orchestrator", value=True)
 
@@ -449,7 +552,7 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
                     interactive=True,
                     scale=3,
                 )
-                refresh_btn = gr.Button("[ REFRESH QUEUE ]", scale=1)
+                refresh_btn = gr.Button("[ REFRESH QUEUE ]", scale=1, elem_classes=["hud-btn-success"])
 
             preview_box = gr.Textbox(
                 label="Content preview",
@@ -465,11 +568,11 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
             )
 
             with gr.Row():
-                approve_btn = gr.Button("[ APPROVE SELECTED ]", variant="primary")
-                save_edit_btn = gr.Button("[ SAVE EDITS ]")
-                reject_btn = gr.Button("[ REJECT & PURGE ]", variant="stop")
+                approve_btn = gr.Button("[ APPROVE SELECTED ]", variant="primary", elem_classes=["hud-btn-success"])
+                save_edit_btn = gr.Button("[ SAVE EDITS ]", elem_classes=["hud-btn-success"])
+                reject_btn = gr.Button("[ REJECT & PURGE ]", variant="stop", elem_classes=["hud-btn-killswitch"])
 
-            queue_action_msg = gr.Textbox(label="Action result", interactive=False)
+            queue_action_msg = gr.Textbox(label="Action result", interactive=False, elem_classes=["hud-card"])
 
             refresh_btn.click(
                 fn=refresh_queue,
@@ -514,9 +617,9 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
                 lines=16,
                 placeholder="Write or paste your lore here…",
             )
-            lore_save_btn = gr.Button("[ SAVE TO KNOWLEDGE BANK ]", variant="primary")
-            lore_synthesis_btn = gr.Button("[ TRIGGER IMMEDIATE SYNTHESIS ]")
-            lore_result = gr.Textbox(label="Result", interactive=False)
+            lore_save_btn = gr.Button("[ SAVE TO KNOWLEDGE BANK ]", variant="primary", elem_classes=["hud-btn-success"])
+            lore_synthesis_btn = gr.Button("[ TRIGGER IMMEDIATE SYNTHESIS ]", elem_classes=["hud-btn-success"])
+            lore_result = gr.Textbox(label="Result", interactive=False, elem_classes=["hud-card"])
 
             lore_save_btn.click(
                 fn=save_lore,
@@ -546,7 +649,7 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
                 max_lines=20,
             )
             with gr.Row():
-                inspect_security_btn = gr.Button("Refresh stealth snapshot", size="lg")
+                inspect_security_btn = gr.Button("Refresh stealth snapshot", size="lg", elem_classes=["hud-btn-success"])
 
             jitter_toggle.change(
                 fn=update_security_settings,
@@ -608,20 +711,21 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
 
             with gr.Row():
                 run_diag_btn = gr.Button(
-                    "[ RUN FULL DIAGNOSTICS & SELF-REPAIR ]", variant="primary", size="lg"
+                    "[ RUN FULL DIAGNOSTICS & SELF-REPAIR ]", variant="primary", size="lg", elem_classes=["hud-btn-success"]
                 )
-                load_receipt_btn = gr.Button("[ LOAD LATEST RECEIPT ]", size="lg")
-                run_sim_btn = gr.Button("[ RUN IMMEDIATE SANDBOX SIMULATION ]", size="lg")
+                load_receipt_btn = gr.Button("[ LOAD LATEST RECEIPT ]", size="lg", elem_classes=["hud-btn-success"])
+                run_sim_btn = gr.Button("[ RUN IMMEDIATE SANDBOX SIMULATION ]", size="lg", elem_classes=["hud-btn-success"])
 
             daemon_toggle = gr.Checkbox(label="Continuous Testing Daemon", value=True)
             with gr.Row():
-                ping_sms_btn = gr.Button("[ SEND TEST SMS PING NOW ]", variant="secondary", size="lg")
+                ping_sms_btn = gr.Button("[ SEND TEST SMS PING NOW ]", variant="secondary", size="lg", elem_classes=["hud-btn-success"])
             simulation_stream = gr.Textbox(
                 label="Simulation activity stream",
                 value="Waiting for the next simulation cycle…",
                 lines=8,
                 interactive=False,
                 max_lines=20,
+                elem_classes=["hud-terminal"],
             )
 
             diag_receipt_view = gr.Textbox(
@@ -630,6 +734,7 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
                 lines=28,
                 interactive=False,
                 max_lines=60,
+                elem_classes=["hud-terminal"],
             )
 
             run_diag_btn.click(
@@ -664,10 +769,11 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
                 lines=8,
                 interactive=False,
                 max_lines=20,
+                elem_classes=["hud-terminal"],
             )
             with gr.Row():
-                daemon_toggle_btn = gr.Button("[ START/STOP TEST DAEMON ]", variant="primary", size="lg")
-                sandbox_btn = gr.Button("[ RUN IMMEDIATE SANDBOX SIMULATION ]", size="lg")
+                daemon_toggle_btn = gr.Button("[ START/STOP TEST DAEMON ]", variant="primary", size="lg", elem_classes=["hud-btn-success"])
+                sandbox_btn = gr.Button("[ RUN IMMEDIATE SANDBOX SIMULATION ]", size="lg", elem_classes=["hud-btn-success"])
             daemon_toggle_btn.click(
                 fn=lambda enabled: toggle_test_daemon(not enabled),
                 inputs=[daemon_state],
@@ -688,6 +794,7 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
                 interactive=False,
                 max_lines=60,
                 every=10,
+                elem_classes=["hud-terminal"],
             )
             refresh_stream_btn = gr.Button("[ REFRESH LIVE STREAM ]")
             refresh_stream_btn.click(fn=refresh_activity_stream, outputs=[activity_stream])
@@ -702,6 +809,7 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
                 interactive=False,
                 max_lines=60,
                 every=15,
+                elem_classes=["hud-terminal"],
             )
             refresh_ledger_btn = gr.Button("[ RESYNC DISTRIBUTION LEDGER ]")
             refresh_ledger_btn.click(fn=refresh_distribution_ledger, outputs=[ledger_view])
