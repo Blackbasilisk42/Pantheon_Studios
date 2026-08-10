@@ -66,6 +66,7 @@ PIPELINE_MODULES = [
     "modules.learning_engine",
     "modules.diagnostics",
     "modules.orchestrator",
+    "modules.activity_logger",
     "publishers.anonymous_feed_publisher",
 ]
 
@@ -200,6 +201,7 @@ def _check_files() -> list[SyncCheck]:
         "modules/security_manager.py",
         "modules/system_state.py",
         "modules/approval_gate.py",
+        "modules/activity_logger.py",
         "lore/immutable_rules.md",
         "policies/privacy_and_copyright.md",
     ]
@@ -213,6 +215,14 @@ def _check_files() -> list[SyncCheck]:
 # ---------------------------------------------------------------------------
 # Check: policy mirror
 # ---------------------------------------------------------------------------
+
+def _check_activity_logger() -> SyncCheck:
+    log_path = Path("intelligence") / "system_activity.log"
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    if log_path.exists():
+        return SyncCheck("Activity logger persistence", "pass", f"{log_path} present")
+    return SyncCheck("Activity logger persistence", "warn", "Activity logger file missing")
+
 
 def _check_policy_mirror() -> list[SyncCheck]:
     results: list[SyncCheck] = []

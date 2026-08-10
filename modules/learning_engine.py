@@ -33,9 +33,11 @@ if str(_REPO_ROOT) not in sys.path:
 try:
     from modules.security_manager import SecurityManager
     from modules.system_state import abort_if_killed, is_killswitch_active
+    from modules.activity_logger import emit_activity
 except ModuleNotFoundError:
     from security_manager import SecurityManager  # type: ignore[no-redef]
     from system_state import abort_if_killed, is_killswitch_active  # type: ignore[no-redef]
+    from activity_logger import emit_activity  # type: ignore[no-redef]
 
 # ---------------------------------------------------------------------------
 # Paths
@@ -250,6 +252,7 @@ def validate_against_guardrails(adjustment: WeightAdjustment) -> GuardrailResult
 
 def run_feedback_analysis(state: LearningState) -> tuple[list[WeightAdjustment], dict[str, Any]]:
     """Compare approved vs rejected queue items and propose style weight deltas."""
+    emit_activity("System Thought", "learning_engine", "Reviewing feedback patterns")
     approved_files = sorted(APPROVED_DIR.glob("*.md")) if APPROVED_DIR.exists() else []
     rejected_files = sorted(REJECTED_DIR.glob("*.md")) if REJECTED_DIR.exists() else []
 

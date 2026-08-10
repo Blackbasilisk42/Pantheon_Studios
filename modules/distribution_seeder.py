@@ -15,10 +15,12 @@ try:
     from modules.security_manager import SecurityManager
     from modules.notifier import send_pending_review_alert
     from modules.system_state import abort_if_killed
+    from modules.activity_logger import emit_activity
 except ModuleNotFoundError:
     from security_manager import SecurityManager  # type: ignore[no-redef]
     from notifier import send_pending_review_alert  # type: ignore[no-redef]
     from system_state import abort_if_killed  # type: ignore[no-redef]
+    from activity_logger import emit_activity  # type: ignore[no-redef]
 
 
 PENDING_DIR = Path("queue") / "pending"
@@ -27,6 +29,7 @@ SYNTHESIS_FILE = Path("pantheon_synthesized_update.md")
 INTELLIGENCE_GLOB = "intelligence_log_*.md"
 CONFIG_PATH = Path("config") / "distribution_targets.json"
 RECEIPTS_DIR = Path("intelligence") / "distribution_receipts"
+DISTRIBUTION_LOG_GLOB = "distribution_log_*.md"
 PUBLIC_POLICY_DISCLAIMER = (
     "\n\n---\nPublic-policy disclaimer: This draft is for review and approval only. "
     "Do not publish or distribute without human review and compliance confirmation."
@@ -49,10 +52,12 @@ class DistributionSeeder:
         self.pending_dir = self.workspace / PENDING_DIR
         self.approved_dir = self.workspace / APPROVED_DIR
         self.receipts_dir = self.workspace / RECEIPTS_DIR
+        self.intelligence_dir = self.workspace / "intelligence"
         self.config_path = self.workspace / CONFIG_PATH
         self.pending_dir.mkdir(parents=True, exist_ok=True)
         self.approved_dir.mkdir(parents=True, exist_ok=True)
         self.receipts_dir.mkdir(parents=True, exist_ok=True)
+        self.intelligence_dir.mkdir(parents=True, exist_ok=True)
 
     def load_source_text(self) -> str:
         parts: list[str] = []
@@ -209,6 +214,22 @@ This draft is for human review and approval before any external distribution.
             + "\n",
             encoding="utf-8",
         )
+        ledger_path = self.intelligence_dir / f"distribution_log_{timestamp}.md"
+        ledger_path.write_text(
+            "\n".join(
+                [
+                    f"# Distribution Log: {title}",
+                    "",
+                    f"- Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+                    f"- Platform: {target.get('channel', 'unknown')}",
+                    f"- Status: {status}",
+                    f"- Summary: {title}",
+                    f"- URL/Path: {receipt_path.as_posix()}",
+                ]
+            )
+            + "\n",
+            encoding="utf-8",
+        )
         return receipt_path
 
     def dispatch_approved_items(self, limit: int | None = None) -> dict[str, Any]:
@@ -234,6 +255,7 @@ This draft is for human review and approval before any external distribution.
                         int(target.get("jitter_max", 0) or 0),
                     )
 
+                emit_activity("Formatting for Reddit/Discord", "distribution_seeder", f"Formatting {title} for {target.get('channel', 'unknown')}")
                 rendered = self._render_for_target(title, content, target)
                 status = "queued"
                 if target.get("kind") in {"dry_run", "local"}:
@@ -249,6 +271,7 @@ This draft is for human review and approval before any external distribution.
                         )
                         with urllib.request.urlopen(request, timeout=5) as response:  # noqa: S310
                             response.read()
+                        emit_activity("Posting Asset", "distribution_seeder", f"Posted {title} to {target.get('name', 'unknown')}")
                         status = "posted"
                     except Exception as exc:  # noqa: BLE001
                         status = f"failed: {exc}"
@@ -261,6 +284,30 @@ This draft is for human review and approval before any external distribution.
             "receipts": receipts,
             "targets": [target.get("name", "unknown") for target in targets],
         }
+
+    def build_distribution_ledger(self) -> list[dict[str, str]]:
+        ledger: list[dict[str, str]] = []
+        source_paths = sorted(self.intelligence_dir.glob(DISTRIBUTION_LOG_GLOB))
+        if not source_paths:
+            source_paths = sorted(self.receipts_dir.glob("*.md"))
+        for path in source_paths:
+            text = path.read_text(encoding="utf-8", errors="replace")
+            lines = [line.strip() for line in text.splitlines() if line.strip()]
+            title = next((line.split(":", 1)[1].strip() for line in lines if line.startswith("# Distribution") or line.startswith("# Distribution Log:")), path.stem)
+            timestamp = next((line.split(":", 1)[1].strip() for line in lines if line.startswith("- Timestamp:")), "unknown")
+            platform = next((line.split(":", 1)[1].strip() for line in lines if line.startswith("- Platform:")), "unknown")
+            status = next((line.split(":", 1)[1].strip() for line in lines if line.startswith("- Status:")), "pending")
+            url_or_path = next((line.split(":", 1)[1].strip() for line in lines if line.startswith("- URL/Path:")), path.as_posix())
+            ledger.append(
+                {
+                    "timestamp": timestamp,
+                    "platform": platform,
+                    "title": title,
+                    "status": status,
+                    "url_or_path": url_or_path,
+                }
+            )
+        return ledger
 
     def distribution_status_md(self) -> str:
         approved_files = sorted(self.approved_dir.glob("*.md"))

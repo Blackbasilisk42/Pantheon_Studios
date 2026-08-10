@@ -407,6 +407,28 @@ def _pipeline_check_orchestrator() -> CheckResult:
         return CheckResult("Pipeline: Orchestrator init", "fail", str(exc))
 
 
+def _pipeline_check_activity_logger() -> CheckResult:
+    try:
+        from modules.activity_logger import ActivityLogger
+        logger = ActivityLogger(log_path=Path("intelligence") / "system_activity.log")
+        logger.log("System Thought", "diagnostics", "probe")
+        if (Path("intelligence") / "system_activity.log").exists():
+            return CheckResult("Pipeline: ActivityLogger init", "pass", "Activity logger is persistent")
+        return CheckResult("Pipeline: ActivityLogger init", "warn", "Activity logger file missing")
+    except Exception as exc:
+        return CheckResult("Pipeline: ActivityLogger init", "fail", str(exc))
+
+
+def _pipeline_check_distribution_ledger() -> CheckResult:
+    try:
+        from modules.distribution_seeder import DistributionSeeder
+        seeder = DistributionSeeder()
+        ledger = seeder.build_distribution_ledger()
+        return CheckResult("Pipeline: Distribution ledger", "pass", f"Ledger entries: {len(ledger)}")
+    except Exception as exc:
+        return CheckResult("Pipeline: Distribution ledger", "fail", str(exc))
+
+
 def _pipeline_check_killswitch() -> CheckResult:
     try:
         from modules.system_state import abort_if_killed, is_killswitch_active, set_killswitch
@@ -476,6 +498,8 @@ class DiagnosticsEngine:
         report.results.append(_pipeline_check_notifier())
         report.results.append(_pipeline_check_publisher())
         report.results.append(_pipeline_check_orchestrator())
+        report.results.append(_pipeline_check_activity_logger())
+        report.results.append(_pipeline_check_distribution_ledger())
         report.results.append(_pipeline_check_killswitch())
 
         # Persist receipt

@@ -23,12 +23,14 @@ try:
     from modules.orchestrator import OrchestratorEngine
     from modules.security_manager import SecurityManager
     from modules.system_state import abort_if_killed, get_state, is_killswitch_active, set_killswitch
+    from modules.activity_logger import emit_activity
 except ModuleNotFoundError:  # pragma: no cover
     from diagnostics import DiagnosticsEngine  # type: ignore[no-redef]
     from notifier import send_daily_heartbeat, send_test_sms_ping  # type: ignore[no-redef]
     from orchestrator import OrchestratorEngine  # type: ignore[no-redef]
     from security_manager import SecurityManager  # type: ignore[no-redef]
     from system_state import abort_if_killed, get_state, is_killswitch_active, set_killswitch  # type: ignore[no-redef]
+    from activity_logger import emit_activity  # type: ignore[no-redef]
 
 
 INTELLIGENCE_DIR = Path("intelligence")
@@ -108,10 +110,12 @@ class ContinuousTesterEngine:
         if bool(state.get("KILLSWITCH_ACTIVE", False)):
             return {"status": "halted", "message": "Killswitch active."}
 
+        emit_activity("System Thought", "continuous_tester", "Running self-healing diagnostics")
         diagnostics = DiagnosticsEngine(auto_repair=True)
         diagnostics.run()
 
         sandbox = self._simulate_sandbox()
+        emit_activity("System Thought", "continuous_tester", "Completing sandbox simulation")
         receipt_paths = []
         receipt_path = self._write_simulation_log(
             "\n".join(

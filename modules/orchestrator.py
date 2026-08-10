@@ -25,9 +25,11 @@ if str(_REPO_ROOT) not in sys.path:
 try:
     from modules.notifier import send_pending_review_alert
     from modules.system_state import abort_if_killed, get_state, is_killswitch_active
+    from modules.activity_logger import emit_activity
 except ModuleNotFoundError:  # pragma: no cover
     from notifier import send_pending_review_alert  # type: ignore[no-redef]
     from system_state import abort_if_killed, get_state, is_killswitch_active  # type: ignore[no-redef]
+    from activity_logger import emit_activity  # type: ignore[no-redef]
 
 LORE_DIR = Path("lore")
 PENDING_DIR = Path("queue") / "pending"
@@ -155,6 +157,7 @@ class OrchestratorEngine:
         self.state.last_status = decision["reason"]
 
         if not decision["ready"]:
+            emit_activity("System Thought", "orchestrator", f"Context insufficient for synthesis: {decision['score']}")
             self._save_state()
             return {
                 "status": "quiet",
@@ -163,6 +166,7 @@ class OrchestratorEngine:
             }
 
         draft_title = decision.get("draft_title") or "Autonomous Draft"
+        emit_activity("Synthesizing Lore", "orchestrator", f"Staging draft {draft_title}")
         draft_path = self._write_pending_draft(draft_title)
         self.state.drafts_staged += 1
         self.state.alerts_sent += 1

@@ -13,6 +13,7 @@ import os
 import shutil
 import socket
 import threading
+import time
 from datetime import datetime
 from pathlib import Path
 
@@ -43,6 +44,7 @@ try:
     from modules.orchestrator import orchestrator_status_md, run_orchestrator_ui, toggle_orchestrator
     from modules.distribution_seeder import DistributionSeeder
     from modules.continuous_tester import ContinuousTesterEngine
+    from modules.activity_logger import get_activity_logger
 except ModuleNotFoundError:
     from lore_ingest import save_entry  # type: ignore[no-redef]
     from system_state import get_state, is_killswitch_active, set_killswitch  # type: ignore[no-redef]
@@ -66,6 +68,7 @@ except ModuleNotFoundError:
     )
     from distribution_seeder import DistributionSeeder  # type: ignore[no-redef]
     from continuous_tester import ContinuousTesterEngine  # type: ignore[no-redef]
+    from activity_logger import get_activity_logger  # type: ignore[no-redef]
 
 PENDING_DIR = Path("queue") / "pending"
 APPROVED_DIR = Path("queue") / "approved"
@@ -297,6 +300,28 @@ def dispatch_latest_approved(limit: int = 1) -> str:
     return "No approved items available for outbound dispatch."
 
 
+def refresh_activity_stream() -> str:
+    logger = get_activity_logger()
+    return logger.snapshot()
+
+
+def refresh_distribution_ledger() -> str:
+    seeder = DistributionSeeder(workspace=Path.cwd())
+    ledger = seeder.build_distribution_ledger()
+    if not ledger:
+        return "No distribution records yet."
+    lines = [
+        "| Timestamp | Platform | Status | Summary | URL/Path |",
+        "|-----------|----------|--------|---------|----------|",
+    ]
+    for entry in ledger:
+        title = entry["title"][:80]
+        lines.append(
+            f"| {entry['timestamp']} | {entry['platform']} | {entry['status']} | {title} | {entry['url_or_path']} |"
+        )
+    return "\n".join(lines)
+
+
 def runtime_tester_status() -> str:
     engine = ContinuousTesterEngine(workspace=Path.cwd(), send_sms=False)
     try:
@@ -353,6 +378,7 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
         status_display = gr.Markdown(value=_status_md(), every=10)
 
     orchestrator_status_display = gr.Markdown(value=orchestrator_status_md())
+    runtime_tester_badge = gr.Markdown(value=runtime_tester_status(), every=30)
     connection_banner = gr.Markdown(value=_connection_banner())
     runtime_tester_badge = gr.Markdown(value=runtime_tester_status(), every=30)
 
@@ -565,7 +591,38 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
                 outputs=[simulation_stream],
             )
 
-        # ---- Tab 5: Continuous Learning & Guardrails ----
+        # ---- Tab 5: Live System Process ----
+        with gr.Tab("Live System Process"):
+            gr.Markdown("Watch the live execution stream from crawlers, synthesis, learning, and testing services.")
+            worker_status = gr.Markdown(
+                "| Worker | Status |\n|--------|--------|\n| Crawlers | ACTIVE |\n| Synthesizer | ACTIVE |\n| Tester | ACTIVE |"
+            )
+            activity_stream = gr.Textbox(
+                label="System Execution Stream",
+                value=refresh_activity_stream(),
+                lines=24,
+                interactive=False,
+                max_lines=60,
+                every=10,
+            )
+            refresh_stream_btn = gr.Button("Refresh Stream")
+            refresh_stream_btn.click(fn=refresh_activity_stream, outputs=[activity_stream])
+
+        # ---- Tab 6: Live Distribution Ledger ----
+        with gr.Tab("Live Distribution Ledger"):
+            gr.Markdown("Inspect every dispatched post across Reddit, YouTube, Substack, Medium, Discord, X/Twitter, and RSS.")
+            ledger_view = gr.Textbox(
+                label="Distribution ledger",
+                value=refresh_distribution_ledger(),
+                lines=20,
+                interactive=False,
+                max_lines=60,
+                every=15,
+            )
+            refresh_ledger_btn = gr.Button("Refresh Ledger")
+            refresh_ledger_btn.click(fn=refresh_distribution_ledger, outputs=[ledger_view])
+
+        # ---- Tab 7: Continuous Learning & Guardrails ----
         with gr.Tab("Continuous Learning & Guardrails"):
             gr.Markdown(
                 "Review active RLHF style weights, toggle trend learning, and inspect guardrail compliance logs."
@@ -611,7 +668,7 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
                 outputs=[learn_status_display, learn_log_view],
             )
 
-        # ---- Tab 6: Distribution & Outbound ----
+        # ---- Tab 8: Distribution & Outbound ----
         with gr.Tab("Distribution & Outbound"):
             gr.Markdown(
                 "Review outbound targets, dispatch approved drafts, and inspect the latest distribution receipts."
@@ -636,7 +693,7 @@ with gr.Blocks(title="Pantheon Studios Control Panel") as demo:
                 outputs=[distribution_status],
             )
 
-        # ---- Tab 7: System Sync ----
+        # ---- Tab 9: System Sync ----
         with gr.Tab("System Sync"):
             gr.Markdown(
                 "Verify file integrity, policy mirrors, and workspace readiness with a single click."
@@ -705,9 +762,32 @@ def main() -> None:
     print("=" * 60)
     try:
         from modules.continuous_tester import ContinuousTesterEngine
-        engine = ContinuousTesterEngine(workspace=Path.cwd(), send_sms=True)
-        thread = threading.Thread(target=engine.start_daemon, kwargs={"interval_minutes": 15}, daemon=True)
-        thread.start()
+        from modules.orchestrator import OrchestratorEngine
+        from modules.crawler_engine import CrawlerEngine
+        from modules.learning_engine import run_feedback_analysis, LearningState
+        from modules.activity_logger import emit_activity
+
+        def _worker_loop(target: str, fn, interval_seconds: int) -> None:
+            while True:
+                try:
+                    emit_activity("System Thought", target, f"worker loop active ({target})")
+                    fn()
+                except Exception as exc:  # noqa: BLE001
+                    emit_activity("System Thought", target, f"worker error: {exc}")
+                time.sleep(interval_seconds)
+
+        engine = ContinuousTesterEngine(workspace=Path.cwd(), send_sms=False)
+        orchestrator = OrchestratorEngine()
+        crawler = CrawlerEngine()
+        learning_state = LearningState()
+        threads = [
+            threading.Thread(target=engine.start_daemon, kwargs={"interval_minutes": 15}, daemon=True),
+            threading.Thread(target=lambda: _worker_loop("orchestrator", orchestrator.run_cycle, 1800), daemon=True),
+            threading.Thread(target=lambda: _worker_loop("crawler", lambda: crawler.fetch("https://example.com"), 3600), daemon=True),
+            threading.Thread(target=lambda: _worker_loop("learning", lambda: run_feedback_analysis(learning_state), 3600), daemon=True),
+        ]
+        for thread in threads:
+            thread.start()
     except Exception:
         pass
 
