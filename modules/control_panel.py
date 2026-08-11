@@ -120,32 +120,29 @@ CSS_THEME = """
 :root, .dark, body {
   color-scheme: dark;
   --body-text-color: #ffffff !important;
-    --body-text-color-subdued: #a3ffe0 !important;
-    --body-text-color-subdued-dark: #a3ffe0 !important;
-    --block-label-text-color: #00ff66 !important;
-    --block-label-text-color-dark: #00ff66 !important;
+  --body-text-color-subdued: #a5f3fc !important;
+  --body-text-color-subdued-dark: #a5f3fc !important;
+  --block-label-text-color: #00f3ff !important;
+  --block-label-text-color-dark: #00f3ff !important;
   --table-cell-text-color: #ffffff !important;
   --table-cell-text-color-dark: #ffffff !important;
   --input-text-color: #ffffff !important;
   --input-text-color-dark: #ffffff !important;
-    --checkbox-label-text-color: #a3ffe0 !important;
-    --block-title-text-color: #00ff66 !important;
-    --subdued-text-color: #a3ffe0 !important;
+  --checkbox-label-text-color: #d1f4ff !important;
+  --block-title-text-color: #00f3ff !important;
+  --subdued-text-color: #a5f3fc !important;
 }
 * { color-scheme: dark; }
 p, span, label, td, th, div, input, textarea, select, button, blockquote, code, pre, .prose *, .prose {
-    color: #ffffff !important;
+  color: #e2e8f0 !important;
   text-shadow: none !important;
 }
 h1, h2, h3, h4, .block-title, label span {
-    color: #00ff66 !important;
+  color: #00f3ff !important;
   font-weight: 600 !important;
 }
-body, .gradio-container {
-    background: radial-gradient(circle, rgba(3,7,5,0.78) 0%, rgba(3,7,5,0.96) 100%),
-                            url("/file=hub/static/assets/background_aura.png") center/cover no-repeat fixed !important;
-}
 .gradio-container {
+  background: radial-gradient(circle at top left, rgba(0,243,255,0.08), transparent 24%), linear-gradient(180deg, #06080e 0%, #0b0f19 100%);
   font-family: 'Orbitron', sans-serif;
   padding: 16px;
 }
@@ -154,118 +151,103 @@ body, .gradio-container {
   position: fixed;
   inset: 0;
   pointer-events: none;
-    background-image: linear-gradient(rgba(0,255,102,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,102,0.08) 1px, transparent 1px);
+  background-image: linear-gradient(rgba(0,243,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(0,243,255,0.08) 1px, transparent 1px);
   background-size: 28px 28px;
   opacity: 0.16;
   mask-image: linear-gradient(180deg, rgba(0,0,0,0.65), rgba(0,0,0,0));
 }
 body, p, span, h1, h2, h3, label, table, td, th, .prose, .gradio-container, .gradio-container .gradio-markdown, .gradio-container .gradio-textbox, .gradio-container .gradio-dropdown, .gradio-container .gradio-checkbox, .gradio-container .gradio-slider, .gradio-container .gr-box {
-    color: #ffffff !important;
+  color: #e2e8f0 !important;
 }
 body, .gradio-container, .gradio-container .gradio-markdown, .gradio-container .gradio-textbox, .gradio-container .gradio-dropdown, .gradio-container .gradio-checkbox, .gradio-container .gradio-slider {
-    color: #ffffff !important;
+  color: #e2e8f0 !important;
 }
 h1, h2, h3, .hud-title {
   font-family: 'Orbitron', sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.22em;
   color: #ffffff !important;
-    text-shadow: 0 0 10px #00ff66;
+  text-shadow: 0 0 10px #00f3ff;
 }
 .hud-title {
   color: #ffffff !important;
-    text-shadow: 0 0 10px #00ff66;
+  text-shadow: 0 0 10px #00f3ff;
 }
 .gradio-container .gradio-markdown, .gradio-container .gradio-markdown p, .gradio-container .gradio-markdown span, .gradio-container .gradio-markdown table, .gradio-container .gradio-markdown td, .gradio-container .gradio-markdown th {
-    color: #a3ffe0 !important;
+  color: #d1f4ff !important;
 }
 .gradio-container .gradio-textbox, .gradio-container .gradio-dropdown, .gradio-container .gradio-checkbox, .gradio-container .gradio-slider, .gradio-container .gradio-button, .gradio-container .gradio-label {
-    color: #a3ffe0 !important;
+  color: #a5f3fc !important;
 }
 .gradio-container .gradio-label, .gradio-container label, .gradio-container .block label, .gradio-container .gradio-dropdown .wrap, .gradio-container .gradio-dropdown .options, .gradio-container .gradio-dropdown .option {
-    color: #00ff66 !important;
+  color: #00f3ff !important;
 }
 .gradio-container table th {
-    color: #00ff66 !important;
-    border-bottom: 1px solid rgba(0,255,102,0.45) !important;
-    text-shadow: 0 0 8px rgba(0,255,102,0.35) !important;
+  color: #00f3ff !important;
 }
 .gradio-container table td, .gradio-container table tr {
   color: #ffffff !important;
 }
 .gradio-container textarea, .gradio-container .hud-terminal, .gradio-container .gradio-textbox textarea {
   color: #ffffff !important;
-    background: rgba(6, 12, 9, 0.85) !important;
+  background: #090d16 !important;
 }
 .gradio-container .gradio-container .prose, .gradio-container .prose {
-    color: #a3ffe0 !important;
+  color: #d1f4ff !important;
 }
 .hud-card, .gradio-container .gr-box, .gradio-container .gr-form, .gradio-container .block, .gradio-container .tabitem, .gradio-container .tabs {
-    background: rgba(6, 12, 9, 0.85) !important;
-    border: 1px solid rgba(0,255,102,0.42) !important;
-    box-shadow: 0 0 14px rgba(0,255,102,0.18), inset 0 0 10px rgba(163,255,224,0.08) !important;
+  background: rgba(14, 20, 36, 0.84) !important;
+  border: 1px solid rgba(0,243,255,0.42) !important;
+  box-shadow: 0 0 12px rgba(0,243,255,0.15), inset 0 0 8px rgba(0,243,255,0.08) !important;
   border-radius: 16px;
 }
-.gradio-container .tabs {
-    border: 1px solid rgba(0,255,102,0.42) !important;
-}
-.gradio-container .tabs .tab-nav button {
-    color: #a3ffe0 !important;
-    border-bottom: 2px solid transparent !important;
-}
-.gradio-container .tabs .tab-nav button.selected,
-.gradio-container .tabs .tab-nav button[aria-selected="true"] {
-    color: #ffffff !important;
-    border-bottom: 2px solid #00ff66 !important;
-    box-shadow: 0 2px 14px rgba(0,255,102,0.35) !important;
-}
 .gradio-container .gradio-button {
-    background: linear-gradient(135deg, #0a1f14 0%, #00ff66 100%) !important;
-    color: #ffffff !important;
-    border: 1px solid rgba(0,255,102,0.55) !important;
-    box-shadow: 0 0 12px rgba(0,255,102,0.28) !important;
+  background: linear-gradient(135deg, #092635 0%, #0f8f9b 100%) !important;
+  color: #f7ffff !important;
+  border: 1px solid rgba(0,243,255,0.55) !important;
+  box-shadow: 0 0 10px rgba(0,243,255,0.22) !important;
   border-radius: 999px !important;
   transition: transform 0.16s ease, box-shadow 0.16s ease;
 }
 .gradio-container .gradio-button:hover {
   transform: translateY(-1px);
-    box-shadow: 0 0 18px rgba(0,255,102,0.4) !important;
+  box-shadow: 0 0 16px rgba(0,243,255,0.36) !important;
 }
 .hud-btn-killswitch {
   background: linear-gradient(135deg, #26070c 0%, #ff3366 100%) !important;
   box-shadow: 0 0 14px rgba(255,51,102,0.38) !important;
 }
 .hud-btn-success {
-    background: linear-gradient(135deg, #062e1f 0%, #00ff66 100%) !important;
-    box-shadow: 0 0 12px rgba(0,255,102,0.3) !important;
+  background: linear-gradient(135deg, #062e1f 0%, #00ff88 100%) !important;
+  box-shadow: 0 0 10px rgba(0,255,136,0.28) !important;
 }
 .hud-terminal {
-    background: rgba(6, 12, 9, 0.85) !important;
-    color: #a3ffe0 !important;
+  background: #050b12 !important;
+  color: #78ffb2 !important;
   font-family: 'Fira Code', monospace !important;
-    border: 1px solid rgba(0,255,102,0.35) !important;
-    box-shadow: inset 0 0 14px rgba(0,255,102,0.14) !important;
+  border: 1px solid rgba(0,243,255,0.35) !important;
+  box-shadow: inset 0 0 12px rgba(0,243,255,0.12) !important;
 }
 .hud-banner {
   padding: 16px 20px;
   border-radius: 18px;
-    background: linear-gradient(90deg, rgba(7,16,12,0.95), rgba(6,12,9,0.9));
-    border: 1px solid rgba(0,255,102,0.5);
-    box-shadow: 0 0 22px rgba(0,255,102,0.2);
+  background: linear-gradient(90deg, rgba(7,16,28,0.95), rgba(12,25,41,0.9));
+  border: 1px solid rgba(0,243,255,0.5);
+  box-shadow: 0 0 20px rgba(0,243,255,0.18);
 }
 .hud-badge {
   display: inline-block;
   padding: 5px 10px;
   border-radius: 999px;
-    background: rgba(0,255,102,0.14);
-    color: #a3ffe0;
-    border: 1px solid rgba(0,255,102,0.36);
-    box-shadow: 0 0 10px rgba(0,255,102,0.22);
+  background: rgba(0,255,136,0.14);
+  color: #7bffb1;
+  border: 1px solid rgba(0,255,136,0.36);
+  box-shadow: 0 0 8px rgba(0,255,136,0.18);
 }
 ::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: rgba(4,8,7,0.8); }
+::-webkit-scrollbar-track { background: rgba(4,8,14,0.8); }
 ::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #0c3d26, #00ff66);
+  background: linear-gradient(180deg, #0f8f9b, #00f3ff);
   border-radius: 999px;
   border: 1px solid rgba(255,255,255,0.08);
 }
@@ -276,11 +258,11 @@ HUD_BANNER_HTML = """
   <div style='display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;'>
     <div>
       <div class='hud-title' style='font-size:1.35rem; margin:0;'>PANTHEON STUDIOS ADMIN PAGE</div>
-            <div style='font-size:0.9rem; color:#a3ffe0; margin-top:6px; text-shadow:0 0 8px rgba(0,255,102,0.35);'>Multi-threaded orchestration • secure LAN access • autonomous synthesis</div>
+      <div style='font-size:0.9rem; color:#88d8ff; margin-top:6px;'>Multi-threaded orchestration • secure LAN access • autonomous synthesis</div>
     </div>
     <div style='display:flex; align-items:center; gap:10px; flex-wrap:wrap;'>
       <span class='hud-badge'>● SYSTEM ONLINE / MULTI-THREADED</span>
-            <span style='font-family:"Fira Code", monospace; color:#a3ffe0; text-shadow:0 0 8px rgba(0,255,102,0.32);'>http://{local_ip}:7860</span>
+      <span style='font-family:"Fira Code", monospace; color:#7af7ff;'>http://{local_ip}:7860</span>
       <span class='hud-badge'>AUTHORIZED ACCESS</span>
     </div>
   </div>
