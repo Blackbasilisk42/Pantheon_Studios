@@ -257,7 +257,7 @@ HUD_BANNER_HTML = """
 <div class='hud-banner'>
   <div style='display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;'>
     <div>
-      <div class='hud-title' style='font-size:1.35rem; margin:0;'>PANTHEON STUDIOS — MISSION CONTROL HUD</div>
+      <div class='hud-title' style='font-size:1.35rem; margin:0;'>PANTHEON STUDIOS ADMIN PAGE</div>
       <div style='font-size:0.9rem; color:#88d8ff; margin-top:6px;'>Multi-threaded orchestration • secure LAN access • autonomous synthesis</div>
     </div>
     <div style='display:flex; align-items:center; gap:10px; flex-wrap:wrap;'>
@@ -563,7 +563,7 @@ LORE_CATEGORIES = [
 _initial_killed = is_killswitch_active()
 _initial_kill_label = "🔴 KILLSWITCH — DEACTIVATE" if _initial_killed else "🟢 KILLSWITCH — ACTIVATE"
 
-with gr.Blocks(title="Pantheon Studios Control Panel", css=CSS_THEME, theme=gr.themes.Base()) as demo:
+with gr.Blocks(title="Pantheon Studios Admin Page", css=CSS_THEME, theme=gr.themes.Base()) as demo:
     gr.HTML(HUD_BANNER_HTML)
     gr.Markdown(
         "> **Secure LAN access** — this panel can be reached from other devices on the same local network. "
