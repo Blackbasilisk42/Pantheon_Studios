@@ -38,7 +38,48 @@
         </div>
       </header>
 
+      {% if notice %}
+      <section class="notice-banner {{ notice_level }}">
+        {{ notice }}
+      </section>
+      {% endif %}
+
       <main class="content-grid">
+        <section id="account" class="glass-panel account-panel">
+          <div class="panel-header">
+            <div>
+              <h2>Team Accounts</h2>
+              <p>Create user access or update your Team Hub identity settings.</p>
+            </div>
+          </div>
+          {% if user %}
+          <form action="/account/setup" method="post" class="studio-form account-form">
+            <input name="username" placeholder="New username (optional)" />
+            <input name="avatar_url" placeholder="Avatar URL (optional)" value="{{ user.avatar_url or '' }}" />
+            <input name="new_password" type="password" placeholder="New password (optional)" />
+            <input name="confirm_new_password" type="password" placeholder="Confirm new password" />
+            <button type="submit">Save Account Settings</button>
+          </form>
+          {% else %}
+          <div class="account-columns">
+            <form action="/login" method="post" class="studio-form account-form">
+              <h3>Login</h3>
+              <input name="username" placeholder="Username" required />
+              <input name="password" type="password" placeholder="Password" required />
+              <button type="submit">Login to Team Hub</button>
+            </form>
+            <form action="/register" method="post" class="studio-form account-form">
+              <h3>Create Account</h3>
+              <input name="username" placeholder="Username" required />
+              <input name="avatar_url" placeholder="Avatar URL (optional)" />
+              <input name="password" type="password" placeholder="Password (min 8 chars)" required />
+              <input name="confirm_password" type="password" placeholder="Confirm password" required />
+              <button type="submit">Create Team Account</button>
+            </form>
+          </div>
+          {% endif %}
+        </section>
+
         <section id="vault" class="glass-panel hero-panel">
           <div class="panel-header">
             <div>

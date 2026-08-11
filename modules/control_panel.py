@@ -119,137 +119,228 @@ CSS_THEME = """
 
 :root, .dark, body {
   color-scheme: dark;
+    --hub-emerald: #00ff66;
+    --hub-mint: #a3ffe0;
+    --hub-panel: rgba(6, 12, 9, 0.85);
+    --hub-panel-soft: rgba(7, 11, 12, 0.72);
   --body-text-color: #ffffff !important;
-  --body-text-color-subdued: #a5f3fc !important;
-  --body-text-color-subdued-dark: #a5f3fc !important;
-  --block-label-text-color: #00f3ff !important;
-  --block-label-text-color-dark: #00f3ff !important;
+    --body-text-color-subdued: var(--hub-mint) !important;
+    --body-text-color-subdued-dark: var(--hub-mint) !important;
+    --block-label-text-color: var(--hub-emerald) !important;
+    --block-label-text-color-dark: var(--hub-emerald) !important;
   --table-cell-text-color: #ffffff !important;
   --table-cell-text-color-dark: #ffffff !important;
   --input-text-color: #ffffff !important;
   --input-text-color-dark: #ffffff !important;
-  --checkbox-label-text-color: #d1f4ff !important;
-  --block-title-text-color: #00f3ff !important;
-  --subdued-text-color: #a5f3fc !important;
+    --checkbox-label-text-color: var(--hub-mint) !important;
+    --block-title-text-color: var(--hub-emerald) !important;
+    --subdued-text-color: var(--hub-mint) !important;
 }
+
+body {
+    margin: 0;
+    min-height: 100vh;
+}
+
 * { color-scheme: dark; }
 p, span, label, td, th, div, input, textarea, select, button, blockquote, code, pre, .prose *, .prose {
-  color: #e2e8f0 !important;
+    color: #ffffff !important;
   text-shadow: none !important;
 }
 h1, h2, h3, h4, .block-title, label span {
-  color: #00f3ff !important;
+    color: var(--hub-emerald) !important;
   font-weight: 600 !important;
 }
-.gradio-container {
-  background: radial-gradient(circle at top left, rgba(0,243,255,0.08), transparent 24%), linear-gradient(180deg, #06080e 0%, #0b0f19 100%);
-  font-family: 'Orbitron', sans-serif;
-  padding: 16px;
+
+body, .gradio-container {
+    background: radial-gradient(circle, rgba(3,7,5,0.78) 0%, rgba(3,7,5,0.96) 100%),
+                            url("/file=hub/static/assets/background_aura.png") center/cover no-repeat fixed !important;
 }
+
+.gradio-container {
+  font-family: 'Orbitron', sans-serif;
+    padding: 24px;
+}
+
 .gradio-container::before {
   content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
-  background-image: linear-gradient(rgba(0,243,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(0,243,255,0.08) 1px, transparent 1px);
-  background-size: 28px 28px;
-  opacity: 0.16;
-  mask-image: linear-gradient(180deg, rgba(0,0,0,0.65), rgba(0,0,0,0));
+    background: radial-gradient(circle at top, rgba(3,7,5,0.65), rgba(3,7,5,0.9));
+    z-index: 0;
 }
+
+.gradio-container::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image: linear-gradient(rgba(0,255,102,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,102,0.07) 1px, transparent 1px);
+  background-size: 28px 28px;
+    opacity: 0.18;
+  mask-image: linear-gradient(180deg, rgba(0,0,0,0.65), rgba(0,0,0,0));
+    z-index: 0;
+}
+
+.gradio-container > * {
+    position: relative;
+    z-index: 1;
+}
+
 body, p, span, h1, h2, h3, label, table, td, th, .prose, .gradio-container, .gradio-container .gradio-markdown, .gradio-container .gradio-textbox, .gradio-container .gradio-dropdown, .gradio-container .gradio-checkbox, .gradio-container .gradio-slider, .gradio-container .gr-box {
-  color: #e2e8f0 !important;
+    color: #ffffff !important;
 }
 body, .gradio-container, .gradio-container .gradio-markdown, .gradio-container .gradio-textbox, .gradio-container .gradio-dropdown, .gradio-container .gradio-checkbox, .gradio-container .gradio-slider {
-  color: #e2e8f0 !important;
+    color: #ffffff !important;
 }
+
 h1, h2, h3, .hud-title {
   font-family: 'Orbitron', sans-serif;
   text-transform: uppercase;
-  letter-spacing: 0.22em;
+    letter-spacing: 0.28em;
   color: #ffffff !important;
-  text-shadow: 0 0 10px #00f3ff;
+    text-shadow: 0 0 12px rgba(0,255,102,0.35);
 }
+
 .hud-title {
   color: #ffffff !important;
-  text-shadow: 0 0 10px #00f3ff;
+    text-shadow: 0 0 12px rgba(0,255,102,0.35);
 }
+
 .gradio-container .gradio-markdown, .gradio-container .gradio-markdown p, .gradio-container .gradio-markdown span, .gradio-container .gradio-markdown table, .gradio-container .gradio-markdown td, .gradio-container .gradio-markdown th {
-  color: #d1f4ff !important;
+    color: var(--hub-mint) !important;
 }
+
 .gradio-container .gradio-textbox, .gradio-container .gradio-dropdown, .gradio-container .gradio-checkbox, .gradio-container .gradio-slider, .gradio-container .gradio-button, .gradio-container .gradio-label {
-  color: #a5f3fc !important;
+    color: var(--hub-mint) !important;
 }
+
 .gradio-container .gradio-label, .gradio-container label, .gradio-container .block label, .gradio-container .gradio-dropdown .wrap, .gradio-container .gradio-dropdown .options, .gradio-container .gradio-dropdown .option {
-  color: #00f3ff !important;
+    color: var(--hub-emerald) !important;
 }
+
 .gradio-container table th {
-  color: #00f3ff !important;
+    color: var(--hub-emerald) !important;
+    text-shadow: 0 0 10px rgba(0,255,102,0.28);
+    border-bottom: 1px solid rgba(0,255,102,0.35);
 }
+
 .gradio-container table td, .gradio-container table tr {
   color: #ffffff !important;
 }
+
 .gradio-container textarea, .gradio-container .hud-terminal, .gradio-container .gradio-textbox textarea {
   color: #ffffff !important;
-  background: #090d16 !important;
+    background: rgba(9, 13, 22, 0.95) !important;
 }
+
 .gradio-container .gradio-container .prose, .gradio-container .prose {
-  color: #d1f4ff !important;
+    color: var(--hub-mint) !important;
 }
+
 .hud-card, .gradio-container .gr-box, .gradio-container .gr-form, .gradio-container .block, .gradio-container .tabitem, .gradio-container .tabs {
-  background: rgba(14, 20, 36, 0.84) !important;
-  border: 1px solid rgba(0,243,255,0.42) !important;
-  box-shadow: 0 0 12px rgba(0,243,255,0.15), inset 0 0 8px rgba(0,243,255,0.08) !important;
-  border-radius: 16px;
+    border: 1px solid rgba(0,255,102,0.4) !important;
+    border-radius: 24px;
+    background: var(--hub-panel-soft) !important;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 0 14px rgba(0,255,102,0.16) !important;
 }
+
+.hud-card {
+    padding: 16px !important;
+}
+
+.gradio-container .tabs {
+    margin-top: 24px;
+    padding: 12px;
+}
+
+.gradio-container .tabs .tab-nav {
+    gap: 8px;
+}
+
+.gradio-container .tabs .tab-nav button {
+    color: #ffffff !important;
+    border: 1px solid rgba(0,255,102,0.35) !important;
+    background: rgba(0,255,102,0.12) !important;
+    border-radius: 999px !important;
+    padding: 8px 12px !important;
+}
+
+.gradio-container .tabs .tab-nav button.selected,
+.gradio-container .tabs .tab-nav button[aria-selected="true"] {
+    background: rgba(0,255,102,0.22) !important;
+    box-shadow: 0 0 16px rgba(0,255,102,0.26) !important;
+}
+
 .gradio-container .gradio-button {
-  background: linear-gradient(135deg, #092635 0%, #0f8f9b 100%) !important;
-  color: #f7ffff !important;
-  border: 1px solid rgba(0,243,255,0.55) !important;
-  box-shadow: 0 0 10px rgba(0,243,255,0.22) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(0,255,102,0.35) !important;
+    background: rgba(0,255,102,0.12) !important;
+    box-shadow: 0 0 14px rgba(0,255,102,0.14) !important;
   border-radius: 999px !important;
+    padding: 8px 12px !important;
+    text-decoration: none;
   transition: transform 0.16s ease, box-shadow 0.16s ease;
 }
+
 .gradio-container .gradio-button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 0 16px rgba(0,243,255,0.36) !important;
+    box-shadow: 0 0 20px rgba(0,255,102,0.3) !important;
 }
+
 .hud-btn-killswitch {
   background: linear-gradient(135deg, #26070c 0%, #ff3366 100%) !important;
   box-shadow: 0 0 14px rgba(255,51,102,0.38) !important;
 }
+
 .hud-btn-success {
-  background: linear-gradient(135deg, #062e1f 0%, #00ff88 100%) !important;
-  box-shadow: 0 0 10px rgba(0,255,136,0.28) !important;
+    background: rgba(0,255,102,0.18) !important;
+    box-shadow: 0 0 14px rgba(0,255,102,0.24) !important;
 }
+
 .hud-terminal {
-  background: #050b12 !important;
-  color: #78ffb2 !important;
+    background: var(--hub-panel) !important;
+    color: #d7fff0 !important;
   font-family: 'Fira Code', monospace !important;
-  border: 1px solid rgba(0,243,255,0.35) !important;
-  box-shadow: inset 0 0 12px rgba(0,243,255,0.12) !important;
+    border: 1px solid rgba(0,255,102,0.35) !important;
+    box-shadow: inset 0 0 16px rgba(0,255,102,0.1) !important;
 }
+
 .hud-banner {
-  padding: 16px 20px;
-  border-radius: 18px;
-  background: linear-gradient(90deg, rgba(7,16,28,0.95), rgba(12,25,41,0.9));
-  border: 1px solid rgba(0,243,255,0.5);
-  box-shadow: 0 0 20px rgba(0,243,255,0.18);
+    padding: 18px 24px;
+    border: 1px solid rgba(0,255,102,0.45);
+    border-radius: 22px;
+    background: rgba(8, 12, 14, 0.75);
+    backdrop-filter: blur(18px);
+    box-shadow: 0 0 24px rgba(0,255,102,0.16);
 }
+
 .hud-badge {
   display: inline-block;
-  padding: 5px 10px;
+    padding: 6px 10px;
   border-radius: 999px;
-  background: rgba(0,255,136,0.14);
-  color: #7bffb1;
-  border: 1px solid rgba(0,255,136,0.36);
-  box-shadow: 0 0 8px rgba(0,255,136,0.18);
+    background: rgba(0,255,102,0.14);
+    color: #d7fff0;
+    border: 1px solid rgba(0,255,102,0.36);
+    box-shadow: 0 0 8px rgba(0,255,102,0.18);
 }
+
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: rgba(4,8,14,0.8); }
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #0f8f9b, #00f3ff);
+    background: linear-gradient(180deg, rgba(0,255,102,0.52), rgba(0,255,102,0.9));
   border-radius: 999px;
   border: 1px solid rgba(255,255,255,0.08);
+}
+
+@media (max-width: 900px) {
+    .hud-banner > div {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 14px !important;
+    }
 }
 """
 
@@ -258,11 +349,11 @@ HUD_BANNER_HTML = """
   <div style='display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;'>
     <div>
       <div class='hud-title' style='font-size:1.35rem; margin:0;'>PANTHEON STUDIOS ADMIN PAGE</div>
-      <div style='font-size:0.9rem; color:#88d8ff; margin-top:6px;'>Multi-threaded orchestration • secure LAN access • autonomous synthesis</div>
+            <div style='font-size:0.9rem; color:#a3ffe0; margin-top:4px;'>Multi-threaded orchestration • secure LAN access • autonomous synthesis</div>
     </div>
     <div style='display:flex; align-items:center; gap:10px; flex-wrap:wrap;'>
       <span class='hud-badge'>● SYSTEM ONLINE / MULTI-THREADED</span>
-      <span style='font-family:"Fira Code", monospace; color:#7af7ff;'>http://{local_ip}:7860</span>
+            <span style='font-family:"Fira Code", monospace; color:#a3ffe0;'>http://{local_ip}:7860</span>
       <span class='hud-badge'>AUTHORIZED ACCESS</span>
     </div>
   </div>
