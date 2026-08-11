@@ -239,21 +239,41 @@ h1, h2, h3, .hud-title {
     color: var(--hub-mint) !important;
 }
 
-.hud-card, .gradio-container .gr-box, .gradio-container .gr-form, .gradio-container .block, .gradio-container .tabitem, .gradio-container .tabs {
+.gradio-container .gr-box,
+.gradio-container .gr-form,
+.gradio-container .block,
+.gradio-container .tabitem,
+.gradio-container .gr-panel {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+}
+
+.hud-card {
+    padding: 16px !important;
     border: 1px solid rgba(0,255,102,0.4) !important;
-    border-radius: 24px;
+    border-radius: 24px !important;
     background: var(--hub-panel-soft) !important;
     backdrop-filter: blur(16px);
     box-shadow: 0 0 14px rgba(0,255,102,0.16) !important;
 }
 
-.hud-card {
-    padding: 16px !important;
-}
-
 .gradio-container .tabs {
     margin-top: 24px;
-    padding: 12px;
+    padding: 0;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.gradio-container .tabitem {
+    margin-top: 10px;
+    padding: 16px;
+    border: 1px solid rgba(0,255,102,0.4) !important;
+    border-radius: 24px;
+    background: var(--hub-panel-soft) !important;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 0 14px rgba(0,255,102,0.16) !important;
 }
 
 .gradio-container .tabs .tab-nav {
@@ -310,11 +330,11 @@ h1, h2, h3, .hud-title {
 
 .hud-banner {
     padding: 18px 24px;
-    border: 1px solid rgba(0,255,102,0.45);
+    border: 1px solid rgba(0,255,102,0.45) !important;
     border-radius: 22px;
     background: rgba(8, 12, 14, 0.75);
     backdrop-filter: blur(18px);
-    box-shadow: 0 0 24px rgba(0,255,102,0.16);
+    box-shadow: 0 0 18px rgba(0,255,102,0.14) !important;
 }
 
 .hud-badge {

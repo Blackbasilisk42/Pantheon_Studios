@@ -35,3 +35,8 @@ __pycache__/
 # Logs
 *.log
 logs/
+
+# Hub runtime artifacts
+hub/.venv/
+hub/hub_data.db
+hub/static/PUBLIC_URL.txt
