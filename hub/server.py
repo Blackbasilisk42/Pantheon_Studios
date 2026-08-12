@@ -104,6 +104,16 @@ async def index(request: Request, db: Session = Depends(get_db)):
     )
 
 
+@app.get("/team", response_class=HTMLResponse)
+async def team_dashboard(request: Request):
+    return templates.TemplateResponse(
+        "team.html",
+        {
+            "request": request,
+        },
+    )
+
+
 @app.get("/api/me")
 def me(request: Request, db: Session = Depends(get_db)) -> JSONResponse:
     user = get_current_user(request, db)

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pantheon OS Squad Dossiers</title>
+    <link rel="stylesheet" href="/static/css/cyberpunk-hud.css" />
+  </head>
+  <body>
+    <div class="dashboard-shell">
+      <header class="telemetry-bar">
+        <h1 class="telemetry-title">PANTHEON_OS // SQUAD_DOSSIERS</h1>
+        <div class="telemetry-chip">SYS_CLOCK: <span id="liveClock">--:--:-- UTC</span></div>
+        <div class="telemetry-chip">ACTIVE_CONNECTIONS: <span id="activeConnections">1204</span></div>
+      </header>
+
+      <main class="hud-grid">
+        <section class="hud-panel">
+          <div class="panel-head">
+            <h2>Team Dossier Grid</h2>
+            <p>Clearance cards with realtime operational states</p>
+          </div>
+
+          <div class="dossier-grid" id="dossierGrid">
+            <article class="dossier-card" data-callsign="GHOSTWIRE">
+              <div class="dossier-head">
+                <div class="avatar-frame" aria-hidden="true">GW</div>
+                <div class="dossier-title">
+                  <span class="callsign">CALLSIGN: GHOSTWIRE</span>
+                  <span class="agent-name">Aria Kade</span>
+                  <span class="rank">RANK: NETRUNNER L3</span>
+                </div>
+              </div>
+              <div class="status-badge" data-status-badge>
+                <span class="status-dot"></span>
+                <span class="status-field">ONLINE / IN_FIELD</span>
+              </div>
+              <div class="tag-row">
+                <span class="skill-tag">Signal Override</span>
+                <span class="skill-tag">Packet Forensics</span>
+                <span class="skill-tag">Zero-Day Mapping</span>
+              </div>
+              <button class="btn-hud" type="button">Mod Dossier</button>
+            </article>
+
+            <article class="dossier-card" data-callsign="NEONRIFT">
+              <div class="dossier-head">
+                <div class="avatar-frame" aria-hidden="true">NR</div>
+                <div class="dossier-title">
+                  <span class="callsign">CALLSIGN: NEONRIFT</span>
+                  <span class="agent-name">Jun Mercer</span>
+                  <span class="rank">RANK: OPS LEAD L4</span>
+                </div>
+              </div>
+              <div class="status-badge" data-status-badge>
+                <span class="status-dot"></span>
+                <span class="status-field">ONLINE / COMMAND</span>
+              </div>
+              <div class="tag-row">
+                <span class="skill-tag">Mission Routing</span>
+                <span class="skill-tag">AI Triage</span>
+                <span class="skill-tag">Incident Containment</span>
+              </div>
+              <button class="btn-hud" type="button">Mod Dossier</button>
+            </article>
+
+            <article class="dossier-card" data-callsign="VECTORHEX">
+              <div class="dossier-head">
+                <div class="avatar-frame" aria-hidden="true">VH</div>
+                <div class="dossier-title">
+                  <span class="callsign">CALLSIGN: VECTORHEX</span>
+                  <span class="agent-name">Milo Soren</span>
+                  <span class="rank">RANK: SEC ENGINEER L2</span>
+                </div>
+              </div>
+              <div class="status-badge" data-status-badge>
+                <span class="status-dot"></span>
+                <span class="status-field">ONLINE / WATCHLIST</span>
+              </div>
+              <div class="tag-row">
+                <span class="skill-tag">Threat Modelling</span>
+                <span class="skill-tag">WAF Tuning</span>
+                <span class="skill-tag">Audit Trails</span>
+              </div>
+              <button class="btn-hud" type="button">Mod Dossier</button>
+            </article>
+
+            <article class="dossier-card" data-callsign="ROOTADMIN">
+              <div class="dossier-head">
+                <div class="avatar-frame" aria-hidden="true">RA</div>
+                <div class="dossier-title">
+                  <span class="callsign">CALLSIGN: ROOTADMIN</span>
+                  <span class="agent-name">Ops Sentinel</span>
+                  <span class="rank">RANK: ROOT ADMIN</span>
+                </div>
+              </div>
+              <div class="status-badge status-alert" data-status-badge>
+                <span class="status-dot"></span>
+                <span class="status-field">ALERT / PRIV_ESC_ATTEMPT</span>
+              </div>
+              <div class="tag-row">
+                <span class="skill-tag">Kernel Shield</span>
+                <span class="skill-tag">Node Quarantine</span>
+                <span class="skill-tag">Root Audit</span>
+              </div>
+              <button class="btn-hud" type="button">Mod Dossier</button>
+            </article>
+          </div>
+        </section>
+
+        <section class="hud-panel">
+          <div class="panel-head">
+            <h2>Interactive Comms Log</h2>
+            <p>Encrypted updates broadcast to all active team channels</p>
+          </div>
+
+          <div id="commsLog" class="comms-log" aria-live="polite">
+            <div class="log-line"><span class="stamp">[08:12:05]</span><span class="channel">[ENC]</span> GHOSTWIRE: Payload hash validated, entering stealth relay.</div>
+            <div class="log-line"><span class="stamp">[08:14:40]</span><span class="channel">[ENC]</span> NEONRIFT: Sprint gate unlocked for Team Hub visual stack.</div>
+            <div class="log-line"><span class="stamp">[08:16:21]</span><span class="channel">[ENC]</span> VECTORHEX: New auth signatures pushed to staging perimeter.</div>
+          </div>
+
+          <div class="controls">
+            <form id="statusForm" class="control-group">
+              <label for="agentCallsign">Update Member Status</label>
+              <div class="control-grid">
+                <select id="agentCallsign" name="agentCallsign" required>
+                  <option value="">Select callsign</option>
+                  <option value="GHOSTWIRE">GHOSTWIRE</option>
+                  <option value="NEONRIFT">NEONRIFT</option>
+                  <option value="VECTORHEX">VECTORHEX</option>
+                  <option value="ROOTADMIN">ROOTADMIN</option>
+                </select>
+                <input id="agentStatus" name="agentStatus" type="text" placeholder="ONLINE / IN_FIELD" required />
+              </div>
+              <button class="btn-hud" type="submit">Patch Status</button>
+            </form>
+
+            <form id="updateForm" class="control-group">
+              <label for="updateMessage">Post Encrypted Project Update</label>
+              <input id="updateAuthor" name="updateAuthor" type="text" placeholder="Author callsign" required />
+              <textarea id="updateMessage" name="updateMessage" placeholder="Enter encrypted project update..." required></textarea>
+              <button class="btn-hud" type="submit">Transmit</button>
+            </form>
+            <p class="helper">Root Admin alerts automatically render in Tactical Red (#ff3333).</p>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const liveClock = document.getElementById("liveClock");
+      const connectionsNode = document.getElementById("activeConnections");
+      const statusForm = document.getElementById("statusForm");
+      const updateForm = document.getElementById("updateForm");
+      const commsLog = document.getElementById("commsLog");
+      const STATUS_STORE_KEY = "pantheon.team.status.v1";
+      const COMMS_STORE_KEY = "pantheon.team.comms.v1";
+      const MAX_STORED_LOGS = 50;
+
+      function renderClock() {
+        const now = new Date();
+        const pad = (v) => String(v).padStart(2, "0");
+        const stamp = `${pad(now.getUTCHours())}:${pad(now.getUTCMinutes())}:${pad(now.getUTCSeconds())} UTC`;
+        liveClock.textContent = stamp;
+      }
+
+      function stampNow() {
+        const now = new Date();
+        const pad = (v) => String(v).padStart(2, "0");
+        return `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+      }
+
+      function loadJson(key, fallback) {
+        try {
+          const raw = localStorage.getItem(key);
+          return raw ? JSON.parse(raw) : fallback;
+        } catch (_error) {
+          return fallback;
+        }
+      }
+
+      function saveJson(key, value) {
+        try {
+          localStorage.setItem(key, JSON.stringify(value));
+        } catch (_error) {
+          // Storage is best-effort for dashboard convenience.
+        }
+      }
+
+      function applyStatus(callsign, statusText) {
+        const card = document.querySelector(`.dossier-card[data-callsign='${callsign}']`);
+        if (!card) {
+          return false;
+        }
+
+        const badge = card.querySelector("[data-status-badge]");
+        const statusField = card.querySelector(".status-field");
+        statusField.textContent = statusText;
+
+        const isAdminAlert = callsign === "ROOTADMIN" || statusText.includes("ALERT");
+        badge.classList.toggle("status-alert", isAdminAlert);
+        return true;
+      }
+
+      function saveCurrentStatuses() {
+        const statuses = {};
+        document.querySelectorAll(".dossier-card[data-callsign]").forEach((card) => {
+          const callsign = card.getAttribute("data-callsign");
+          const statusField = card.querySelector(".status-field");
+          if (callsign && statusField) {
+            statuses[callsign] = statusField.textContent.trim();
+          }
+        });
+        saveJson(STATUS_STORE_KEY, statuses);
+      }
+
+      function renderStoredComms() {
+        const storedLogs = loadJson(COMMS_STORE_KEY, []);
+        if (!Array.isArray(storedLogs) || storedLogs.length === 0) {
+          return;
+        }
+
+        commsLog.innerHTML = "";
+        storedLogs.forEach((entry) => {
+          const line = document.createElement("div");
+          line.className = "log-line";
+
+          const stamp = document.createElement("span");
+          stamp.className = "stamp";
+          stamp.textContent = `[${entry.stamp || "--:--:--"}]`;
+
+          const channel = document.createElement("span");
+          channel.className = "channel";
+          channel.textContent = "[ENC]";
+
+          line.appendChild(stamp);
+          line.appendChild(channel);
+          line.append(` ${(entry.author || "SYSTEM").toUpperCase()}: ${entry.message || ""}`);
+
+          if ((entry.author || "").trim().toUpperCase() === "ROOTADMIN") {
+            line.style.borderLeftColor = "#ff3333";
+            line.style.color = "#ffb0b0";
+          }
+
+          commsLog.appendChild(line);
+        });
+      }
+
+      function persistCommsFromDom() {
+        const logEntries = [];
+        commsLog.querySelectorAll(".log-line").forEach((line) => {
+          const stampNode = line.querySelector(".stamp");
+          const text = line.textContent || "";
+          const normalized = text.replace(/\s+/g, " ").trim();
+          const parts = normalized.split(": ");
+          const head = parts.shift() || "";
+          const message = parts.join(": ");
+          const authorMatch = head.match(/\[ENC\]\s+([^:]+)$/);
+
+          logEntries.push({
+            stamp: (stampNode?.textContent || "").replace(/\[|\]/g, ""),
+            author: authorMatch ? authorMatch[1].trim() : "SYSTEM",
+            message,
+          });
+        });
+
+        saveJson(COMMS_STORE_KEY, logEntries.slice(0, MAX_STORED_LOGS));
+      }
+
+      function appendLog(author, message) {
+        const line = document.createElement("div");
+        line.className = "log-line";
+
+        const stamp = document.createElement("span");
+        stamp.className = "stamp";
+        stamp.textContent = `[${stampNow()}]`;
+
+        const channel = document.createElement("span");
+        channel.className = "channel";
+        channel.textContent = "[ENC]";
+
+        line.appendChild(stamp);
+        line.appendChild(channel);
+        line.append(` ${author.toUpperCase()}: ${message}`);
+
+        const isRootAlert = author.trim().toUpperCase() === "ROOTADMIN";
+        if (isRootAlert) {
+          line.style.borderLeftColor = "#ff3333";
+          line.style.color = "#ffb0b0";
+        }
+
+        commsLog.prepend(line);
+        while (commsLog.children.length > MAX_STORED_LOGS) {
+          commsLog.removeChild(commsLog.lastElementChild);
+        }
+        persistCommsFromDom();
+      }
+
+      statusForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const callsign = document.getElementById("agentCallsign").value.trim().toUpperCase();
+        const status = document.getElementById("agentStatus").value.trim().toUpperCase();
+
+        if (!callsign || !status) {
+          return;
+        }
+
+        const updated = applyStatus(callsign, status);
+        if (!updated) {
+          appendLog("SYSTEM", `Unknown callsign ${callsign} in status patch.`);
+          return;
+        }
+
+        appendLog("SYSTEM", `${callsign} status patched to ${status}.`);
+        saveCurrentStatuses();
+        statusForm.reset();
+      });
+
+      updateForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const author = document.getElementById("updateAuthor").value.trim();
+        const message = document.getElementById("updateMessage").value.trim();
+
+        if (!author || !message) {
+          return;
+        }
+
+        appendLog(author, message);
+
+        const nextConnections = Number(connectionsNode.textContent || "0") + 1;
+        connectionsNode.textContent = String(nextConnections);
+
+        updateForm.reset();
+      });
+
+      const storedStatuses = loadJson(STATUS_STORE_KEY, {});
+      Object.entries(storedStatuses).forEach(([callsign, statusText]) => {
+        applyStatus(String(callsign).toUpperCase(), String(statusText).toUpperCase());
+      });
+
+      renderStoredComms();
+      if (loadJson(COMMS_STORE_KEY, []).length === 0) {
+        persistCommsFromDom();
+      }
+
+      renderClock();
+      setInterval(renderClock, 1000);
+    </script>
+  </body>
+</html>

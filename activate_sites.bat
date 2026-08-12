@@ -3,9 +3,6 @@ setlocal
 set "ROOT=%~dp0"
 cd /d "%ROOT%"
 
-set "MODE=%~1"
-if "%MODE%"=="" set "MODE=all"
-
 where python >nul 2>nul
 if errorlevel 1 (
   echo [launcher] python was not found on PATH.
@@ -27,12 +24,6 @@ python modules/preflight.py
 if errorlevel 1 (
   echo [launcher] pre-flight checks failed.
   exit /b 1
-)
-
-if /I "%MODE%"=="control" (
-  echo [launcher] launching Pantheon Studios control panel only...
-  python modules/control_panel.py
-  exit /b %errorlevel%
 )
 
 echo [launcher] launching all enabled Pantheon sites...
