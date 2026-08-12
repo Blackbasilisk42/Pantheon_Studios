@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PANTHEON_OS // OPERATIVE ACCESS TERMINAL</title>
+    <style>
+        :root {
+            --bg-void: #05070a;
+            --neon-emerald: #00ff9d;
+            --neon-cyan: #00e5ff;
+            --neon-pink: #ff007f;
+            --panel-bg: rgba(10, 16, 26, 0.85);
+            --border-glow: 0 0 10px rgba(0, 229, 255, 0.3);
+        }
+
+        body {
+            background-color: var(--bg-void);
+            color: var(--neon-cyan);
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(0, 229, 255, 0.05) 0%, transparent 80%),
+                linear-gradient(rgba(0, 255, 157, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 4px;
+        }
+
+        .terminal-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--neon-cyan);
+            box-shadow: var(--border-glow);
+            width: 440px;
+            padding: 30px;
+            clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+            position: relative;
+        }
+
+        .header {
+            border-bottom: 1px solid var(--neon-cyan);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 1.1rem;
+            margin: 0;
+            color: var(--neon-emerald);
+            letter-spacing: 2px;
+        }
+
+        .header .sub {
+            font-size: 0.75rem;
+            color: #8a9ba8;
+            margin-top: 4px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: rgba(0, 229, 255, 0.05);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            color: #8a9ba8;
+            padding: 10px;
+            font-family: inherit;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn.active {
+            background: rgba(0, 229, 255, 0.2);
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+            font-weight: bold;
+            box-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.75rem;
+            margin-bottom: 6px;
+            color: var(--neon-emerald);
+            letter-spacing: 1px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            box-sizing: border-box;
+            background: rgba(5, 7, 10, 0.9);
+            border: 1px solid rgba(0, 229, 255, 0.4);
+            color: #ffffff;
+            padding: 10px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            outline: none;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+        }
+
+        .action-btn {
+            width: 100%;
+            background: var(--neon-cyan);
+            color: #000;
+            border: none;
+            padding: 12px;
+            font-family: inherit;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 10px;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: var(--neon-emerald);
+            box-shadow: 0 0 12px rgba(0, 255, 157, 0.6);
+        }
+
+        .status-msg {
+            margin-top: 15px;
+            font-size: 0.8rem;
+            text-align: center;
+            min-height: 18px;
+        }
+
+        .status-msg.error { color: var(--neon-pink); }
+        .status-msg.success { color: var(--neon-emerald); }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="terminal-card">
+    <div class="header">
+        <h1>PANTHEON_OS // ACCESS_TERMINAL</h1>
+        <div class="sub">SYS_VER: 2.4.0 // AUTHENTICATION_PROTOCOL</div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" id="btn-login" onclick="switchTab('login')">[SIGN_IN]</button>
+        <button class="tab-btn" id="btn-register" onclick="switchTab('register')">[REGISTER]</button>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <form id="form-login" onsubmit="handleLogin(event)">
+        <div class="form-group">
+            <label>OPERATIVE CALLSIGN</label>
+            <input type="text" id="login-callsign" placeholder="e.g. KAIGE_01" required>
+        </div>
+        <div class="form-group">
+            <label>PASSKEY</label>
+            <input type="password" id="login-passkey" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="action-btn">AUTHENTICATE</button>
+    </form>
+
+    <!-- REGISTER FORM -->
+    <form id="form-register" class="hidden" onsubmit="handleRegister(event)">
+        <div class="form-group">
+            <label>OPERATIVE CALLSIGN</label>
+            <input type="text" id="reg-callsign" placeholder="e.g. KAIGE_01" required>
+        </div>
+        <div class="form-group">
+            <label>PASSKEY</label>
+            <input type="password" id="reg-passkey" placeholder="••••••••" required>
+        </div>
+        <div class="form-group">
+            <label>SPECIALTY / ROLE</label>
+            <select id="reg-role">
+                <option value="Tactical Operative">Tactical Operative</option>
+                <option value="Creative Director">Creative Director</option>
+                <option value="Lead Developer">Lead Developer</option>
+                <option value="Systems Specialist">Systems Specialist</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>CLEARANCE LEVEL</label>
+            <select id="reg-clearance">
+                <option value="LEVEL_01">LEVEL_01 (Standard)</option>
+                <option value="LEVEL_02">LEVEL_02 (Tactical)</option>
+                <option value="LEVEL_03">LEVEL_03 (Command)</option>
+            </select>
+        </div>
+        <button type="submit" class="action-btn">INITIALIZE OPERATIVE</button>
+    </form>
+
+    <div id="status-message" class="status-msg"></div>
+</div>
+
+<script>
+    function switchTab(tab) {
+        const loginBtn = document.getElementById('btn-login');
+        const regBtn = document.getElementById('btn-register');
+        const loginForm = document.getElementById('form-login');
+        const regForm = document.getElementById('form-register');
+        const status = document.getElementById('status-message');
+
+        status.innerText = '';
+
+        if (tab === 'login') {
+            loginBtn.classList.add('active');
+            regBtn.classList.remove('active');
+            loginForm.classList.remove('hidden');
+            regForm.classList.add('hidden');
+        } else {
+            regBtn.classList.add('active');
+            loginBtn.classList.remove('active');
+            regForm.classList.remove('hidden');
+            loginForm.classList.add('hidden');
+        }
+    }
+
+    function getUsers() {
+        return JSON.parse(localStorage.getItem('pantheon_operatives') || '{}');
+    }
+
+    function handleRegister(e) {
+        e.preventDefault();
+        const callsign = document.getElementById('reg-callsign').value.trim();
+        const passkey = document.getElementById('reg-passkey').value;
+        const role = document.getElementById('reg-role').value;
+        const clearance = document.getElementById('reg-clearance').value;
+        const status = document.getElementById('status-message');
+
+        const users = getUsers();
+
+        if (users[callsign]) {
+            status.className = 'status-msg error';
+            status.innerText = 'CALLSIGN ALREADY REGISTERED IN SYSTEM.';
+            return;
+        }
+
+        users[callsign] = {
+            callsign: callsign,
+            passkey: passkey,
+            role: role,
+            clearance: clearance,
+            registered: new Date().toISOString(),
+            status: 'ACTIVE_FIELD_AGENT'
+        };
+
+        localStorage.setItem('pantheon_operatives', JSON.stringify(users));
+        localStorage.setItem('pantheon_active_session', callsign);
+
+        status.className = 'status-msg success';
+        status.innerText = 'OPERATIVE CREATED. REDIRECTING TO PROFILE...';
+
+        setTimeout(() => {
+            window.location.href = 'profile.html';
+        }, 1200);
+    }
+
+    function handleLogin(e) {
+        e.preventDefault();
+        const callsign = document.getElementById('login-callsign').value.trim();
+        const passkey = document.getElementById('login-passkey').value;
+        const status = document.getElementById('status-message');
+
+        const users = getUsers();
+        const user = users[callsign];
+
+        if (!user || user.passkey !== passkey) {
+            status.className = 'status-msg error';
+            status.innerText = 'ACCESS DENIED: INVALID CALLSIGN OR PASSKEY.';
+            return;
+        }
+
+        localStorage.setItem('pantheon_active_session', callsign);
+
+        status.className = 'status-msg success';
+        status.innerText = 'AUTHENTICATED. ACCESSING DOSSIER...';
+
+        setTimeout(() => {
+            window.location.href = 'profile.html';
+        }, 1000);
+    }
+</script>
+
+</body>
+</html>

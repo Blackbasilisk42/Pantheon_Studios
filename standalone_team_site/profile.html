@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PANTHEON_OS // OPERATIVE DOSSIER</title>
+    <style>
+        :root {
+            --bg-void: #05070a;
+            --neon-emerald: #00ff9d;
+            --neon-cyan: #00e5ff;
+            --neon-pink: #ff007f;
+            --panel-bg: rgba(10, 16, 26, 0.85);
+            --border-glow: 0 0 10px rgba(0, 229, 255, 0.3);
+        }
+
+        body {
+            background-color: var(--bg-void);
+            color: var(--neon-cyan);
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(0, 229, 255, 0.05) 0%, transparent 80%),
+                linear-gradient(rgba(0, 255, 157, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 4px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--neon-cyan);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        .header-bar h1 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: var(--neon-emerald);
+            letter-spacing: 2px;
+        }
+
+        .btn-logout {
+            background: rgba(255, 0, 127, 0.15);
+            border: 1px solid var(--neon-pink);
+            color: var(--neon-pink);
+            padding: 8px 16px;
+            font-family: inherit;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .btn-logout:hover {
+            background: var(--neon-pink);
+            color: #000;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--panel-bg);
+            border: 1px solid var(--neon-cyan);
+            box-shadow: var(--border-glow);
+            padding: 20px;
+            clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
+        }
+
+        .card h2 {
+            margin-top: 0;
+            font-size: 0.95rem;
+            color: var(--neon-emerald);
+            border-bottom: 1px rgba(0, 229, 255, 0.3) dashed;
+            padding-bottom: 8px;
+            letter-spacing: 1px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .field-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+        }
+
+        .field-label { color: #8a9ba8; }
+        .field-val { color: #ffffff; font-weight: bold; }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        /* COMMS TABS */
+        .comms-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .tab-btn {
+            background: rgba(0, 229, 255, 0.05);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            color: #8a9ba8;
+            padding: 6px 12px;
+            font-family: inherit;
+            font-size: 0.75rem;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .tab-btn.active {
+            background: rgba(0, 229, 255, 0.2);
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+            font-weight: bold;
+        }
+
+        .dm-select-wrapper {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.8rem;
+        }
+
+        .dm-select-wrapper select, .upload-form select, .upload-form input[type="text"] {
+            background: rgba(5, 7, 10, 0.9);
+            border: 1px solid rgba(0, 229, 255, 0.4);
+            color: #ffffff;
+            padding: 6px 10px;
+            font-family: inherit;
+            font-size: 0.8rem;
+            outline: none;
+        }
+
+        .comms-log {
+            height: 160px;
+            overflow-y: auto;
+            background: rgba(5, 7, 10, 0.9);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            padding: 12px;
+            margin-bottom: 15px;
+            font-size: 0.8rem;
+        }
+
+        .msg-entry {
+            margin-bottom: 10px;
+            border-bottom: 1px dotted rgba(0, 229, 255, 0.15);
+            padding-bottom: 6px;
+        }
+
+        .msg-sender { color: var(--neon-emerald); font-weight: bold; }
+        .msg-sender.dm-me { color: var(--neon-cyan); }
+        .msg-time { color: #607080; font-size: 0.7rem; margin-left: 8px; }
+        .msg-body { color: #d0e0f0; margin-top: 4px; }
+
+        .comms-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .comms-input-group input {
+            flex: 1;
+            background: rgba(5, 7, 10, 0.9);
+            border: 1px solid rgba(0, 229, 255, 0.4);
+            color: #ffffff;
+            padding: 10px;
+            font-family: inherit;
+            outline: none;
+        }
+
+        .comms-input-group button, .action-btn-sm {
+            background: var(--neon-cyan);
+            color: #000;
+            border: none;
+            padding: 10px 18px;
+            font-family: inherit;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+
+        /* MEDIA VAULT STYLES */
+        .upload-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: rgba(5, 7, 10, 0.6);
+            padding: 15px;
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .upload-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .media-item {
+            background: rgba(5, 7, 10, 0.9);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            padding: 10px;
+            position: relative;
+        }
+
+        .media-item img {
+            width: 100%;
+            height: 130px;
+            object-fit: cover;
+            border: 1px solid rgba(0, 229, 255, 0.2);
+        }
+
+        .media-badge {
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            text-transform: uppercase;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 6px;
+        }
+
+        .badge-private { background: rgba(255, 0, 127, 0.2); color: var(--neon-pink); border: 1px solid var(--neon-pink); }
+        .badge-restricted { background: rgba(255, 230, 0, 0.2); color: #ffe600; border: 1px solid #ffe600; }
+        .badge-public { background: rgba(0, 255, 157, 0.2); color: var(--neon-emerald); border: 1px solid var(--neon-emerald); }
+
+        .media-title {
+            font-size: 0.8rem;
+            color: #ffffff;
+            margin-top: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-bar">
+        <h1>PANTHEON_OS // OPERATIVE_PROFILE</h1>
+        <button class="btn-logout" onclick="logout()">[TERMINATE_SESSION]</button>
+    </div>
+
+    <div class="grid">
+        <!-- DOSSIER DETAILS -->
+        <div class="card">
+            <h2>DOSSIER // IDENTITY</h2>
+            <div class="field-row">
+                <span class="field-label">CALLSIGN:</span>
+                <span class="field-val" id="disp-callsign">---</span>
+            </div>
+            <div class="field-row">
+                <span class="field-label">SPECIALTY:</span>
+                <span class="field-val" id="disp-role">---</span>
+            </div>
+            <div class="field-row">
+                <span class="field-label">CLEARANCE:</span>
+                <span class="field-val" id="disp-clearance">---</span>
+            </div>
+            <div class="field-row">
+                <span class="field-label">FIELD STATUS:</span>
+                <span class="field-val" id="disp-status" style="color: var(--neon-emerald);">---</span>
+            </div>
+        </div>
+
+        <!-- SYSTEM METRICS -->
+        <div class="card">
+            <h2>SYSTEM // TELEMETRY</h2>
+            <div class="field-row">
+                <span class="field-label">ENCRYPTION:</span>
+                <span class="field-val">AES-256-GCM</span>
+            </div>
+            <div class="field-row">
+                <span class="field-label">ACTIVE NODE:</span>
+                <span class="field-val">PANTHEON_HQ_01</span>
+            </div>
+            <div class="field-row">
+                <span class="field-label">INITIALIZED:</span>
+                <span class="field-val" id="disp-date">---</span>
+            </div>
+        </div>
+
+        <!-- TACTICAL COMMS & DM TERMINAL -->
+        <div class="card full-width">
+            <h2>TACTICAL_COMMS // NETWORK</h2>
+
+            <div class="comms-tabs">
+                <button class="tab-btn active" id="tab-broadcast" onclick="setMode('broadcast')">[BROADCAST_CHANNEL]</button>
+                <button class="tab-btn" id="tab-dm" onclick="setMode('dm')">[DIRECT_ENCRYPTED_MESSAGES]</button>
+            </div>
+
+            <div id="dm-recipient-bar" class="dm-select-wrapper hidden">
+                <span style="color: var(--neon-emerald);">SELECT RECIPIENT:</span>
+                <select id="dm-target" onchange="loadDMs()">
+                    <!-- Operatives auto-populate here -->
+                </select>
+            </div>
+
+            <div class="comms-log" id="comms-box">
+                <!-- Messages render here -->
+            </div>
+
+            <form class="comms-input-group" onsubmit="postMessage(event)">
+                <input type="text" id="msg-input" placeholder="Transmit signal..." required autocomplete="off">
+                <button type="submit">TRANSMIT</button>
+            </form>
+        </div>
+
+        <!-- MEDIA VAULT & UPLOAD SECTION -->
+        <div class="card full-width">
+            <h2>INTEL_VAULT // MEDIA_ASSETS</h2>
+
+            <!-- UPLOAD FORM -->
+            <form class="upload-form" onsubmit="uploadMedia(event)">
+                <div class="upload-row">
+                    <input type="text" id="media-title" placeholder="Intel Asset Caption/Title..." required style="flex:1;">
+                    <input type="file" id="media-file" accept="image/*" required style="color:#8a9ba8;">
+                </div>
+                <div class="upload-row">
+                    <label style="font-size:0.75rem; color:var(--neon-emerald);">VISIBILITY PROTOCOL:</label>
+                    <select id="media-privacy" onchange="toggleRestrictedTarget()">
+                        <option value="private">CLASSIFIED (Only Me)</option>
+                        <option value="restricted">RESTRICTED (Specific Operative)</option>
+                        <option value="public">PUBLIC_HQ (All Team Members)</option>
+                    </select>
+
+                    <div id="restricted-wrapper" class="hidden">
+                        <select id="media-target-user">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+
+                    <button type="submit" class="action-btn-sm" style="margin-left:auto;">UPLOAD INTEL</button>
+                </div>
+            </form>
+
+            <!-- MEDIA GALLERY DISPLAY -->
+            <div class="media-grid" id="media-gallery">
+                <!-- Uploaded assets render here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let activeCallsign = localStorage.getItem('pantheon_active_session');
+    let currentMode = 'broadcast';
+
+    if (!activeCallsign) {
+        window.location.href = 'login.html';
+    }
+
+    function loadProfile() {
+        const users = JSON.parse(localStorage.getItem('pantheon_operatives') || '{}');
+        const user = users[activeCallsign];
+
+        if (!user) {
+            logout();
+            return;
+        }
+
+        document.getElementById('disp-callsign').innerText = user.callsign;
+        document.getElementById('disp-role').innerText = user.role;
+        document.getElementById('disp-clearance').innerText = user.clearance;
+        document.getElementById('disp-status').innerText = user.status || 'ACTIVE_FIELD_AGENT';
+        document.getElementById('disp-date').innerText = new Date(user.registered).toLocaleDateString();
+
+        populateRecipientLists(users);
+        loadBroadcast();
+        loadMediaGallery();
+    }
+
+    function populateRecipientLists(users) {
+        const dmSelect = document.getElementById('dm-target');
+        const mediaTargetSelect = document.getElementById('media-target-user');
+        
+        dmSelect.innerHTML = '';
+        mediaTargetSelect.innerHTML = '';
+
+        const otherOperatives = Object.keys(users).filter(c => c !== activeCallsign);
+
+        if (otherOperatives.length === 0) {
+            dmSelect.innerHTML = '<option value="">NO OTHER OPERATIVES</option>';
+            mediaTargetSelect.innerHTML = '<option value="">NO OTHER OPERATIVES</option>';
+            return;
+        }
+
+        otherOperatives.forEach(c => {
+            const opt1 = document.createElement('option');
+            opt1.value = c;
+            opt1.innerText = c;
+            dmSelect.appendChild(opt1);
+
+            const opt2 = document.createElement('option');
+            opt2.value = c;
+            opt2.innerText = c;
+            mediaTargetSelect.appendChild(opt2);
+        });
+    }
+
+    function toggleRestrictedTarget() {
+        const privacy = document.getElementById('media-privacy').value;
+        const wrapper = document.getElementById('restricted-wrapper');
+        if (privacy === 'restricted') {
+            wrapper.classList.remove('hidden');
+        } else {
+            wrapper.classList.add('hidden');
+        }
+    }
+
+    function setMode(mode) {
+        currentMode = mode;
+        const bBtn = document.getElementById('tab-broadcast');
+        const dBtn = document.getElementById('tab-dm');
+        const dmBar = document.getElementById('dm-recipient-bar');
+
+        if (mode === 'broadcast') {
+            bBtn.classList.add('active');
+            dBtn.classList.remove('active');
+            dmBar.classList.add('hidden');
+            loadBroadcast();
+        } else {
+            dBtn.classList.add('active');
+            bBtn.classList.remove('active');
+            dmBar.classList.remove('hidden');
+            loadDMs();
+        }
+    }
+
+    function loadBroadcast() {
+        const msgs = JSON.parse(localStorage.getItem('pantheon_comms') || '[]');
+        const box = document.getElementById('comms-box');
+        
+        if (msgs.length === 0) {
+            box.innerHTML = '<div style="color: #607080;">No broadcast transmissions logged.</div>';
+            return;
+        }
+
+        box.innerHTML = msgs.map(m => `
+            <div class="msg-entry">
+                <span class="msg-sender">[${m.sender}]</span>
+                <span class="msg-time">${new Date(m.timestamp).toLocaleTimeString()}</span>
+                <div class="msg-body">${m.text}</div>
+            </div>
+        `).join('');
+
+        box.scrollTop = box.scrollHeight;
+    }
+
+    function loadDMs() {
+        const target = document.getElementById('dm-target').value;
+        const box = document.getElementById('comms-box');
+
+        if (!target) {
+            box.innerHTML = '<div style="color: #607080;">Register a second operative to test Direct Messaging.</div>';
+            return;
+        }
+
+        const allDms = JSON.parse(localStorage.getItem('pantheon_dms') || '[]');
+        const thread = allDms.filter(m => 
+            (m.sender === activeCallsign && m.recipient === target) ||
+            (m.sender === target && m.recipient === activeCallsign)
+        );
+
+        if (thread.length === 0) {
+            box.innerHTML = `<div style="color: #607080;">Encrypted channel open with [${target}]. No messages exchanged yet.</div>`;
+            return;
+        }
+
+        box.innerHTML = thread.map(m => `
+            <div class="msg-entry">
+                <span class="msg-sender ${m.sender === activeCallsign ? 'dm-me' : ''}">[${m.sender} -> ${m.recipient}]</span>
+                <span class="msg-time">${new Date(m.timestamp).toLocaleTimeString()}</span>
+                <div class="msg-body">${m.text}</div>
+            </div>
+        `).join('');
+
+        box.scrollTop = box.scrollHeight;
+    }
+
+    function postMessage(e) {
+        e.preventDefault();
+        const input = document.getElementById('msg-input');
+        const text = input.value.trim();
+        if (!text) return;
+
+        if (currentMode === 'broadcast') {
+            const msgs = JSON.parse(localStorage.getItem('pantheon_comms') || '[]');
+            msgs.push({
+                sender: activeCallsign,
+                text: text,
+                timestamp: new Date().toISOString()
+            });
+            localStorage.setItem('pantheon_comms', JSON.stringify(msgs));
+            loadBroadcast();
+        } else {
+            const target = document.getElementById('dm-target').value;
+            if (!target) return;
+
+            const allDms = JSON.parse(localStorage.getItem('pantheon_dms') || '[]');
+            allDms.push({
+                sender: activeCallsign,
+                recipient: target,
+                text: text,
+                timestamp: new Date().toISOString()
+            });
+            localStorage.setItem('pantheon_dms', JSON.stringify(allDms));
+            loadDMs();
+        }
+
+        input.value = '';
+    }
+
+    function uploadMedia(e) {
+        e.preventDefault();
+        const title = document.getElementById('media-title').value.trim();
+        const fileInput = document.getElementById('media-file');
+        const privacy = document.getElementById('media-privacy').value;
+        const targetUser = document.getElementById('media-target-user').value;
+
+        if (!fileInput.files || !fileInput.files[0]) return;
+
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+            const mediaData = evt.target.result;
+            const allMedia = JSON.parse(localStorage.getItem('pantheon_media') || '[]');
+
+            allMedia.push({
+                id: 'media_' + Date.now(),
+                owner: activeCallsign,
+                title: title,
+                data: mediaData,
+                privacy: privacy, // 'private', 'restricted', 'public'
+                targetUser: privacy === 'restricted' ? targetUser : null,
+                timestamp: new Date().toISOString()
+            });
+
+            localStorage.setItem('pantheon_media', JSON.stringify(allMedia));
+            document.getElementById('media-title').value = '';
+            fileInput.value = '';
+            loadMediaGallery();
+        };
+
+        reader.readAsDataURL(fileInput.files[0]);
+    }
+
+    function loadMediaGallery() {
+        const gallery = document.getElementById('media-gallery');
+        const allMedia = JSON.parse(localStorage.getItem('pantheon_media') || '[]');
+
+        // Filter rules:
+        // 1. Owner can always see their own media.
+        // 2. Others can see 'public' media.
+        // 3. Target user can see 'restricted' media.
+        const visibleMedia = allMedia.filter(item => {
+            if (item.owner === activeCallsign) return true;
+            if (item.privacy === 'public') return true;
+            if (item.privacy === 'restricted' && item.targetUser === activeCallsign) return true;
+            return false;
+        });
+
+        if (visibleMedia.length === 0) {
+            gallery.innerHTML = '<div style="color:#607080; grid-column:span 2;">No media assets found in vault. Upload an image above to test.</div>';
+            return;
+        }
+
+        gallery.innerHTML = visibleMedia.map(item => {
+            let badgeClass = 'badge-private';
+            let badgeText = 'CLASSIFIED (ONLY ME)';
+
+            if (item.privacy === 'public') {
+                badgeClass = 'badge-public';
+                badgeText = 'PUBLIC HQ';
+            } else if (item.privacy === 'restricted') {
+                badgeClass = 'badge-restricted';
+                badgeText = `RESTRICTED -> ${item.targetUser}`;
+            }
+
+            return `
+                <div class="media-item">
+                    <img src="${item.data}" alt="${item.title}">
+                    <div class="media-title">${item.title}</div>
+                    <span class="media-badge ${badgeClass}">${badgeText}</span>
+                    <div style="font-size:0.65rem; color:#607080; margin-top:4px;">BY: [${item.owner}]</div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function logout() {
+        localStorage.removeItem('pantheon_active_session');
+        window.location.href = 'login.html';
+    }
+
+    loadProfile();
+</script>
+
+</body>
+</html>
