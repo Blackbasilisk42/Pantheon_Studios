@@ -17,15 +17,7 @@ _DEFAULTS: dict[str, object] = {
     "KILLSWITCH_ACTIVE": False,
     "LEARNING_ENABLED": True,
     "LAST_SYNC_TIMESTAMP": None,
-    "SITE_SWITCHES": {
-        "control_panel": True,
-        "team_hub": True,
-        "hub_tunnel": True,
-    },
 }
-
-
-_KNOWN_SITES = ("control_panel", "team_hub", "hub_tunnel")
 
 
 def _read() -> dict[str, object]:
@@ -50,32 +42,6 @@ def set_killswitch(active: bool) -> None:
     state = _read()
     state["KILLSWITCH_ACTIVE"] = active
     _write(state)
-
-
-def get_site_switches() -> dict[str, bool]:
-    state = _read()
-    raw = state.get("SITE_SWITCHES")
-    switches = dict(_DEFAULTS["SITE_SWITCHES"])
-    if isinstance(raw, dict):
-        for site in _KNOWN_SITES:
-            if site in raw:
-                switches[site] = bool(raw.get(site))
-    return switches
-
-
-def is_site_enabled(site_name: str) -> bool:
-    return bool(get_site_switches().get(site_name, False))
-
-
-def set_site_enabled(site_name: str, enabled: bool) -> dict[str, bool]:
-    if site_name not in _KNOWN_SITES:
-        raise ValueError(f"Unknown site switch: {site_name}")
-    state = _read()
-    switches = get_site_switches()
-    switches[site_name] = bool(enabled)
-    state["SITE_SWITCHES"] = switches
-    _write(state)
-    return switches
 
 
 def abort_if_killed() -> None:

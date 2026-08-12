@@ -31,13 +31,7 @@ except ImportError:
 
 try:
     from modules.lore_ingest import save_entry
-    from modules.system_state import (
-        get_site_switches,
-        get_state,
-        is_killswitch_active,
-        set_killswitch,
-        set_site_enabled,
-    )
+    from modules.system_state import get_state, is_killswitch_active, set_killswitch
     from modules.diagnostics import latest_receipt_text, run_diagnostics_ui
     from modules.learning_engine import (
         get_learning_status_md,
@@ -58,13 +52,7 @@ try:
     from modules.heavy_crawler import run_parallel_scan
 except ModuleNotFoundError:
     from lore_ingest import save_entry  # type: ignore[no-redef]
-    from system_state import (  # type: ignore[no-redef]
-        get_site_switches,
-        get_state,
-        is_killswitch_active,
-        set_killswitch,
-        set_site_enabled,
-    )
+    from system_state import get_state, is_killswitch_active, set_killswitch  # type: ignore[no-redef]
     from diagnostics import latest_receipt_text, run_diagnostics_ui  # type: ignore[no-redef]
     from learning_engine import (  # type: ignore[no-redef]
         get_learning_status_md,
@@ -462,12 +450,6 @@ def toggle_killswitch(current_state: bool) -> tuple[bool, str, str]:
     return new_state, label, status
 
 
-def update_site_switch(site_name: str, enabled: bool) -> str:
-    set_site_enabled(site_name, enabled)
-    state_label = "ENABLED" if enabled else "DISABLED"
-    return f"{site_name} is now {state_label}."
-
-
 # ---------------------------------------------------------------------------
 # Lore ingest
 # ---------------------------------------------------------------------------
@@ -691,7 +673,6 @@ LORE_CATEGORIES = [
 
 _initial_killed = is_killswitch_active()
 _initial_kill_label = "🔴 KILLSWITCH — DEACTIVATE" if _initial_killed else "🟢 KILLSWITCH — ACTIVATE"
-_initial_site_switches = get_site_switches()
 
 with gr.Blocks(title="Pantheon Studios Admin Page", css=CSS_THEME, theme=gr.themes.Base()) as demo:
     gr.HTML(HUD_BANNER_HTML)
@@ -726,30 +707,6 @@ with gr.Blocks(title="Pantheon Studios Admin Page", css=CSS_THEME, theme=gr.them
             elem_classes=["hud-btn-killswitch"],
         )
         orchestrator_toggle = gr.Checkbox(label="Autonomous Orchestrator", value=True)
-
-    with gr.Row():
-        control_panel_site_toggle = gr.Checkbox(
-            label="Control Panel Site Enabled",
-            value=bool(_initial_site_switches.get("control_panel", True)),
-            interactive=True,
-        )
-        team_hub_site_toggle = gr.Checkbox(
-            label="Team Hub Site Enabled",
-            value=bool(_initial_site_switches.get("team_hub", True)),
-            interactive=True,
-        )
-        hub_tunnel_site_toggle = gr.Checkbox(
-            label="Hub Tunnel Enabled",
-            value=bool(_initial_site_switches.get("hub_tunnel", True)),
-            interactive=True,
-        )
-
-    site_switch_status = gr.Textbox(
-        label="Site switch status",
-        value="Individual site switches ready.",
-        interactive=False,
-        elem_classes=["hud-card"],
-    )
 
     gr.Markdown("---")
 
@@ -1153,21 +1110,6 @@ with gr.Blocks(title="Pantheon Studios Admin Page", css=CSS_THEME, theme=gr.them
     orchestrator_toggle.change(
         fn=run_orchestrator_ui,
         outputs=[orchestrator_status_display],
-    )
-    control_panel_site_toggle.change(
-        fn=lambda enabled: update_site_switch("control_panel", enabled),
-        inputs=[control_panel_site_toggle],
-        outputs=[site_switch_status],
-    )
-    team_hub_site_toggle.change(
-        fn=lambda enabled: update_site_switch("team_hub", enabled),
-        inputs=[team_hub_site_toggle],
-        outputs=[site_switch_status],
-    )
-    hub_tunnel_site_toggle.change(
-        fn=lambda enabled: update_site_switch("hub_tunnel", enabled),
-        inputs=[hub_tunnel_site_toggle],
-        outputs=[site_switch_status],
     )
     daemon_toggle.change(
         fn=lambda enabled: runtime_tester_status(),
