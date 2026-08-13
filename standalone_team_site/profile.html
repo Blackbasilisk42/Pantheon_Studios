@@ -105,6 +105,57 @@
             grid-column: span 2;
         }
 
+        /* SOCIAL RELAY STYLES */
+        .social-section {
+            margin-top: 15px;
+            border-top: 1px dashed rgba(0, 229, 255, 0.3);
+            padding-top: 10px;
+        }
+
+        .social-badges-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
+
+        .social-badge {
+            display: inline-block;
+            background: rgba(0, 229, 255, 0.1);
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 4px 8px;
+            font-size: 0.7rem;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .social-badge:hover {
+            background: var(--neon-cyan);
+            color: #000;
+        }
+
+        .social-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .social-input-group input {
+            background: rgba(5, 7, 10, 0.9);
+            border: 1px solid rgba(0, 229, 255, 0.4);
+            color: #ffffff;
+            padding: 6px 10px;
+            font-family: inherit;
+            font-size: 0.75rem;
+            outline: none;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
         /* COMMS TABS */
         .comms-tabs {
             display: flex;
@@ -287,6 +338,23 @@
                 <span class="field-label">FIELD STATUS:</span>
                 <span class="field-val" id="disp-status" style="color: var(--neon-emerald);">---</span>
             </div>
+
+            <!-- EXTERNAL SOCIAL COMM RELAYS -->
+            <div class="social-section">
+                <div class="field-label" style="font-size:0.75rem; color:var(--neon-emerald);">EXTERNAL_COMM_RELAYS:</div>
+                <div id="disp-socials-container" class="social-badges-wrapper">
+                    <!-- Dynamic Badges Render Here -->
+                </div>
+                <button class="tab-btn" onclick="toggleSocialEdit()" style="width:100%; margin-top:5px;">[CONFIGURE_SOCIAL_RELAYS]</button>
+
+                <form id="social-edit-form" class="social-input-group hidden" onsubmit="saveSocials(event)">
+                    <input type="text" id="input-discord" placeholder="Discord Tag / Server URL">
+                    <input type="text" id="input-youtube" placeholder="YouTube URL or @Channel">
+                    <input type="text" id="input-patreon" placeholder="Patreon Page URL">
+                    <input type="text" id="input-facebook" placeholder="Facebook Profile URL">
+                    <button type="submit" class="action-btn-sm" style="padding:6px;">SAVE RELAYS</button>
+                </form>
+            </div>
         </div>
 
         <!-- SYSTEM METRICS -->
@@ -391,9 +459,70 @@
         document.getElementById('disp-status').innerText = user.status || 'ACTIVE_FIELD_AGENT';
         document.getElementById('disp-date').innerText = new Date(user.registered).toLocaleDateString();
 
+        // Load Socials Data
+        const socials = user.socials || {};
+        document.getElementById('input-discord').value = socials.discord || '';
+        document.getElementById('input-youtube').value = socials.youtube || '';
+        document.getElementById('input-patreon').value = socials.patreon || '';
+        document.getElementById('input-facebook').value = socials.facebook || '';
+
+        renderSocialBadges(socials);
+
         populateRecipientLists(users);
         loadBroadcast();
         loadMediaGallery();
+    }
+
+    function renderSocialBadges(socials) {
+        const container = document.getElementById('disp-socials-container');
+        container.innerHTML = '';
+        let count = 0;
+
+        if (socials.discord) {
+            container.innerHTML += `<span class="social-badge">[DISCORD] ${socials.discord}</span>`;
+            count++;
+        }
+        if (socials.youtube) {
+            const url = socials.youtube.startsWith('http') ? socials.youtube : `https://${socials.youtube}`;
+            container.innerHTML += `<a href="${url}" target="_blank" class="social-badge">[YOUTUBE] ↗</a>`;
+            count++;
+        }
+        if (socials.patreon) {
+            const url = socials.patreon.startsWith('http') ? socials.patreon : `https://${socials.patreon}`;
+            container.innerHTML += `<a href="${url}" target="_blank" class="social-badge">[PATREON] ↗</a>`;
+            count++;
+        }
+        if (socials.facebook) {
+            const url = socials.facebook.startsWith('http') ? socials.facebook : `https://${socials.facebook}`;
+            container.innerHTML += `<a href="${url}" target="_blank" class="social-badge">[FACEBOOK] ↗</a>`;
+            count++;
+        }
+
+        if (count === 0) {
+            container.innerHTML = '<span style="color:#607080; font-size:0.75rem;">NO SOCIAL RELAYS CONFIGURED</span>';
+        }
+    }
+
+    function toggleSocialEdit() {
+        const form = document.getElementById('social-edit-form');
+        form.classList.toggle('hidden');
+    }
+
+    function saveSocials(e) {
+        e.preventDefault();
+        const users = JSON.parse(localStorage.getItem('pantheon_operatives') || '{}');
+        if (!users[activeCallsign]) return;
+
+        users[activeCallsign].socials = {
+            discord: document.getElementById('input-discord').value.trim(),
+            youtube: document.getElementById('input-youtube').value.trim(),
+            patreon: document.getElementById('input-patreon').value.trim(),
+            facebook: document.getElementById('input-facebook').value.trim()
+        };
+
+        localStorage.setItem('pantheon_operatives', JSON.stringify(users));
+        renderSocialBadges(users[activeCallsign].socials);
+        toggleSocialEdit();
     }
 
     function populateRecipientLists(users) {
@@ -574,10 +703,6 @@
         const gallery = document.getElementById('media-gallery');
         const allMedia = JSON.parse(localStorage.getItem('pantheon_media') || '[]');
 
-        // Filter rules:
-        // 1. Owner can always see their own media.
-        // 2. Others can see 'public' media.
-        // 3. Target user can see 'restricted' media.
         const visibleMedia = allMedia.filter(item => {
             if (item.owner === activeCallsign) return true;
             if (item.privacy === 'public') return true;
