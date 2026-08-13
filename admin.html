@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PANTHEON_OS // OMNI_ADMIN_COMMAND</title>
+    <style>
+        :root {
+            --bg-void: #05070a;
+            --neon-cyan: #00e5ff;
+            --neon-emerald: #00ff9d;
+            --neon-pink: #ff007f;
+            --neon-amber: #ffb700;
+            --neon-red: #ff3333;
+            --panel-bg: rgba(10, 16, 26, 0.92);
+            --border-glow: 0 0 12px rgba(255, 0, 127, 0.35);
+            --font-mono: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            background-color: var(--bg-void);
+            color: var(--neon-cyan);
+            font-family: var(--font-mono);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(255, 0, 127, 0.05) 0%, transparent 80%),
+                linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 4px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* HEADER */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--neon-pink);
+            padding-bottom: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(255, 0, 127, 0.2);
+        }
+
+        .sys-title {
+            font-size: 1.1rem;
+            color: var(--neon-pink);
+            letter-spacing: 2px;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+        }
+
+        .pulse-red {
+            width: 12px;
+            height: 12px;
+            background: var(--neon-red);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--neon-red);
+            animation: warningPulse 1s infinite alternate;
+        }
+
+        @keyframes warningPulse { 
+            0% { opacity: 0.3; } 
+            100% { opacity: 1; } 
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            background: rgba(0, 229, 255, 0.1);
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 6px 12px;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            text-decoration: none;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        .nav-btn:hover {
+            background: var(--neon-cyan);
+            color: #000;
+        }
+
+        .btn-danger-nav {
+            background: rgba(255, 51, 51, 0.2);
+            border: 1px solid var(--neon-red);
+            color: var(--neon-red);
+        }
+
+        .btn-danger-nav:hover {
+            background: var(--neon-red);
+            color: #ffffff;
+        }
+
+        /* AUTH GATE MODAL */
+        .auth-card {
+            max-width: 450px;
+            margin: 80px auto;
+            background: var(--panel-bg);
+            border: 2px solid var(--neon-pink);
+            box-shadow: var(--border-glow);
+            padding: 30px;
+            clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
+        }
+
+        .auth-header {
+            font-size: 1rem;
+            color: var(--neon-pink);
+            border-bottom: 1px dashed var(--neon-pink);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            letter-spacing: 1.5px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* SUB TABS */
+        .admin-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .admin-tab-btn {
+            background: rgba(10, 16, 26, 0.8);
+            border: 1px solid rgba(255, 0, 127, 0.4);
+            color: #8a9ba8;
+            padding: 10px 18px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        .admin-tab-btn.active {
+            background: rgba(255, 0, 127, 0.2);
+            border-color: var(--neon-pink);
+            color: #ffffff;
+            box-shadow: 0 0 10px rgba(255, 0, 127, 0.4);
+        }
+
+        /* CARDS & PANELS */
+        .card {
+            background: var(--panel-bg);
+            border: 1px solid var(--neon-pink);
+            box-shadow: var(--border-glow);
+            padding: 20px;
+            margin-bottom: 25px;
+            clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
+        }
+
+        .card-header {
+            font-size: 0.95rem;
+            color: var(--neon-pink);
+            border-bottom: 1px dashed rgba(255, 0, 127, 0.4);
+            padding-bottom: 8px;
+            margin-bottom: 18px;
+            letter-spacing: 1px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        /* KILL SWITCH CONTROLS */
+        .killswitch-box {
+            background: rgba(20, 5, 10, 0.9);
+            border: 2px solid var(--neon-red);
+            padding: 20px;
+            box-shadow: inset 0 0 15px rgba(255, 51, 51, 0.2);
+        }
+
+        .btn-killswitch {
+            width: 100%;
+            background: var(--neon-red);
+            color: #ffffff;
+            border: none;
+            padding: 14px;
+            font-family: var(--font-mono);
+            font-weight: bold;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 0 15px rgba(255, 51, 51, 0.6);
+            margin-top: 10px;
+        }
+
+        .btn-killswitch:hover {
+            background: #ff0000;
+            box-shadow: 0 0 25px rgba(255, 0, 0, 0.9);
+        }
+
+        .btn-purge {
+            background: rgba(255, 183, 0, 0.15);
+            border: 1px solid var(--neon-amber);
+            color: var(--neon-amber);
+            padding: 8px 12px;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        .btn-purge:hover {
+            background: var(--neon-amber);
+            color: #000000;
+        }
+
+        /* USER TABLE */
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+
+        .user-table th, .user-table td {
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            padding: 10px;
+            text-align: left;
+        }
+
+        .user-table th {
+            background: rgba(0, 229, 255, 0.1);
+            color: var(--neon-emerald);
+        }
+
+        .action-btn-danger {
+            background: rgba(255, 51, 51, 0.2);
+            border: 1px solid var(--neon-red);
+            color: var(--neon-red);
+            padding: 4px 8px;
+            cursor: pointer;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+        }
+
+        .action-btn-danger:hover {
+            background: var(--neon-red);
+            color: #ffffff;
+        }
+
+        /* SITE BUILDER & THEME FORM */
+        .form-row {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+
+        .form-row label {
+            font-size: 0.75rem;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+        }
+
+        .form-input, select, textarea {
+            background: rgba(5, 7, 10, 0.95);
+            border: 1px solid rgba(0, 229, 255, 0.4);
+            color: #ffffff;
+            padding: 8px 10px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            outline: none;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .form-input:focus, textarea:focus {
+            border-color: var(--neon-emerald);
+        }
+
+        .toggle-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .toggle-item {
+            background: rgba(5, 7, 10, 0.8);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+        }
+
+        .btn-save-builder {
+            background: var(--neon-emerald);
+            color: #000000;
+            border: none;
+            padding: 12px;
+            font-family: var(--font-mono);
+            font-weight: bold;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .btn-save-builder:hover {
+            box-shadow: 0 0 15px rgba(0, 255, 157, 0.6);
+        }
+
+        .hidden { 
+            display: none !important; 
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- TOP HEADER -->
+    <div class="top-bar">
+        <div class="sys-title">
+            <div class="pulse-red"></div>
+            PANTHEON_OS // OMNI_ADMIN_COMMAND
+        </div>
+        <div class="nav-links">
+            <a href="index.html" class="nav-btn">[HQ_FEED]</a>
+            <a href="profile.html" class="nav-btn">[MY_DOSSIER]</a>
+            <button class="nav-btn btn-danger-nav" id="lock-session-btn" onclick="lockAdminSession()">[LOCK_SESSION]</button>
+        </div>
+    </div>
+
+    <!-- SECURITY GATE // AUTH FORM -->
+    <div id="admin-auth-gate" class="auth-card">
+        <div class="auth-header">ADMINISTRATOR // OVERRIDE ACCESS</div>
+        <p style="font-size: 0.75rem; color: #8a9ba8; text-align: center; margin-bottom: 20px;">
+            Enter clearance credentials to initialize administrative controls.
+        </p>
+        <form onsubmit="authenticateAdmin(event)">
+            <div class="form-row">
+                <label>Admin Callsign / User</label>
+                <input type="text" id="auth-username" class="form-input" placeholder="e.g. ADMIN" required autocomplete="off">
+            </div>
+            <div class="form-row">
+                <label>Security Key / Password</label>
+                <input type="password" id="auth-password" class="form-input" placeholder="••••••••••••" required>
+            </div>
+            <div id="auth-error" style="color: var(--neon-red); font-size: 0.75rem; margin-bottom: 10px; display: none;">
+                [ERROR]: INVALID OVERRIDE CREDENTIALS.
+            </div>
+            <button type="submit" class="btn-killswitch" style="background: var(--neon-pink); box-shadow: 0 0 10px var(--neon-pink);">
+                VERIFY CLEARANCE
+            </button>
+        </form>
+    </div>
+
+    <!-- MAIN ADMIN DASHBOARD (UNLOCKED AFTER AUTH) -->
+    <div id="admin-dashboard" class="hidden">
+        <!-- TABS -->
+        <div class="admin-tabs">
+            <button class="admin-tab-btn active" id="tab-security-btn" onclick="switchTab('security')">[SECURITY_&_KILLSWITCH]</button>
+            <button class="admin-tab-btn" id="tab-builder-btn" onclick="switchTab('builder')">[NO-CODE_SITE_BUILDER]</button>
+            <button class="admin-tab-btn" id="tab-users-btn" onclick="switchTab('users')">[OPERATIVE_ROSTER]</button>
+        </div>
+
+        <!-- TAB 1: EMERGENCY KILLSWITCH & PROTOCOLS -->
+        <div id="tab-security">
+            <div class="grid-2">
+                <!-- KILL SWITCH CONTROL PANEL -->
+                <div class="card killswitch-box">
+                    <div class="card-header" style="color:var(--neon-red); border-bottom-color:var(--neon-red);">
+                        SYSTEM_LOCKDOWN // MASTER_KILLSWITCH
+                    </div>
+                    <p style="font-size:0.75rem; color:#d0e0f0; line-height:1.5;">
+                        Activating the Master Lockdown flags system restrictions across memory, freezing registration terminals and public comm relays.
+                    </p>
+
+                    <div style="margin: 15px 0;">
+                        <span style="font-size:0.75rem; color:#8a9ba8;">LOCKDOWN_STATUS:</span>
+                        <strong id="lockdown-state-indicator" style="color:var(--neon-emerald); margin-left:8px;">SYSTEMS_NORMAL</strong>
+                    </div>
+
+                    <button class="btn-killswitch" id="master-kill-btn" onclick="toggleMasterLockdown()">
+                        ENGAGE MASTER LOCKDOWN
+                    </button>
+                </div>
+
+                <!-- TARGETED DATA PURGES -->
+                <div class="card">
+                    <div class="card-header">DATA_PURGE_PROTOCOLS</div>
+                    <p style="font-size:0.75rem; color:#8a9ba8;">Selectively clear local logs, direct messages, or stored media assets.</p>
+
+                    <button class="btn-purge" onclick="purgeComms()">[PURGE_BROADCAST_COMMS_LOGS]</button>
+                    <button class="btn-purge" onclick="purgeDMs()">[PURGE_ENCRYPTED_DIRECT_MESSAGES]</button>
+                    <button class="btn-purge" onclick="purgeVault()">[WIPE_ALL_MEDIA_VAULT_ASSETS]</button>
+
+                    <div style="margin-top:20px; border-top:1px dashed var(--neon-red); padding-top:12px;">
+                        <span style="font-size:0.75rem; color:var(--neon-red); font-weight:bold;">FACTORY_RESET // NUCLEAR_OVERRIDE</span>
+                        <button class="btn-killswitch" style="padding:8px; font-size:0.75rem; margin-top:8px;" onclick="nuclearReset()">
+                            FACTORY RESET ENTIRE SITE MEMORY
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: NO-CODE SITE BUILDER & THEME STUDIO -->
+        <div id="tab-builder" class="hidden">
+            <div class="grid-2">
+                <!-- THEME & STYLE TUNER -->
+                <div class="card">
+                    <div class="card-header">THEME_STUDIO // VISUAL_PARAMETERS</div>
+                    <form onsubmit="saveSiteConfig(event)">
+                        <div class="form-row">
+                            <label>Primary Neon Accent Color</label>
+                            <input type="color" id="cfg-primary-color" value="#00e5ff" class="form-input" style="height:40px; padding:2px;">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Secondary Accent Color</label>
+                            <input type="color" id="cfg-accent-color" value="#00ff9d" class="form-input" style="height:40px; padding:2px;">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Background Void Shade</label>
+                            <input type="color" id="cfg-bg-color" value="#05070a" class="form-input" style="height:40px; padding:2px;">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Custom System Title Banner</label>
+                            <input type="text" id="cfg-site-title" class="form-input" placeholder="PANTHEON_OS // COMMAND_HUB">
+                        </div>
+
+                        <button type="submit" class="btn-save-builder">APPLY VISUAL OVERRIDES</button>
+                    </form>
+                </div>
+
+                <!-- MODULE LAYOUT TOGGLE GRID & CUSTOM SCRIPT INJECTOR -->
+                <div class="card">
+                    <div class="card-header">UI_LAYOUT_MODULES & CUSTOM_INJECTOR</div>
+                    <div style="font-size:0.75rem; color:#8a9ba8; margin-bottom:10px;">Enable or disable UI blocks on the Command Hub:</div>
+
+                    <div class="toggle-grid">
+                        <div class="toggle-item">
+                            <span>TACTICAL_RADAR</span>
+                            <input type="checkbox" id="mod-radar" checked>
+                        </div>
+                        <div class="toggle-item">
+                            <span>SIGNAL_LATTICE</span>
+                            <input type="checkbox" id="mod-lattice" checked>
+                        </div>
+                        <div class="toggle-item">
+                            <span>PROJECT_SHOWCASE</span>
+                            <input type="checkbox" id="mod-showcase" checked>
+                        </div>
+                        <div class="toggle-item">
+                            <span>PUBLIC_LOGS</span>
+                            <input type="checkbox" id="mod-logs" checked>
+                        </div>
+                    </div>
+
+                    <div class="form-row" style="margin-top:15px;">
+                        <label style="color:var(--neon-pink);">CUSTOM CSS / SCRIPT INJECTOR (ADVANCED)</label>
+                        <textarea id="cfg-custom-css" rows="4" placeholder="/* Inject custom CSS or third-party visual builder widgets directly */&#10;body { font-size: 14px; }"></textarea>
+                    </div>
+
+                    <button type="button" class="btn-save-builder" style="background:var(--neon-cyan);" onclick="saveModulesAndScripts()">
+                        SAVE LAYOUT & SCRIPT OVERRIDES
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: OPERATIVE ROSTER & CLEARANCE -->
+        <div id="tab-users" class="hidden">
+            <div class="card">
+                <div class="card-header">REGISTERED_OPERATIVES_ROSTER</div>
+                <table class="user-table">
+                    <thead>
+                        <tr>
+                            <th>CALLSIGN</th>
+                            <th>SPECIALTY / ROLE</th>
+                            <th>CLEARANCE</th>
+                            <th>REGISTRATION DATE</th>
+                            <th>OVERRIDE ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="user-roster-body">
+                        <!-- Dynamic rendering -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // HARDCODED ADMIN CREDENTIALS
+    const ADMIN_USER = "Kaige";
+    const ADMIN_PASS = "@Sammyzzz3Jimbo21";
+
+    // AUTHENTICATION CHECK
+    function checkAdminAuth() {
+        const isAuthed = localStorage.getItem('pantheon_admin_auth') === 'true';
+        const gate = document.getElementById('admin-auth-gate');
+        const dash = document.getElementById('admin-dashboard');
+
+        if (isAuthed) {
+            gate.classList.add('hidden');
+            dash.classList.remove('hidden');
+            checkLockdownStatus();
+            loadSiteConfig();
+        } else {
+            gate.classList.remove('hidden');
+            dash.classList.add('hidden');
+        }
+    }
+
+    function authenticateAdmin(e) {
+        e.preventDefault();
+        const u = document.getElementById('auth-username').value.trim();
+        const p = document.getElementById('auth-password').value.trim();
+        const err = document.getElementById('auth-error');
+
+        if (u.toUpperCase() === ADMIN_USER && p === ADMIN_PASS) {
+            localStorage.setItem('pantheon_admin_auth', 'true');
+            err.style.display = 'none';
+            checkAdminAuth();
+        } else {
+            err.style.display = 'block';
+        }
+    }
+
+    function lockAdminSession() {
+        localStorage.removeItem('pantheon_admin_auth');
+        checkAdminAuth();
+    }
+
+    // TAB SWITCHING
+    function switchTab(tabName) {
+        document.getElementById('tab-security').classList.add('hidden');
+        document.getElementById('tab-builder').classList.add('hidden');
+        document.getElementById('tab-users').classList.add('hidden');
+
+        document.getElementById('tab-security-btn').classList.remove('active');
+        document.getElementById('tab-builder-btn').classList.remove('active');
+        document.getElementById('tab-users-btn').classList.remove('active');
+
+        if (tabName === 'security') {
+            document.getElementById('tab-security').classList.remove('hidden');
+            document.getElementById('tab-security-btn').classList.add('active');
+        } else if (tabName === 'builder') {
+            document.getElementById('tab-builder').classList.remove('hidden');
+            document.getElementById('tab-builder-btn').classList.add('active');
+        } else if (tabName === 'users') {
+            document.getElementById('tab-users').classList.remove('hidden');
+            document.getElementById('tab-users-btn').classList.add('active');
+            renderUserRoster();
+        }
+    }
+
+    // LOCKDOWN CONTROLS
+    function checkLockdownStatus() {
+        const isLocked = localStorage.getItem('pantheon_lockdown') === 'true';
+        const indicator = document.getElementById('lockdown-state-indicator');
+        const btn = document.getElementById('master-kill-btn');
+
+        if (isLocked) {
+            indicator.innerText = 'LOCKDOWN_ENGAGED // ACCESS_RESTRICTED';
+            indicator.style.color = 'var(--neon-red)';
+            btn.innerText = 'DISENGAGE MASTER LOCKDOWN';
+            btn.style.background = 'var(--neon-emerald)';
+            btn.style.color = '#000000';
+        } else {
+            indicator.innerText = 'SYSTEMS_NORMAL';
+            indicator.style.color = 'var(--neon-emerald)';
+            btn.innerText = 'ENGAGE MASTER LOCKDOWN';
+            btn.style.background = 'var(--neon-red)';
+            btn.style.color = '#ffffff';
+        }
+    }
+
+    function toggleMasterLockdown() {
+        const isLocked = localStorage.getItem('pantheon_lockdown') === 'true';
+        localStorage.setItem('pantheon_lockdown', !isLocked ? 'true' : 'false');
+        checkLockdownStatus();
+        alert(!isLocked ? 'MASTER LOCKDOWN ENGAGED. SYSTEM RESTRICTIONS ACTIVE.' : 'LOCKDOWN DISENGAGED. NORMAL OPERATIONS RESTORED.');
+    }
+
+    // PURGE PROTOCOLS
+    function purgeComms() {
+        if (confirm('PURGE ALL BROADCAST TRANSMISSIONS FROM LOCAL MEMORY?')) {
+            localStorage.removeItem('pantheon_comms');
+            alert('BROADCAST LOGS CLEARED.');
+        }
+    }
+
+    function purgeDMs() {
+        if (confirm('PURGE ALL ENCRYPTED DIRECT MESSAGES FROM LOCAL MEMORY?')) {
+            localStorage.removeItem('pantheon_dms');
+            alert('DIRECT MESSAGES WIPED.');
+        }
+    }
+
+    function purgeVault() {
+        if (confirm('PURGE ALL MEDIA VAULT ASSETS FROM LOCAL MEMORY?')) {
+            localStorage.removeItem('pantheon_media');
+            alert('MEDIA VAULT PURGED.');
+        }
+    }
+
+    function nuclearReset() {
+        const verification = prompt('TYPE "OVERRIDE-PURGE" TO CONFIRM FULL SITE FACTORY RESET:');
+        if (verification === 'OVERRIDE-PURGE') {
+            localStorage.clear();
+            alert('SITE MEMORY TOTALLY WIPED.');
+            location.reload();
+        } else {
+            alert('VERIFICATION FAILED. OVERRIDE ABORTED.');
+        }
+    }
+
+    // SITE BUILDER & CONFIG SAVING
+    function loadSiteConfig() {
+        const cfg = JSON.parse(localStorage.getItem('pantheon_site_config') || '{}');
+        if (cfg.primaryColor) document.getElementById('cfg-primary-color').value = cfg.primaryColor;
+        if (cfg.accentColor) document.getElementById('cfg-accent-color').value = cfg.accentColor;
+        if (cfg.bgColor) document.getElementById('cfg-bg-color').value = cfg.bgColor;
+        if (cfg.siteTitle) document.getElementById('cfg-site-title').value = cfg.siteTitle;
+        if (cfg.customCss) document.getElementById('cfg-custom-css').value = cfg.customCss;
+
+        if (cfg.modules) {
+            document.getElementById('mod-radar').checked = cfg.modules.radar !== false;
+            document.getElementById('mod-lattice').checked = cfg.modules.lattice !== false;
+            document.getElementById('mod-showcase').checked = cfg.modules.showcase !== false;
+            document.getElementById('mod-logs').checked = cfg.modules.logs !== false;
+        }
+    }
+
+    function saveSiteConfig(e) {
+        e.preventDefault();
+        const cfg = JSON.parse(localStorage.getItem('pantheon_site_config') || '{}');
+        
+        cfg.primaryColor = document.getElementById('cfg-primary-color').value;
+        cfg.accentColor = document.getElementById('cfg-accent-color').value;
+        cfg.bgColor = document.getElementById('cfg-bg-color').value;
+        cfg.siteTitle = document.getElementById('cfg-site-title').value.trim();
+
+        localStorage.setItem('pantheon_site_config', JSON.stringify(cfg));
+        alert('VISUAL PARAMETERS SAVED TO SYSTEM CONFIG.');
+    }
+
+    function saveModulesAndScripts() {
+        const cfg = JSON.parse(localStorage.getItem('pantheon_site_config') || '{}');
+        
+        cfg.customCss = document.getElementById('cfg-custom-css').value;
+        cfg.modules = {
+            radar: document.getElementById('mod-radar').checked,
+            lattice: document.getElementById('mod-lattice').checked,
+            showcase: document.getElementById('mod-showcase').checked,
+            logs: document.getElementById('mod-logs').checked
+        };
+
+        localStorage.setItem('pantheon_site_config', JSON.stringify(cfg));
+        alert('LAYOUT MODULES & CUSTOM SCRIPTS INJECTED INTO SYSTEM CONFIG.');
+    }
+
+    // OPERATIVE ROSTER MANAGEMENT
+    function renderUserRoster() {
+        const tbody = document.getElementById('user-roster-body');
+        const users = JSON.parse(localStorage.getItem('pantheon_operatives') || '{}');
+        const userKeys = Object.keys(users);
+
+        if (userKeys.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#8a9ba8;">NO REGISTERED OPERATIVES FOUND IN MEMORY.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = userKeys.map(k => {
+            const u = users[k];
+            return `
+                <tr>
+                    <td style="font-weight:bold; color:#ffffff;">${u.callsign}</td>
+                    <td>${u.role || 'Operative'}</td>
+                    <td style="color:var(--neon-emerald);">${u.clearance || 'CLEARANCE_LEVEL_01'}</td>
+                    <td>${new Date(u.registered || Date.now()).toLocaleDateString()}</td>
+                    <td>
+                        <button class="action-btn-danger" onclick="purgeOperative('${u.callsign}')">REVOKE ACCESS</button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function purgeOperative(callsign) {
+        if (confirm(`REVOKE ALL ACCESS FOR OPERATIVE [${callsign}]?`)) {
+            const users = JSON.parse(localStorage.getItem('pantheon_operatives') || '{}');
+            delete users[callsign];
+            localStorage.setItem('pantheon_operatives', JSON.stringify(users));
+            renderUserRoster();
+        }
+    }
+
+    // INITIALIZATION
+    checkAdminAuth();
+</script>
+
+</body>
+</html>
