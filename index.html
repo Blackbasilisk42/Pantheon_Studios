@@ -525,7 +525,7 @@
 <div class="container">
     <!-- SYSTEM HEADER -->
     <div class="top-bar">
-        <div class="sys-title">
+        <div class="sys-title" id="site-title-banner">
             <div class="pulse-dot"></div>
             PANTHEON_OS // SQUAD_DOSSIERS_v2.4
         </div>
@@ -555,7 +555,7 @@
     <!-- HUD TOP GRID (RADAR & SIGNAL LATTICE) -->
     <div class="hud-grid">
         <!-- RADAR OVERLAY -->
-        <div class="hud-card">
+        <div class="hud-card" id="mod-radar-card">
             <div class="card-header">TACTICAL_OVERLAY // CITY SECTOR N-5</div>
             <div class="radar-box">
                 <div class="radar-sweep"></div>
@@ -569,7 +569,7 @@
         </div>
 
         <!-- SIGNAL LATTICE -->
-        <div class="hud-card">
+        <div class="hud-card" id="mod-lattice-card">
             <div class="card-header">SIGNAL_LATTICE // THREAT VECTOR</div>
             <div class="lattice-matrix">
                 <div class="matrix-cell"></div><div class="matrix-cell"></div><div class="matrix-cell"></div>
@@ -676,7 +676,7 @@
     </div>
 
     <!-- MEDIA // PROJECT SHOWCASE -->
-    <div class="showcase-card">
+    <div class="showcase-card" id="mod-showcase-card">
         <div class="showcase-header">
             <span class="showcase-title">MEDIA // PROJECT SHOWCASE</span>
             <span class="pipeline-badge">LIVE PIPELINE</span>
@@ -733,7 +733,7 @@
     </div>
 
     <!-- ENCRYPTED COMMS // PUBLIC LOGS TERMINAL -->
-    <div class="terminal-card">
+    <div class="terminal-card" id="mod-logs-card">
         <div class="card-header">ENCRYPTED_COMMS // PUBLIC_LOGS</div>
         <div class="terminal-logs" id="terminal-box">
             <div class="sys-line">SYS: OPS: orbital uplink calibration complete.</div>
@@ -898,6 +898,48 @@
         loadPublicFeed();
     }
 
+    // APPLY DYNAMIC VISUAL & MODULE CONFIG FROM OMNI ADMIN BUILDER
+    function applySiteConfig() {
+        const cfg = JSON.parse(localStorage.getItem('pantheon_site_config') || '{}');
+        
+        // Custom Colors from Admin Studio
+        if (cfg.primaryColor) document.documentElement.style.setProperty('--neon-primary', cfg.primaryColor);
+        if (cfg.accentColor) document.documentElement.style.setProperty('--neon-accent', cfg.accentColor);
+        if (cfg.bgColor) document.documentElement.style.setProperty('--bg-void', cfg.bgColor);
+        
+        // Custom Banner Title from Admin Studio
+        if (cfg.siteTitle) {
+            const banner = document.getElementById('site-title-banner');
+            if (banner) banner.innerHTML = `<div class="pulse-dot"></div> ${cfg.siteTitle}`;
+        }
+
+        // Layout Module Toggles from Admin Studio
+        if (cfg.modules) {
+            const radar = document.getElementById('mod-radar-card');
+            const lattice = document.getElementById('mod-lattice-card');
+            const showcase = document.getElementById('mod-showcase-card');
+            const logs = document.getElementById('mod-logs-card');
+
+            if (radar) radar.style.display = cfg.modules.radar === false ? 'none' : 'block';
+            if (lattice) lattice.style.display = cfg.modules.lattice === false ? 'none' : 'block';
+            if (showcase) showcase.style.display = cfg.modules.showcase === false ? 'none' : 'block';
+            if (logs) logs.style.display = cfg.modules.logs === false ? 'none' : 'block';
+        }
+
+        // Custom Script / CSS Injector from Admin Studio
+        if (cfg.customCss) {
+            let styleTag = document.getElementById('pantheon-custom-css');
+            if (!styleTag) {
+                styleTag = document.createElement('style');
+                styleTag.id = 'pantheon-custom-css';
+                document.head.appendChild(styleTag);
+            }
+            styleTag.innerHTML = cfg.customCss;
+        }
+    }
+
+    // INITIALIZATION
+    applySiteConfig();
     loadPublicFeed();
 </script>
 
