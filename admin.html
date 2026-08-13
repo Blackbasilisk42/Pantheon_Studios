@@ -540,7 +540,8 @@
         const p = document.getElementById('auth-password').value.trim();
         const err = document.getElementById('auth-error');
 
-        if (u.toUpperCase() === ADMIN_USER && p === ADMIN_PASS) {
+        // FIXED: Convert both inputs to lower case to eliminate uppercase mismatch bugs
+        if (u.toLowerCase() === ADMIN_USER.toLowerCase() && p === ADMIN_PASS) {
             localStorage.setItem('pantheon_admin_auth', 'true');
             err.style.display = 'none';
             checkAdminAuth();
