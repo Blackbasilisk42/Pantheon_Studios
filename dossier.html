@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PANTHEON STUDIOS // HERO ARCHIVE</title>
+    <title>PANTHEON STUDIOS // HERO DOSSIER WIKI</title>
     <style>
         :root {
             --bg-void: #060913;
@@ -11,7 +11,7 @@
             --db-orange: #ff5500;
             --db-cyan: #00e5ff;
             --db-ki: #00ff88;
-            --db-purple: #a100ff;
+            --db-red: #ff3333;
             --panel-bg: rgba(12, 18, 32, 0.92);
             --scouter-glow: 0 0 15px rgba(255, 183, 0, 0.35);
             --font-mono: 'Courier New', Courier, monospace;
@@ -31,11 +31,11 @@
         }
 
         .container {
-            max-width: 1100px;
+            max-width: 1000px;
             margin: 0 auto;
         }
 
-        /* HEADER & NAVIGATION */
+        /* HEADER BAR */
         .top-bar {
             display: flex;
             justify-content: space-between;
@@ -60,9 +60,9 @@
         .pulse-orb {
             width: 12px;
             height: 12px;
-            background: var(--db-gold);
+            background: var(--db-ki);
             border-radius: 50%;
-            box-shadow: 0 0 10px var(--db-gold);
+            box-shadow: 0 0 10px var(--db-ki);
             animation: dbPulse 1.2s infinite alternate;
         }
 
@@ -85,7 +85,6 @@
             font-size: 0.75rem;
             text-decoration: none;
             text-transform: uppercase;
-            cursor: pointer;
             transition: all 0.2s ease;
         }
 
@@ -95,378 +94,421 @@
             box-shadow: 0 0 10px var(--db-cyan);
         }
 
-        /* WIKI GRID LAYOUT */
-        .wiki-grid {
-            display: grid;
-            grid-template-columns: 1fr 350px;
-            gap: 25px;
-        }
-
-        .wiki-main {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .wiki-card {
+        /* CARD CONTAINERS */
+        .card {
             background: var(--panel-bg);
-            border: 1px solid var(--db-cyan);
-            box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
-            padding: 20px;
+            border: 1px solid var(--db-gold);
+            box-shadow: var(--scouter-glow);
+            padding: 22px;
+            margin-bottom: 25px;
             clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
         }
 
-        .wiki-section-title {
-            font-size: 0.9rem;
+        .card-header {
+            font-size: 0.95rem;
             color: var(--db-gold);
             border-bottom: 1px dashed rgba(255, 183, 0, 0.4);
-            padding-bottom: 6px;
-            margin-bottom: 14px;
-            letter-spacing: 1.5px;
+            padding-bottom: 8px;
+            margin-bottom: 18px;
+            letter-spacing: 1px;
             font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        .wiki-text {
-            font-size: 0.85rem;
-            color: #d0e0f0;
-            line-height: 1.7;
-            margin: 0;
-        }
-
-        /* SCOUTER SIDEBAR INFOBOX */
-        .infobox {
-            background: var(--panel-bg);
-            border: 2px solid var(--db-gold);
-            box-shadow: var(--scouter-glow);
-            padding: 18px;
             display: flex;
-            flex-direction: column;
-            gap: 15px;
-            clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
-            position: relative;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .infobox-header {
-            text-align: center;
-            border-bottom: 1px solid var(--db-gold);
-            padding-bottom: 10px;
+        /* HERO HEADER BLOCK */
+        .hero-banner {
+            display: flex;
+            gap: 20px;
+            align-items: center;
         }
 
-        .infobox-callsign {
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: #ffffff;
-            letter-spacing: 2px;
-            text-shadow: 0 0 10px var(--db-gold);
-        }
-
-        .infobox-subtitle {
-            font-size: 0.75rem;
-            color: var(--db-orange);
-            margin-top: 4px;
-            font-weight: bold;
-        }
-
-        /* SCOUTER PORTRAIT FRAME */
-        .avatar-box {
-            width: 100%;
-            height: 250px;
-            background: radial-gradient(circle, rgba(255, 183, 0, 0.1) 0%, rgba(6, 9, 19, 0.95) 80%);
-            border: 1px solid var(--db-gold);
+        .hero-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: 3px solid var(--db-gold);
+            box-shadow: 0 0 15px rgba(255, 183, 0, 0.5);
             display: flex;
             justify-content: center;
             align-items: center;
-            position: relative;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ffffff;
+            background: rgba(6, 9, 19, 0.95);
+            flex-shrink: 0;
             overflow: hidden;
         }
 
-        /* SCOUTER HUD OVERLAY LINES */
-        .avatar-box::before {
-            content: '';
-            position: absolute;
-            top: 10px; right: 10px; bottom: 10px; left: 10px;
-            border: 1px dashed rgba(255, 183, 0, 0.3);
-            pointer-events: none;
-        }
-
-        .avatar-box img {
+        .hero-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .avatar-placeholder {
-            font-size: 2.8rem;
-            font-weight: bold;
-            color: var(--db-gold);
-            text-shadow: 0 0 15px var(--db-gold);
+        .hero-meta {
+            flex: 1;
         }
 
-        .info-table {
-            width: 100%;
-            border-collapse: collapse;
+        .hero-callsign {
+            font-size: 1.8rem;
+            color: #ffffff;
+            font-weight: bold;
+            margin: 0;
+            letter-spacing: 2px;
+        }
+
+        .hero-subtitle {
+            font-size: 0.9rem;
+            color: var(--db-orange);
+            font-weight: bold;
+            margin-top: 4px;
+        }
+
+        .spec-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+            background: rgba(6, 9, 19, 0.8);
+            padding: 12px;
+            border: 1px solid rgba(0, 229, 255, 0.2);
+        }
+
+        .spec-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .spec-label {
+            font-size: 0.65rem;
+            color: #8a9ba8;
+            text-transform: uppercase;
+        }
+
+        .spec-val {
+            font-size: 0.8rem;
+            color: var(--db-ki);
+            font-weight: bold;
+        }
+
+        /* LORE SECTIONS */
+        .lore-block {
+            margin-bottom: 18px;
+        }
+
+        .lore-title {
+            font-size: 0.8rem;
+            color: var(--db-cyan);
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+        }
+
+        .lore-text {
+            font-size: 0.85rem;
+            color: #d0e0f0;
+            line-height: 1.6;
+            background: rgba(6, 9, 19, 0.6);
+            padding: 12px;
+            border-left: 3px solid var(--db-gold);
+        }
+
+        /* XENOVERSE POWER GRID */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .stat-bar-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .stat-row {
+            display: flex;
+            align-items: center;
             font-size: 0.75rem;
         }
 
-        .info-table td {
-            padding: 6px 0;
-            border-bottom: 1px dotted rgba(0, 229, 255, 0.2);
-        }
-
-        .info-table td.label {
+        .stat-label {
+            width: 120px;
             color: #8a9ba8;
-            text-transform: uppercase;
-            width: 42%;
-        }
-
-        .info-table td.value {
-            color: #ffffff;
             font-weight: bold;
-            text-align: right;
-        }
-
-        /* XENOVERSE ATTRIBUTE METERS */
-        .skill-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .skill-row {
-            display: flex;
-            align-items: center;
-            font-size: 0.7rem;
-        }
-
-        .skill-label {
-            width: 110px;
-            color: var(--db-cyan);
             text-transform: uppercase;
-            font-weight: bold;
         }
 
-        .skill-bar-container {
+        .stat-track {
             flex: 1;
-            height: 10px;
+            height: 14px;
             background: rgba(0, 229, 255, 0.1);
             border: 1px solid rgba(0, 229, 255, 0.3);
             position: relative;
             overflow: hidden;
         }
 
-        .skill-bar-fill {
+        .stat-fill {
             height: 100%;
-            background: linear-gradient(90deg, var(--db-cyan), var(--db-ki));
+            background: linear-gradient(90deg, var(--db-gold), var(--db-ki));
             box-shadow: 0 0 8px var(--db-ki);
         }
 
-        /* SKILL & GEAR BADGES */
-        .tag-cloud {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-
-        .skill-badge {
-            background: rgba(255, 183, 0, 0.1);
-            border: 1px solid var(--db-gold);
-            color: var(--db-gold);
-            padding: 4px 8px;
-            font-size: 0.7rem;
-            text-transform: uppercase;
+        .stat-num {
+            width: 40px;
+            text-align: right;
+            color: #ffffff;
             font-weight: bold;
         }
 
-        @media (max-width: 850px) {
-            .wiki-grid { grid-template-columns: 1fr; }
+        /* EQUIPMENT TAG CLOUD */
+        .tag-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .eq-tag {
+            background: rgba(0, 229, 255, 0.1);
+            border: 1px solid var(--db-cyan);
+            color: var(--db-cyan);
+            padding: 6px 10px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- HEADER BAR -->
+    <!-- HEADER -->
     <div class="top-bar">
         <div class="sys-title">
             <div class="pulse-orb"></div>
-            PANTHEON STUDIOS // HERO ARCHIVE // TIME NEST DOSSIER
+            PANTHEON STUDIOS // HERO DOSSIER WIKI
         </div>
         <div class="nav-links">
             <a href="index.html" class="nav-btn">[SHOWCASE_HUB]</a>
+            <a href="builder.html" class="nav-btn" style="border-color: var(--db-gold); color: var(--db-gold);">[HERO_BUILDER]</a>
             <a href="profile.html" class="nav-btn">[MY_PROFILE]</a>
-            <a href="admin.html" class="nav-btn" style="border-color: var(--db-gold); color: var(--db-gold);">[STUDIO_ADMIN]</a>
+            <a href="admin.html" class="nav-btn">[TIME_NEST_ADMIN]</a>
         </div>
     </div>
 
-    <!-- MAIN WIKI GRID -->
-    <div class="wiki-grid">
-        <!-- LEFT COLUMN: LORE & NARRATIVE -->
-        <div class="wiki-main">
-            <!-- HERO TITLE HEADER -->
-            <div class="wiki-card" style="border-color: var(--db-gold);">
-                <div style="font-size:0.75rem; color:var(--db-ki); font-weight:bold; margin-bottom:4px;" id="char-show-title">SHOW PROJECT: UNASSIGNED</div>
-                <h1 style="margin:0; font-size:1.8rem; color:#ffffff; letter-spacing:2px;" id="char-title">NAME: UNKNOWN</h1>
-                <div style="font-size:0.85rem; color:#8a9ba8; margin-top:4px;" id="char-subtitle">Race: Unknown // Fighting Style: Balanced</div>
-            </div>
-
-            <!-- ORIGIN & BACKGROUND -->
-            <div class="wiki-card">
-                <div class="wiki-section-title">// ORIGIN & BACKSTORY</div>
-                <p class="wiki-text" id="char-bio">
-                    No dossier profile loaded. Open the Character Builder terminal to enter backstory, origin details, and history for this fighter.
-                </p>
-            </div>
-
-            <!-- SHOW SAGA & STORY ARC -->
-            <div class="wiki-card">
-                <div class="wiki-section-title">// SHOW SAGA & NARRATIVE ARC</div>
-                <p class="wiki-text" id="char-narrative">
-                    Details regarding character rivalries, episode storylines, and character development arcs across show seasons.
-                </p>
-            </div>
-
-            <!-- SPECIAL TECHNIQUES & COMBAT STYLE -->
-            <div class="wiki-card">
-                <div class="wiki-section-title">// COMBAT STYLE & SPECIAL TECHNIQUES</div>
-                <p class="wiki-text" id="char-capabilities">
-                    Breakdown of fighting stance, spatial control techniques, ki blast efficiency, and transformation capabilities.
-                </p>
-            </div>
-        </div>
-
-        <!-- RIGHT COLUMN: SCOUTER INFOBOX -->
-        <div class="infobox">
-            <div class="infobox-header">
-                <div class="infobox-callsign" id="info-callsign">KAIGE</div>
-                <div class="infobox-subtitle" id="info-role">HEAVY STRIKE / TITAN</div>
-            </div>
-
-            <!-- SCOUTER PORTRAIT -->
-            <div class="avatar-box" id="avatar-container">
-                <div class="avatar-placeholder" id="avatar-initials">KG</div>
-            </div>
-
-            <!-- STATS TABLE -->
-            <table class="info-table">
-                <tr>
-                    <td class="label">Show Title:</td>
-                    <td class="value" id="info-show">Phantom Frequency</td>
-                </tr>
-                <tr>
-                    <td class="label">Race / Species:</td>
-                    <td class="value" id="info-race">Frieza Race</td>
-                </tr>
-                <tr>
-                    <td class="label">Physical Height:</td>
-                    <td class="value" id="info-height">2x Frieza Height</td>
-                </tr>
-                <tr>
-                    <td class="label">Combat Class:</td>
-                    <td class="value" id="info-class">Strike Specialist</td>
-                </tr>
-                <tr>
-                    <td class="label">Roster Status:</td>
-                    <td class="value" style="color:var(--db-ki);" id="info-status">UNLEASHED</td>
-                </tr>
-            </table>
-
-            <!-- XENOVERSE COMBAT ATTRIBUTES -->
-            <div style="font-size:0.75rem; color:var(--db-gold); font-weight:bold; margin-top:5px; border-bottom:1px solid rgba(255,183,0,0.3); padding-bottom:4px;">
-                ATTRIBUTES & POWER METERS
-            </div>
-            <div class="skill-group" id="skill-meters-container">
-                <!-- Attribute rows injected dynamically -->
-            </div>
-
-            <!-- SUPER SKILLS & EQUIPMENT -->
-            <div style="font-size:0.75rem; color:var(--db-gold); font-weight:bold; margin-top:5px; border-bottom:1px solid rgba(255,183,0,0.3); padding-bottom:4px;">
-                SIGNATURE SKILLS & MODULES
-            </div>
-            <div class="tag-cloud" id="gear-tags-container">
-                <!-- Skill tags injected dynamically -->
-            </div>
-        </div>
+    <!-- MAIN DOSSIER CONTAINER -->
+    <div id="dossier-content">
+        <!-- Dynamically rendered via JavaScript below -->
     </div>
 </div>
 
 <script>
-    // SAMPLE DEFAULT FIGHTER DATA (KAIGE)
-    const defaultFighter = {
-        id: "kaige",
-        callsign: "KAIGE",
-        race: "Frieza Race",
-        showTitle: "Project: Phantom Frequency",
-        role: "Lead Heavy Strike / Spatial Titan",
-        combatClass: "Strike Heavy / Center of Gravity",
-        status: "UNLEASHED / ACTIVE",
-        height: "Twice Frieza's Height",
-        avatarUrl: "", 
-        bio: "Standing nearly twice the height of Frieza, Kaige is a towering powerhouse built for brutal close-quarters dominance. Known across the show for his imposing physical presence and spatial awareness control on the battlefield.",
-        narrative: "Anchor fighter in 'Project: Phantom Frequency'. Leads front-line battles and turns the tide of major saga conflicts through heavy physical pressure and precise timing.",
-        capabilities: "Master of the Center of Gravity technique, giving him supreme control over surrounding battle positioning. Heavy strike specialist who seamlessly weaves devastating skill casts into fluid combat strings.",
-        skills: [
-            { label: "MAX HEALTH", value: 95 },
-            { label: "MAX KI", value: 85 },
-            { label: "MAX STAMINA", value: 90 },
-            { label: "BASIC ATTACK", value: 88 },
-            { label: "STRIKE SUPER", value: 98 },
-            { label: "KI BLAST SUPER", value: 75 }
-        ],
-        equipment: ["Dark Inscription", "Center of Gravity System", "Gigantic Nova", "Strike Boost Super Soul"]
+    // DEFAULT BUILT-IN HERO DATABASE
+    const defaultHeroes = {
+        "kaige": {
+            id: "kaige",
+            callsign: "KAIGE",
+            realName: "RESTRICTED",
+            showTitle: "Project: Phantom Frequency",
+            role: "Lead Heavy Strike / Spatial Titan",
+            race: "Frieza Race",
+            status: "UNLEASHED / ACTIVE",
+            height: "Twice Frieza's Height",
+            avatarUrl: "",
+            bio: "Standing nearly twice the height of Frieza, Kaige is a towering Frieza-Race powerhouse built for dominant close-quarters strike combat. Operating inside the Time Nest, Kaige uses sheer physical mass paired with precision spatial awareness.",
+            narrative: "Serves as the front-line anchor in 'Project: Phantom Frequency'. Kaige leads the high-impact Future Saga DLC missions inside the Time Nest, turning chaotic battlefield dynamics in favor of the Time Patrol.",
+            capabilities: "Master of the Center of Gravity system for spatial control. Known for manually landing the Dark Inscription move and dropping massive ultimate damage via Gigantic Nova.",
+            skills: [
+                { label: "MAX HEALTH", value: 95 },
+                { label: "MAX KI", value: 85 },
+                { label: "MAX STAMINA", value: 90 },
+                { label: "BASIC ATTACK", value: 88 },
+                { label: "STRIKE SUPER", value: 98 },
+                { label: "KI BLAST SUPER", value: 75 }
+            ],
+            equipment: ["Dark Inscription", "Center of Gravity System", "Gigantic Nova", "Strike Boost Super Soul", "Deadzone Adjust Script"]
+        },
+        "ghostwire": {
+            id: "ghostwire",
+            callsign: "GHOSTWIRE",
+            realName: "Aria Kade",
+            showTitle: "Project: Ghostline Brief",
+            role: "Narrative Lead / Ki Tactician",
+            race: "Earthling / Cyber-Enhanced",
+            status: "ACTIVE",
+            height: "5'9\"",
+            avatarUrl: "",
+            bio: "A strategic mastermind skilled in long-range Ki manipulation and signal disruption.",
+            narrative: "Coordinates tactical intel during intense squad engagements across show episodes.",
+            capabilities: "Specializes in high Ki Blast Super outputs and field frequency hacking.",
+            skills: [
+                { label: "MAX HEALTH", value: 75 },
+                { label: "MAX KI", value: 95 },
+                { label: "MAX STAMINA", value: 85 },
+                { label: "BASIC ATTACK", value: 70 },
+                { label: "STRIKE SUPER", value: 65 },
+                { label: "KI BLAST SUPER", value: 92 }
+            ],
+            equipment: ["Signal Breaker", "Ki Frequency Amplifier", "Telemetry Visor"]
+        },
+        "novaframe": {
+            id: "novaframe",
+            callsign: "NOVAFRAME",
+            realName: "Nico Vale",
+            showTitle: "Project: Neon Archive",
+            role: "Visual Systems / Defense Specialist",
+            race: "Android Class",
+            status: "STANDBY / TRAINING",
+            height: "6'1\"",
+            avatarUrl: "",
+            bio: "Constructed for visual data processing and rapid-fire defensive counters.",
+            narrative: "Protects team assets while rendering real-time battle capture feeds.",
+            capabilities: "Balanced endurance fighter utilizing energy shields and timing macros.",
+            skills: [
+                { label: "MAX HEALTH", value: 88 },
+                { label: "MAX KI", value: 80 },
+                { label: "MAX STAMINA", value: 85 },
+                { label: "BASIC ATTACK", value: 82 },
+                { label: "STRIKE SUPER", value: 70 },
+                { label: "KI BLAST SUPER", value: 84 }
+            ],
+            equipment: ["Energy Barrier", "Vosk Offline Processor", "Artscape Shielding"]
+        },
+        "razorbyte": {
+            id: "razorbyte",
+            callsign: "RAZORBYTE",
+            realName: "Rex Onyx",
+            showTitle: "Project: Phantom Frequency",
+            role: "Field Specialist / Blitz Strike",
+            race: "Saiyan",
+            status: "ACTIVE",
+            height: "6'0\"",
+            avatarUrl: "",
+            bio: "An aggressive frontline combatant specializing in fast combo strings.",
+            narrative: "Provides high-speed backup during Time Patrol raid encounters.",
+            capabilities: "Rapid combo scaling paired with high physical Stamina.",
+            skills: [
+                { label: "MAX HEALTH", value: 82 },
+                { label: "MAX KI", value: 78 },
+                { label: "MAX STAMINA", value: 92 },
+                { label: "BASIC ATTACK", value: 90 },
+                { label: "STRIKE SUPER", value: 88 },
+                { label: "KI BLAST SUPER", value: 68 }
+            ],
+            equipment: ["Blitz Gauntlets", "Stamina Recovery Capsule"]
+        }
     };
 
-    // RENDER CHARACTER DOSSIER
     function renderDossier() {
         const urlParams = new URLSearchParams(window.location.search);
-        const charId = urlParams.get('id');
+        let heroId = urlParams.get('id');
 
-        const savedCharacters = JSON.parse(localStorage.getItem('pantheon_characters') || '{}');
-        const charData = (charId && savedCharacters[charId]) ? savedCharacters[charId] : defaultFighter;
-
-        // Main Column
-        document.getElementById('char-show-title').innerText = `SHOW PROJECT: ${charData.showTitle || 'UNASSIGNED'}`;
-        document.getElementById('char-title').innerText = `NAME: ${charData.callsign}`;
-        document.getElementById('char-subtitle').innerText = `Race: ${charData.race || 'Frieza Race'} // Role: ${charData.role}`;
-        document.getElementById('char-bio').innerText = charData.bio;
-        document.getElementById('char-narrative').innerText = charData.narrative;
-        document.getElementById('char-capabilities').innerText = charData.capabilities;
-
-        // Infobox Table
-        document.getElementById('info-callsign').innerText = charData.callsign;
-        document.getElementById('info-role').innerText = charData.role;
-        document.getElementById('info-show').innerText = charData.showTitle;
-        document.getElementById('info-race').innerText = charData.race || 'Frieza Race';
-        document.getElementById('info-height').innerText = charData.height || 'N/A';
-        document.getElementById('info-class').innerText = charData.combatClass || 'Strike Heavy';
-        document.getElementById('info-status').innerText = charData.status || 'ACTIVE';
-
-        // Avatar
-        const avatarBox = document.getElementById('avatar-container');
-        if (charData.avatarUrl) {
-            avatarBox.innerHTML = `<img src="${charData.avatarUrl}" alt="${charData.callsign}">`;
-        } else {
-            const initials = charData.callsign ? charData.callsign.substring(0, 2).toUpperCase() : '??';
-            avatarBox.innerHTML = `<div class="avatar-placeholder">${initials}</div>`;
+        if (!heroId) {
+            heroId = 'kaige'; // Default fallback hero
         }
 
-        // Xenoverse Attributes
-        const skillsContainer = document.getElementById('skill-meters-container');
-        const skillsList = charData.skills || defaultFighter.skills;
+        // Check LocalStorage custom creations first, then fallback to defaultHeroes
+        const savedCharacters = JSON.parse(localStorage.getItem('pantheon_characters') || '{}');
+        const hero = savedCharacters[heroId] || defaultHeroes[heroId] || defaultHeroes['kaige'];
 
-        skillsContainer.innerHTML = skillsList.map(s => `
-            <div class="skill-row">
-                <span class="skill-label">${s.label}</span>
-                <div class="skill-bar-container">
-                    <div class="skill-bar-fill" style="width: ${s.value}%;"></div>
+        const container = document.getElementById('dossier-content');
+        const initials = hero.callsign.substring(0, 2).toUpperCase();
+
+        const avatarHTML = hero.avatarUrl 
+            ? `<img src="${hero.avatarUrl}" alt="${hero.callsign}">` 
+            : initials;
+
+        container.innerHTML = `
+            <!-- HERO HEADER CARD -->
+            <div class="card">
+                <div class="card-header">
+                    <span>HERO PROFILE // SCOUTER ANALYSIS</span>
+                    <a href="builder.html" style="color:var(--db-gold); font-size:0.75rem; text-decoration:none;">[EDIT IN HERO BUILDER ↗]</a>
+                </div>
+
+                <div class="hero-banner">
+                    <div class="hero-avatar">${avatarHTML}</div>
+                    <div class="hero-meta">
+                        <h1 class="hero-callsign">${hero.callsign}</h1>
+                        <div class="hero-subtitle">${hero.role}</div>
+                    </div>
+                </div>
+
+                <div class="spec-grid">
+                    <div class="spec-item">
+                        <span class="spec-label">SHOW PROJECT</span>
+                        <span class="spec-val">${hero.showTitle || 'N/A'}</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">REAL NAME</span>
+                        <span class="spec-val">${hero.realName || 'Restricted'}</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">RACE / SPECIES</span>
+                        <span class="spec-val">${hero.race || 'Unspecified'}</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">HEIGHT</span>
+                        <span class="spec-val">${hero.height || 'N/A'}</span>
+                    </div>
                 </div>
             </div>
-        `).join('');
 
-        // Skill Badges
-        const gearContainer = document.getElementById('gear-tags-container');
-        const gearList = charData.equipment || defaultFighter.equipment;
-        gearContainer.innerHTML = gearList.map(g => `<span class="skill-badge">${g}</span>`).join('');
+            <!-- DEEP LORE CARD -->
+            <div class="card">
+                <div class="card-header">DEEP LORE & SHOW ARCS</div>
+                
+                <div class="lore-block">
+                    <div class="lore-title">1. ORIGIN & CHARACTER BACKSTORY</div>
+                    <div class="lore-text">${hero.bio || 'No backstory registered.'}</div>
+                </div>
+
+                <div class="lore-block">
+                    <div class="lore-title">2. SHOW SAGA & NARRATIVE TRAJECTORY</div>
+                    <div class="lore-text">${hero.narrative || hero.showRole || 'No show arc registered.'}</div>
+                </div>
+
+                <div class="lore-block">
+                    <div class="lore-title">3. COMBAT CAPABILITIES & SPATIAL SYSTEMS</div>
+                    <div class="lore-text">${hero.capabilities || 'No combat systems registered.'}</div>
+                </div>
+            </div>
+
+            <!-- XENOVERSE ATTRIBUTES & EQUIPMENT CARD -->
+            <div class="card">
+                <div class="card-header">XENOVERSE ATTRIBUTES & SIGNATURE SKILLS</div>
+                
+                <div class="grid-2">
+                    <!-- POWER GRID METERS -->
+                    <div class="stat-bar-group">
+                        <div style="font-size:0.75rem; color:var(--db-gold); font-weight:bold; margin-bottom:6px;">POWER GRID METERS</div>
+                        ${(hero.skills || []).map(s => `
+                            <div class="stat-row">
+                                <span class="stat-label">${s.label}</span>
+                                <div class="stat-track">
+                                    <div class="stat-fill" style="width: ${s.value}%;"></div>
+                                </div>
+                                <span class="stat-num">${s.value}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <!-- SIGNATURE EQUIPMENT TAGS -->
+                    <div>
+                        <div style="font-size:0.75rem; color:var(--db-gold); font-weight:bold; margin-bottom:12px;">SIGNATURE SKILLS & GEAR</div>
+                        <div class="tag-cloud">
+                            ${(hero.equipment || []).map(item => `
+                                <span class="eq-tag">[ ${item} ]</span>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
     }
 
     renderDossier();
