@@ -12,6 +12,7 @@
             --db-cyan: #00e5ff;
             --db-ki: #00ff88;
             --db-purple: #a100ff;
+            --db-red: #ff3333;
             --panel-bg: rgba(12, 18, 32, 0.92);
             --scouter-glow: 0 0 12px rgba(255, 183, 0, 0.35);
             --font-mono: 'Courier New', Courier, monospace;
@@ -538,9 +539,110 @@
             border: 1px solid rgba(0, 229, 255, 0.2);
             padding: 12px;
         }
+
+        /* MAINTENANCE LOCKOUT OVERLAY STYLES */
+        #maintenance-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #060913;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(255, 51, 51, 0.12) 0%, transparent 80%),
+                linear-gradient(rgba(255, 183, 0, 0.04) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 4px;
+            z-index: 99999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .maint-card {
+            background: rgba(12, 18, 32, 0.96);
+            border: 2px solid var(--db-red);
+            box-shadow: 0 0 25px rgba(255, 51, 51, 0.4);
+            width: 460px;
+            padding: 30px;
+            text-align: center;
+            clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+        }
+
+        .maint-title {
+            color: var(--db-red);
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .maint-sub {
+            color: var(--db-gold);
+            font-size: 0.75rem;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+
+        .maint-text {
+            color: #d0e0f0;
+            font-size: 0.8rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            border-left: 3px solid var(--db-red);
+            padding-left: 10px;
+            text-align: left;
+            background: rgba(6, 9, 19, 0.6);
+            padding: 10px;
+        }
+
+        .maint-form {
+            display: flex;
+            gap: 10px;
+        }
+
+        .maint-form input {
+            flex: 1;
+            background: rgba(6, 9, 19, 0.95);
+            border: 1px solid rgba(255, 51, 51, 0.5);
+            color: #fff;
+            padding: 10px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            outline: none;
+        }
+
+        .maint-form button {
+            background: var(--db-gold);
+            color: #000;
+            border: none;
+            padding: 10px 16px;
+            font-family: var(--font-mono);
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
     </style>
 </head>
 <body class="theme-spectral">
+
+<!-- MAINTENANCE LOCKOUT OVERLAY -->
+<div id="maintenance-overlay">
+    <div class="maint-card">
+        <div class="maint-title">⚠️ SITE UNDER MAINTENANCE</div>
+        <div class="maint-sub">SYSTEM ACCESS RESTRICTED // KI BARRIER ACTIVE</div>
+        <div class="maint-text">
+            The Pantheon Studios Showcase Hub is currently undergoing core system maintenance and show updates. Public access is temporarily restricted.
+        </div>
+        <form class="maint-form" onsubmit="unlockMaintenance(event)">
+            <input type="password" id="maint-key-input" placeholder="ENTER DEVELOPER KEY..." required autocomplete="off">
+            <button type="submit">UNSEAL</button>
+        </form>
+        <div id="maint-error" style="color:var(--db-red); font-size:0.75rem; margin-top:10px; font-weight:bold;"></div>
+    </div>
+</div>
 
 <div class="container">
     <!-- STUDIO HEADER -->
@@ -776,6 +878,35 @@
 <script>
     const activeCallsign = localStorage.getItem('pantheon_active_session') || 'GUEST_FAN';
 
+    // MAINTENANCE GATE CHECK LOGIC
+    const DEV_PASSCODE = 'pantheon'; // Passkey to bypass maintenance overlay
+
+    function checkMaintenanceGate() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const passParam = urlParams.get('pass');
+        const overlay = document.getElementById('maintenance-overlay');
+
+        if (passParam === DEV_PASSCODE || localStorage.getItem('pantheon_maint_unlocked') === 'true') {
+            localStorage.setItem('pantheon_maint_unlocked', 'true');
+            if (overlay) overlay.style.display = 'none';
+        } else {
+            if (overlay) overlay.style.display = 'flex';
+        }
+    }
+
+    function unlockMaintenance(e) {
+        e.preventDefault();
+        const inputVal = document.getElementById('maint-key-input').value.trim();
+        const errBox = document.getElementById('maint-error');
+
+        if (inputVal === DEV_PASSCODE) {
+            localStorage.setItem('pantheon_maint_unlocked', 'true');
+            document.getElementById('maintenance-overlay').style.display = 'none';
+        } else {
+            errBox.innerText = 'ACCESS DENIED: INVALID DEVELOPER PASSKEY';
+        }
+    }
+
     // Live Clock
     function updateClock() {
         const now = new Date();
@@ -951,6 +1082,7 @@
     }
 
     // INITIALIZATION
+    checkMaintenanceGate();
     applySiteConfig();
     loadPublicFeed();
 </script>
