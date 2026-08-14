@@ -3,21 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PANTHEON_OS // OPERATIVE ACCESS TERMINAL</title>
+    <title>PANTHEON STUDIOS // TIME NEST ACCESS TERMINAL</title>
     <style>
         :root {
-            --bg-void: #05070a;
-            --neon-emerald: #00ff9d;
-            --neon-cyan: #00e5ff;
-            --neon-pink: #ff007f;
-            --panel-bg: rgba(10, 16, 26, 0.85);
-            --border-glow: 0 0 10px rgba(0, 229, 255, 0.3);
+            --bg-void: #060913;
+            --db-gold: #ffb700;
+            --db-orange: #ff5500;
+            --db-cyan: #00e5ff;
+            --db-ki: #00ff88;
+            --db-purple: #a100ff;
+            --db-red: #ff3333;
+            --panel-bg: rgba(12, 18, 32, 0.92);
+            --scouter-glow: 0 0 15px rgba(0, 229, 255, 0.35);
+            --font-mono: 'Courier New', Courier, monospace;
         }
 
         body {
             background-color: var(--bg-void);
-            color: var(--neon-cyan);
-            font-family: 'Courier New', Courier, monospace;
+            color: var(--db-cyan);
+            font-family: var(--font-mono);
             margin: 0;
             padding: 0;
             display: flex;
@@ -25,15 +29,15 @@
             align-items: center;
             min-height: 100vh;
             background-image: 
-                radial-gradient(circle at 50% 50%, rgba(0, 229, 255, 0.05) 0%, transparent 80%),
-                linear-gradient(rgba(0, 255, 157, 0.03) 1px, transparent 1px);
+                radial-gradient(circle at 50% 50%, rgba(0, 229, 255, 0.08) 0%, transparent 80%),
+                linear-gradient(rgba(0, 255, 136, 0.03) 1px, transparent 1px);
             background-size: 100% 100%, 100% 4px;
         }
 
         .terminal-card {
             background: var(--panel-bg);
-            border: 1px solid var(--neon-cyan);
-            box-shadow: var(--border-glow);
+            border: 2px solid var(--db-gold);
+            box-shadow: 0 0 20px rgba(255, 183, 0, 0.25);
             width: 440px;
             padding: 30px;
             clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
@@ -41,7 +45,7 @@
         }
 
         .header {
-            border-bottom: 1px solid var(--neon-cyan);
+            border-bottom: 1px dashed var(--db-gold);
             padding-bottom: 12px;
             margin-bottom: 20px;
         }
@@ -49,8 +53,9 @@
         .header h1 {
             font-size: 1.1rem;
             margin: 0;
-            color: var(--neon-emerald);
+            color: var(--db-gold);
             letter-spacing: 2px;
+            font-weight: bold;
         }
 
         .header .sub {
@@ -71,19 +76,19 @@
             border: 1px solid rgba(0, 229, 255, 0.3);
             color: #8a9ba8;
             padding: 10px;
-            font-family: inherit;
+            font-family: var(--font-mono);
             font-size: 0.8rem;
             cursor: pointer;
             text-transform: uppercase;
+            font-weight: bold;
             transition: all 0.2s ease;
         }
 
         .tab-btn.active {
-            background: rgba(0, 229, 255, 0.2);
-            border-color: var(--neon-cyan);
-            color: var(--neon-cyan);
-            font-weight: bold;
-            box-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
+            background: rgba(255, 183, 0, 0.2);
+            border-color: var(--db-gold);
+            color: var(--db-gold);
+            box-shadow: 0 0 10px rgba(255, 183, 0, 0.4);
         }
 
         .form-group {
@@ -94,46 +99,48 @@
             display: block;
             font-size: 0.75rem;
             margin-bottom: 6px;
-            color: var(--neon-emerald);
+            color: var(--db-ki);
             letter-spacing: 1px;
+            font-weight: bold;
+            text-transform: uppercase;
         }
 
         input, select, textarea {
             width: 100%;
             box-sizing: border-box;
-            background: rgba(5, 7, 10, 0.9);
+            background: rgba(6, 9, 19, 0.95);
             border: 1px solid rgba(0, 229, 255, 0.4);
             color: #ffffff;
             padding: 10px;
-            font-family: inherit;
+            font-family: var(--font-mono);
             font-size: 0.85rem;
             outline: none;
         }
 
         input:focus, select:focus, textarea:focus {
-            border-color: var(--neon-cyan);
-            box-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+            border-color: var(--db-ki);
+            box-shadow: 0 0 8px rgba(0, 255, 136, 0.5);
         }
 
         .action-btn {
             width: 100%;
-            background: var(--neon-cyan);
+            background: var(--db-gold);
             color: #000;
             border: none;
             padding: 12px;
-            font-family: inherit;
+            font-family: var(--font-mono);
             font-weight: bold;
             font-size: 0.9rem;
             cursor: pointer;
             letter-spacing: 1px;
             text-transform: uppercase;
             margin-top: 10px;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
         }
 
         .action-btn:hover {
-            background: var(--neon-emerald);
-            box-shadow: 0 0 12px rgba(0, 255, 157, 0.6);
+            background: var(--db-ki);
+            box-shadow: 0 0 12px rgba(0, 255, 136, 0.6);
         }
 
         .status-msg {
@@ -141,68 +148,69 @@
             font-size: 0.8rem;
             text-align: center;
             min-height: 18px;
+            font-weight: bold;
         }
 
-        .status-msg.error { color: var(--neon-pink); }
-        .status-msg.success { color: var(--neon-emerald); }
+        .status-msg.error { color: var(--db-red); }
+        .status-msg.success { color: var(--db-ki); }
 
-        .hidden { display: none; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
 <div class="terminal-card">
     <div class="header">
-        <h1>PANTHEON_OS // ACCESS_TERMINAL</h1>
-        <div class="sub">SYS_VER: 2.4.0 // AUTHENTICATION_PROTOCOL</div>
+        <h1>TIME NEST // ACCESS TERMINAL</h1>
+        <div class="sub">TIME PATROL VER: 2.4.0 // HERO AUTHENTICATION</div>
     </div>
 
     <div class="tabs">
-        <button class="tab-btn active" id="btn-login" onclick="switchTab('login')">[SIGN_IN]</button>
-        <button class="tab-btn" id="btn-register" onclick="switchTab('register')">[REGISTER]</button>
+        <button class="tab-btn active" id="btn-login" onclick="switchTab('login')">[SIGN IN]</button>
+        <button class="tab-btn" id="btn-register" onclick="switchTab('register')">[REGISTER HERO]</button>
     </div>
 
     <!-- LOGIN FORM -->
     <form id="form-login" onsubmit="handleLogin(event)">
         <div class="form-group">
-            <label>OPERATIVE CALLSIGN</label>
-            <input type="text" id="login-callsign" placeholder="e.g. KAIGE_01" required>
+            <label>HERO CALLSIGN</label>
+            <input type="text" id="login-callsign" placeholder="e.g. Kaige" required autocomplete="off">
         </div>
         <div class="form-group">
-            <label>PASSKEY</label>
-            <input type="password" id="login-passkey" placeholder="••••••••" required>
+            <label>KI PASSKEY</label>
+            <input type="password" id="login-passkey" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" required>
         </div>
-        <button type="submit" class="action-btn">AUTHENTICATE</button>
+        <button type="submit" class="action-btn">SYNCHRONIZE KI</button>
     </form>
 
     <!-- REGISTER FORM -->
     <form id="form-register" class="hidden" onsubmit="handleRegister(event)">
         <div class="form-group">
-            <label>OPERATIVE CALLSIGN</label>
-            <input type="text" id="reg-callsign" placeholder="e.g. KAIGE_01" required>
+            <label>HERO CALLSIGN</label>
+            <input type="text" id="reg-callsign" placeholder="e.g. Kaige" required autocomplete="off">
         </div>
         <div class="form-group">
-            <label>PASSKEY</label>
-            <input type="password" id="reg-passkey" placeholder="••••••••" required>
+            <label>KI PASSKEY</label>
+            <input type="password" id="reg-passkey" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" required>
         </div>
         <div class="form-group">
-            <label>SPECIALTY / ROLE</label>
+            <label>FIGHTING STYLE / ROLE</label>
             <select id="reg-role">
-                <option value="Tactical Operative">Tactical Operative</option>
-                <option value="Creative Director">Creative Director</option>
-                <option value="Lead Developer">Lead Developer</option>
-                <option value="Systems Specialist">Systems Specialist</option>
+                <option value="Heavy Strike Titan">Heavy Strike Titan</option>
+                <option value="Ki Blast Specialist">Ki Blast Specialist</option>
+                <option value="Support Noise Lead">Support Noise Lead</option>
+                <option value="Time Patrol Director">Time Patrol Director</option>
             </select>
         </div>
         <div class="form-group">
-            <label>CLEARANCE LEVEL</label>
+            <label>COMBAT CLASS</label>
             <select id="reg-clearance">
-                <option value="LEVEL_01">LEVEL_01 (Standard)</option>
-                <option value="LEVEL_02">LEVEL_02 (Tactical)</option>
-                <option value="LEVEL_03">LEVEL_03 (Command)</option>
+                <option value="CLASS_01">CLASS_01 (Time Patrol)</option>
+                <option value="CLASS_02">CLASS_02 (Elite Guard)</option>
+                <option value="CLASS_03">CLASS_03 (Supreme Kai Council)</option>
             </select>
         </div>
-        <button type="submit" class="action-btn">INITIALIZE OPERATIVE</button>
+        <button type="submit" class="action-btn">AWAKEN TIME PATROLLER</button>
     </form>
 
     <div id="status-message" class="status-msg"></div>
@@ -247,7 +255,7 @@
 
         if (users[callsign]) {
             status.className = 'status-msg error';
-            status.innerText = 'CALLSIGN ALREADY REGISTERED IN SYSTEM.';
+            status.innerText = 'CALLSIGN ALREADY REGISTERED IN TIME NEST.';
             return;
         }
 
@@ -257,14 +265,14 @@
             role: role,
             clearance: clearance,
             registered: new Date().toISOString(),
-            status: 'ACTIVE_FIELD_AGENT'
+            status: 'ACTIVE_TIME_PATROLLER'
         };
 
         localStorage.setItem('pantheon_operatives', JSON.stringify(users));
         localStorage.setItem('pantheon_active_session', callsign);
 
         status.className = 'status-msg success';
-        status.innerText = 'OPERATIVE CREATED. REDIRECTING TO PROFILE...';
+        status.innerText = 'TIME PATROLLER AWAKENED. SYNCHRONIZING PROFILE...';
 
         setTimeout(() => {
             window.location.href = 'profile.html';
@@ -282,14 +290,14 @@
 
         if (!user || user.passkey !== passkey) {
             status.className = 'status-msg error';
-            status.innerText = 'ACCESS DENIED: INVALID CALLSIGN OR PASSKEY.';
+            status.innerText = 'ACCESS DENIED: INVALID CALLSIGN OR KI PASSKEY.';
             return;
         }
 
         localStorage.setItem('pantheon_active_session', callsign);
 
         status.className = 'status-msg success';
-        status.innerText = 'AUTHENTICATED. ACCESSING DOSSIER...';
+        status.innerText = 'KI SYNCHRONIZED. ACCESSING HERO DOSSIER...';
 
         setTimeout(() => {
             window.location.href = 'profile.html';

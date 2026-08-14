@@ -3,27 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PANTHEON_OS // OPERATIVE DOSSIER</title>
+    <title>PANTHEON STUDIOS // HERO PROFILE & CAPSULE VAULT</title>
     <style>
         :root {
-            --bg-void: #05070a;
-            --neon-emerald: #00ff9d;
-            --neon-cyan: #00e5ff;
-            --neon-pink: #ff007f;
-            --panel-bg: rgba(10, 16, 26, 0.85);
-            --border-glow: 0 0 10px rgba(0, 229, 255, 0.3);
+            --bg-void: #060913;
+            --db-gold: #ffb700;
+            --db-orange: #ff5500;
+            --db-cyan: #00e5ff;
+            --db-ki: #00ff88;
+            --db-purple: #a100ff;
+            --db-red: #ff3333;
+            --panel-bg: rgba(12, 18, 32, 0.92);
+            --scouter-glow: 0 0 12px rgba(0, 229, 255, 0.35);
+            --font-mono: 'Courier New', Courier, monospace;
         }
 
         body {
             background-color: var(--bg-void);
-            color: var(--neon-cyan);
-            font-family: 'Courier New', Courier, monospace;
+            color: var(--db-cyan);
+            font-family: var(--font-mono);
             margin: 0;
             padding: 20px;
             min-height: 100vh;
             background-image: 
-                radial-gradient(circle at 50% 50%, rgba(0, 229, 255, 0.05) 0%, transparent 80%),
-                linear-gradient(rgba(0, 255, 157, 0.03) 1px, transparent 1px);
+                radial-gradient(circle at 50% 30%, rgba(0, 229, 255, 0.08) 0%, transparent 70%),
+                linear-gradient(rgba(0, 255, 136, 0.03) 1px, transparent 1px);
             background-size: 100% 100%, 100% 4px;
         }
 
@@ -32,37 +36,42 @@
             margin: 0 auto;
         }
 
+        /* HEADER BAR */
         .header-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid var(--neon-cyan);
+            border-bottom: 2px solid var(--db-gold);
             padding-bottom: 15px;
             margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(255, 183, 0, 0.2);
         }
 
         .header-bar h1 {
             margin: 0;
-            font-size: 1.2rem;
-            color: var(--neon-emerald);
+            font-size: 1.1rem;
+            color: var(--db-gold);
             letter-spacing: 2px;
+            font-weight: bold;
         }
 
         .btn-logout {
-            background: rgba(255, 0, 127, 0.15);
-            border: 1px solid var(--neon-pink);
-            color: var(--neon-pink);
+            background: rgba(255, 51, 51, 0.15);
+            border: 1px solid var(--db-red);
+            color: var(--db-red);
             padding: 8px 16px;
-            font-family: inherit;
+            font-family: var(--font-mono);
             cursor: pointer;
             text-transform: uppercase;
             font-size: 0.8rem;
-            transition: all 0.2s;
+            font-weight: bold;
+            transition: all 0.2s ease;
         }
 
         .btn-logout:hover {
-            background: var(--neon-pink);
-            color: #000;
+            background: var(--db-red);
+            color: #ffffff;
+            box-shadow: 0 0 12px var(--db-red);
         }
 
         .grid {
@@ -73,8 +82,8 @@
 
         .card {
             background: var(--panel-bg);
-            border: 1px solid var(--neon-cyan);
-            box-shadow: var(--border-glow);
+            border: 1px solid var(--db-cyan);
+            box-shadow: var(--scouter-glow);
             padding: 20px;
             clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
         }
@@ -82,13 +91,14 @@
         .card h2 {
             margin-top: 0;
             font-size: 0.95rem;
-            color: var(--neon-emerald);
-            border-bottom: 1px rgba(0, 229, 255, 0.3) dashed;
+            color: var(--db-gold);
+            border-bottom: 1px rgba(255, 183, 0, 0.3) dashed;
             padding-bottom: 8px;
             letter-spacing: 1px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            font-weight: bold;
         }
 
         .field-row {
@@ -98,14 +108,14 @@
             font-size: 0.85rem;
         }
 
-        .field-label { color: #8a9ba8; }
+        .field-label { color: #8a9ba8; text-transform: uppercase; }
         .field-val { color: #ffffff; font-weight: bold; }
 
         .full-width {
             grid-column: span 2;
         }
 
-        /* SOCIAL RELAY STYLES */
+        /* ENERGY RELAY STYLES */
         .social-section {
             margin-top: 15px;
             border-top: 1px dashed rgba(0, 229, 255, 0.3);
@@ -123,18 +133,20 @@
         .social-badge {
             display: inline-block;
             background: rgba(0, 229, 255, 0.1);
-            border: 1px solid var(--neon-cyan);
-            color: var(--neon-cyan);
+            border: 1px solid var(--db-cyan);
+            color: var(--db-cyan);
             padding: 4px 8px;
             font-size: 0.7rem;
             text-decoration: none;
             text-transform: uppercase;
             font-weight: bold;
+            transition: all 0.2s ease;
         }
 
         .social-badge:hover {
-            background: var(--neon-cyan);
+            background: var(--db-cyan);
             color: #000;
+            box-shadow: 0 0 8px var(--db-cyan);
         }
 
         .social-input-group {
@@ -145,18 +157,18 @@
         }
 
         .social-input-group input {
-            background: rgba(5, 7, 10, 0.9);
+            background: rgba(6, 9, 19, 0.9);
             border: 1px solid rgba(0, 229, 255, 0.4);
             color: #ffffff;
             padding: 6px 10px;
-            font-family: inherit;
+            font-family: var(--font-mono);
             font-size: 0.75rem;
             outline: none;
             width: 100%;
             box-sizing: border-box;
         }
 
-        /* COMMS TABS */
+        /* SCOUTER COMMS TABS */
         .comms-tabs {
             display: flex;
             gap: 10px;
@@ -164,21 +176,27 @@
         }
 
         .tab-btn {
-            background: rgba(0, 229, 255, 0.05);
+            background: rgba(0, 229, 255, 0.08);
             border: 1px solid rgba(0, 229, 255, 0.3);
             color: #8a9ba8;
             padding: 6px 12px;
-            font-family: inherit;
+            font-family: var(--font-mono);
             font-size: 0.75rem;
             cursor: pointer;
             text-transform: uppercase;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            background: rgba(0, 229, 255, 0.2);
+            color: var(--db-cyan);
         }
 
         .tab-btn.active {
-            background: rgba(0, 229, 255, 0.2);
-            border-color: var(--neon-cyan);
-            color: var(--neon-cyan);
-            font-weight: bold;
+            background: rgba(255, 183, 0, 0.2);
+            border-color: var(--db-gold);
+            color: var(--db-gold);
         }
 
         .dm-select-wrapper {
@@ -190,11 +208,11 @@
         }
 
         .dm-select-wrapper select, .upload-form select, .upload-form input[type="text"] {
-            background: rgba(5, 7, 10, 0.9);
+            background: rgba(6, 9, 19, 0.9);
             border: 1px solid rgba(0, 229, 255, 0.4);
             color: #ffffff;
             padding: 6px 10px;
-            font-family: inherit;
+            font-family: var(--font-mono);
             font-size: 0.8rem;
             outline: none;
         }
@@ -202,7 +220,7 @@
         .comms-log {
             height: 160px;
             overflow-y: auto;
-            background: rgba(5, 7, 10, 0.9);
+            background: rgba(6, 9, 19, 0.95);
             border: 1px solid rgba(0, 229, 255, 0.3);
             padding: 12px;
             margin-bottom: 15px;
@@ -215,8 +233,8 @@
             padding-bottom: 6px;
         }
 
-        .msg-sender { color: var(--neon-emerald); font-weight: bold; }
-        .msg-sender.dm-me { color: var(--neon-cyan); }
+        .msg-sender { color: var(--db-ki); font-weight: bold; }
+        .msg-sender.dm-me { color: var(--db-gold); }
         .msg-time { color: #607080; font-size: 0.7rem; margin-left: 8px; }
         .msg-body { color: #d0e0f0; margin-top: 4px; }
 
@@ -227,32 +245,37 @@
 
         .comms-input-group input {
             flex: 1;
-            background: rgba(5, 7, 10, 0.9);
+            background: rgba(6, 9, 19, 0.9);
             border: 1px solid rgba(0, 229, 255, 0.4);
             color: #ffffff;
             padding: 10px;
-            font-family: inherit;
+            font-family: var(--font-mono);
             outline: none;
         }
 
         .comms-input-group button, .action-btn-sm {
-            background: var(--neon-cyan);
+            background: var(--db-gold);
             color: #000;
             border: none;
             padding: 10px 18px;
-            font-family: inherit;
+            font-family: var(--font-mono);
             font-weight: bold;
             cursor: pointer;
             text-transform: uppercase;
             font-size: 0.8rem;
+            transition: all 0.2s ease;
         }
 
-        /* MEDIA VAULT STYLES */
+        .comms-input-group button:hover, .action-btn-sm:hover {
+            box-shadow: 0 0 10px var(--db-gold);
+        }
+
+        /* CAPSULE VAULT STYLES */
         .upload-form {
             display: flex;
             flex-direction: column;
             gap: 10px;
-            background: rgba(5, 7, 10, 0.6);
+            background: rgba(6, 9, 19, 0.6);
             padding: 15px;
             border: 1px solid rgba(0, 229, 255, 0.2);
             margin-bottom: 20px;
@@ -272,7 +295,7 @@
         }
 
         .media-item {
-            background: rgba(5, 7, 10, 0.9);
+            background: rgba(6, 9, 19, 0.9);
             border: 1px solid rgba(0, 229, 255, 0.3);
             padding: 10px;
             position: relative;
@@ -294,9 +317,9 @@
             margin-top: 6px;
         }
 
-        .badge-private { background: rgba(255, 0, 127, 0.2); color: var(--neon-pink); border: 1px solid var(--neon-pink); }
-        .badge-restricted { background: rgba(255, 230, 0, 0.2); color: #ffe600; border: 1px solid #ffe600; }
-        .badge-public { background: rgba(0, 255, 157, 0.2); color: var(--neon-emerald); border: 1px solid var(--neon-emerald); }
+        .badge-private { background: rgba(255, 51, 51, 0.2); color: var(--db-red); border: 1px solid var(--db-red); }
+        .badge-restricted { background: rgba(255, 183, 0, 0.2); color: var(--db-gold); border: 1px solid var(--db-gold); }
+        .badge-public { background: rgba(0, 255, 136, 0.2); color: var(--db-ki); border: 1px solid var(--db-ki); }
 
         .media-title {
             font-size: 0.8rem;
@@ -305,92 +328,93 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            font-weight: bold;
         }
 
-        .hidden { display: none; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header-bar">
-        <h1>PANTHEON_OS // OPERATIVE_PROFILE</h1>
+        <h1>PANTHEON STUDIOS // HERO PROFILE</h1>
         <div style="display: flex; gap: 10px; align-items: center;">
-            <a href="index.html" class="tab-btn" style="text-decoration: none;">[HQ_FEED]</a>
-            <a href="admin.html" class="tab-btn" style="text-decoration: none; border-color: var(--neon-pink); color: var(--neon-pink);">[OMNI_ADMIN]</a>
-            <button class="btn-logout" onclick="logout()">[TERMINATE_SESSION]</button>
+            <a href="index.html" class="tab-btn" style="text-decoration: none;">[SHOWCASE_HUB]</a>
+            <a href="admin.html" class="tab-btn" style="text-decoration: none; border-color: var(--db-gold); color: var(--db-gold);">[TIME_NEST_ADMIN]</a>
+            <button class="btn-logout" onclick="logout()">[POWER_DOWN_SESSION]</button>
         </div>
     </div>
 
     <div class="grid">
-        <!-- DOSSIER DETAILS -->
+        <!-- HERO DOSSIER DETAILS -->
         <div class="card">
-            <h2>DOSSIER // IDENTITY</h2>
+            <h2>HERO DOSSIER // IDENTITY & KI CLASS</h2>
             <div class="field-row">
-                <span class="field-label">CALLSIGN:</span>
+                <span class="field-label">HERO CALLSIGN:</span>
                 <span class="field-val" id="disp-callsign">---</span>
             </div>
             <div class="field-row">
-                <span class="field-label">SPECIALTY:</span>
+                <span class="field-label">FIGHTING STYLE / ROLE:</span>
                 <span class="field-val" id="disp-role">---</span>
             </div>
             <div class="field-row">
-                <span class="field-label">CLEARANCE:</span>
+                <span class="field-label">COMBAT CLASS:</span>
                 <span class="field-val" id="disp-clearance">---</span>
             </div>
             <div class="field-row">
-                <span class="field-label">FIELD STATUS:</span>
-                <span class="field-val" id="disp-status" style="color: var(--neon-emerald);">---</span>
+                <span class="field-label">AURA STATUS:</span>
+                <span class="field-val" id="disp-status" style="color: var(--db-ki);">---</span>
             </div>
 
-            <!-- EXTERNAL SOCIAL COMM RELAYS -->
+            <!-- EXTERNAL SOCIAL ENERGY RELAYS -->
             <div class="social-section">
-                <div class="field-label" style="font-size:0.75rem; color:var(--neon-emerald);">EXTERNAL_COMM_RELAYS:</div>
+                <div class="field-label" style="font-size:0.75rem; color:var(--db-ki); font-weight:bold;">EXTERNAL ENERGY RELAYS:</div>
                 <div id="disp-socials-container" class="social-badges-wrapper">
                     <!-- Dynamic Badges Render Here -->
                 </div>
-                <button class="tab-btn" onclick="toggleSocialEdit()" style="width:100%; margin-top:5px;">[CONFIGURE_SOCIAL_RELAYS]</button>
+                <button class="tab-btn" onclick="toggleSocialEdit()" style="width:100%; margin-top:5px;">[CONFIGURE ENERGY RELAYS]</button>
 
                 <form id="social-edit-form" class="social-input-group hidden" onsubmit="saveSocials(event)">
-                    <input type="text" id="input-discord" placeholder="Discord Tag / Server URL">
+                    <input type="text" id="input-discord" placeholder="Discord Tag / Server Link">
                     <input type="text" id="input-youtube" placeholder="YouTube URL or @Channel">
-                    <input type="text" id="input-patreon" placeholder="Patreon Page URL">
-                    <input type="text" id="input-facebook" placeholder="Facebook Profile URL">
+                    <input type="text" id="input-patreon" placeholder="Patreon Page Link">
+                    <input type="text" id="input-facebook" placeholder="Facebook Profile Link">
                     <button type="submit" class="action-btn-sm" style="padding:6px;">SAVE RELAYS</button>
                 </form>
             </div>
         </div>
 
-        <!-- SYSTEM METRICS -->
+        <!-- SCOUTER METRICS -->
         <div class="card">
-            <h2>SYSTEM // TELEMETRY</h2>
+            <h2>SCOUTER METRICS // TELEMETRY</h2>
             <div class="field-row">
-                <span class="field-label">ENCRYPTION:</span>
+                <span class="field-label">KI ENCRYPTION:</span>
                 <span class="field-val">AES-256-GCM</span>
             </div>
             <div class="field-row">
-                <span class="field-label">ACTIVE NODE:</span>
+                <span class="field-label">TIME NEST HUB:</span>
                 <span class="field-val">PANTHEON_HQ_01</span>
             </div>
             <div class="field-row">
-                <span class="field-label">INITIALIZED:</span>
+                <span class="field-label">AWAKENED DATE:</span>
                 <span class="field-val" id="disp-date">---</span>
             </div>
         </div>
 
-        <!-- TACTICAL COMMS & DM TERMINAL -->
+        <!-- SCOUTER COMMS & TELEPATHIC DM TERMINAL -->
         <div class="card full-width">
-            <h2>TACTICAL_COMMS // NETWORK</h2>
+            <h2>SCOUTER COMMS // TRANSMISSION RELAY</h2>
 
             <div class="comms-tabs">
-                <button class="tab-btn active" id="tab-broadcast" onclick="setMode('broadcast')">[BROADCAST_CHANNEL]</button>
-                <button class="tab-btn" id="tab-dm" onclick="setMode('dm')">[DIRECT_ENCRYPTED_MESSAGES]</button>
+                <button class="tab-btn active" id="tab-broadcast" onclick="setMode('broadcast')">[TIME NEST BROADCAST]</button>
+                <button class="tab-btn" id="tab-dm" onclick="setMode('dm')">[ENCRYPTED TELEPATHY (DM)]</button>
             </div>
 
             <div id="dm-recipient-bar" class="dm-select-wrapper hidden">
-                <span style="color: var(--neon-emerald);">SELECT RECIPIENT:</span>
+                <span style="color: var(--db-ki); font-weight:bold;">TARGET HERO:</span>
                 <select id="dm-target" onchange="loadDMs()">
-                    <!-- Operatives auto-populate here -->
+                    <!-- Hero fighters auto-populate here -->
                 </select>
             </div>
 
@@ -399,27 +423,27 @@
             </div>
 
             <form class="comms-input-group" onsubmit="postMessage(event)">
-                <input type="text" id="msg-input" placeholder="Transmit signal..." required autocomplete="off">
+                <input type="text" id="msg-input" placeholder="Transmit Ki Signal..." required autocomplete="off">
                 <button type="submit">TRANSMIT</button>
             </form>
         </div>
 
-        <!-- MEDIA VAULT & UPLOAD SECTION -->
+        <!-- CAPSULE VAULT & ASSET DISPLAY -->
         <div class="card full-width">
-            <h2>INTEL_VAULT // MEDIA_ASSETS</h2>
+            <h2>CAPSULE VAULT // SHOW & LORE ASSETS</h2>
 
             <!-- UPLOAD FORM -->
             <form class="upload-form" onsubmit="uploadMedia(event)">
                 <div class="upload-row">
-                    <input type="text" id="media-title" placeholder="Intel Asset Caption/Title..." required style="flex:1;">
+                    <input type="text" id="media-title" placeholder="Capsule Asset Caption/Title..." required style="flex:1;">
                     <input type="file" id="media-file" accept="image/*" required style="color:#8a9ba8;">
                 </div>
                 <div class="upload-row">
-                    <label style="font-size:0.75rem; color:var(--neon-emerald);">VISIBILITY PROTOCOL:</label>
+                    <label style="font-size:0.75rem; color:var(--db-ki); font-weight:bold;">CAPSULE VISIBILITY:</label>
                     <select id="media-privacy" onchange="toggleRestrictedTarget()">
-                        <option value="private">CLASSIFIED (Only Me)</option>
-                        <option value="restricted">RESTRICTED (Specific Operative)</option>
-                        <option value="public">PUBLIC_HQ (All Team Members)</option>
+                        <option value="private">CLASSIFIED CAPSULE (Only Me)</option>
+                        <option value="restricted">RESTRICTED CAPSULE (Specific Hero)</option>
+                        <option value="public">PUBLIC SHOWCASE (All Time Patrollers)</option>
                     </select>
 
                     <div id="restricted-wrapper" class="hidden">
@@ -428,7 +452,7 @@
                         </select>
                     </div>
 
-                    <button type="submit" class="action-btn-sm" style="margin-left:auto;">UPLOAD INTEL</button>
+                    <button type="submit" class="action-btn-sm" style="margin-left:auto;">STORE IN CAPSULE</button>
                 </div>
             </form>
 
@@ -458,10 +482,10 @@
         }
 
         document.getElementById('disp-callsign').innerText = user.callsign;
-        document.getElementById('disp-role').innerText = user.role;
-        document.getElementById('disp-clearance').innerText = user.clearance;
-        document.getElementById('disp-status').innerText = user.status || 'ACTIVE_FIELD_AGENT';
-        document.getElementById('disp-date').innerText = new Date(user.registered).toLocaleDateString();
+        document.getElementById('disp-role').innerText = user.role || 'Hero Fighter';
+        document.getElementById('disp-clearance').innerText = user.clearance || 'CLASS_01';
+        document.getElementById('disp-status').innerText = user.status || 'ACTIVE_TIME_PATROLLER';
+        document.getElementById('disp-date').innerText = new Date(user.registered || Date.now()).toLocaleDateString();
 
         // Load Socials Data
         const socials = user.socials || {};
@@ -503,7 +527,7 @@
         }
 
         if (count === 0) {
-            container.innerHTML = '<span style="color:#607080; font-size:0.75rem;">NO SOCIAL RELAYS CONFIGURED</span>';
+            container.innerHTML = '<span style="color:#607080; font-size:0.75rem;">NO ENERGY RELAYS CONFIGURED</span>';
         }
     }
 
@@ -539,8 +563,8 @@
         const otherOperatives = Object.keys(users).filter(c => c !== activeCallsign);
 
         if (otherOperatives.length === 0) {
-            dmSelect.innerHTML = '<option value="">NO OTHER OPERATIVES</option>';
-            mediaTargetSelect.innerHTML = '<option value="">NO OTHER OPERATIVES</option>';
+            dmSelect.innerHTML = '<option value="">NO OTHER HEROES</option>';
+            mediaTargetSelect.innerHTML = '<option value="">NO OTHER HEROES</option>';
             return;
         }
 
@@ -611,7 +635,7 @@
         const box = document.getElementById('comms-box');
 
         if (!target) {
-            box.innerHTML = '<div style="color: #607080;">Register a second operative to test Direct Messaging.</div>';
+            box.innerHTML = '<div style="color: #607080;">Register a second hero to test Telepathic Direct Messaging.</div>';
             return;
         }
 
@@ -622,7 +646,7 @@
         );
 
         if (thread.length === 0) {
-            box.innerHTML = `<div style="color: #607080;">Encrypted channel open with [${target}]. No messages exchanged yet.</div>`;
+            box.innerHTML = `<div style="color: #607080;">Encrypted channel open with [${target}]. No signals exchanged yet.</div>`;
             return;
         }
 
@@ -715,17 +739,17 @@
         });
 
         if (visibleMedia.length === 0) {
-            gallery.innerHTML = '<div style="color:#607080; grid-column:span 2;">No media assets found in vault. Upload an image above to test.</div>';
+            gallery.innerHTML = '<div style="color:#607080; grid-column:span 2;">No show assets found in capsule vault. Upload an image above to test.</div>';
             return;
         }
 
         gallery.innerHTML = visibleMedia.map(item => {
             let badgeClass = 'badge-private';
-            let badgeText = 'CLASSIFIED (ONLY ME)';
+            let badgeText = 'CLASSIFIED CAPSULE';
 
             if (item.privacy === 'public') {
                 badgeClass = 'badge-public';
-                badgeText = 'PUBLIC HQ';
+                badgeText = 'PUBLIC SHOWCASE';
             } else if (item.privacy === 'restricted') {
                 badgeClass = 'badge-restricted';
                 badgeText = `RESTRICTED -> ${item.targetUser}`;

@@ -3,36 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PANTHEON_OS // COMMAND_HUB</title>
+    <title>PANTHEON STUDIOS // HERO & SHOW HUB</title>
     <style>
         :root {
-            --bg-void: #05070a;
-            --neon-primary: #00e5ff;
-            --neon-accent: #00ff9d;
-            --neon-pink: #ff007f;
-            --neon-amber: #ffb700;
-            --panel-bg: rgba(10, 16, 26, 0.88);
-            --border-glow: 0 0 10px rgba(0, 229, 255, 0.3);
+            --bg-void: #060913;
+            --db-gold: #ffb700;
+            --db-orange: #ff5500;
+            --db-cyan: #00e5ff;
+            --db-ki: #00ff88;
+            --db-purple: #a100ff;
+            --panel-bg: rgba(12, 18, 32, 0.92);
+            --scouter-glow: 0 0 12px rgba(255, 183, 0, 0.35);
             --font-mono: 'Courier New', Courier, monospace;
         }
 
-        /* OBSIDIAN THEME OVERRIDE */
+        /* OBSIDIAN / SUPER SAIYAN OVERRIDE THEME */
         body.theme-obsidian {
-            --neon-primary: #ff6600;
-            --neon-accent: #ffb700;
-            --border-glow: 0 0 10px rgba(255, 102, 0, 0.4);
+            --db-gold: #ffea00;
+            --db-cyan: #ff5500;
+            --db-ki: #ffaa00;
+            --scouter-glow: 0 0 15px rgba(255, 85, 0, 0.45);
         }
 
         body {
             background-color: var(--bg-void);
-            color: var(--neon-primary);
+            color: var(--db-cyan);
             font-family: var(--font-mono);
             margin: 0;
             padding: 20px;
             min-height: 100vh;
             background-image: 
-                radial-gradient(circle at 50% 50%, rgba(0, 229, 255, 0.05) 0%, transparent 80%),
-                linear-gradient(rgba(0, 255, 157, 0.03) 1px, transparent 1px);
+                radial-gradient(circle at 50% 30%, rgba(255, 183, 0, 0.08) 0%, transparent 70%),
+                linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px);
             background-size: 100% 100%, 100% 4px;
             transition: all 0.3s ease;
         }
@@ -42,36 +44,41 @@
             margin: 0 auto;
         }
 
-        /* SYSTEM HEADER */
+        /* STUDIO HEADER BAR */
         .top-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid var(--neon-primary);
+            border-bottom: 2px solid var(--db-gold);
             padding-bottom: 10px;
             margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(255, 183, 0, 0.2);
         }
 
         .sys-title {
             font-size: 1.1rem;
-            color: var(--neon-accent);
+            color: var(--db-gold);
             letter-spacing: 2px;
             margin: 0;
             display: flex;
             align-items: center;
             gap: 10px;
+            font-weight: bold;
         }
 
-        .pulse-dot {
-            width: 10px;
-            height: 10px;
-            background: var(--neon-accent);
+        .pulse-orb {
+            width: 12px;
+            height: 12px;
+            background: var(--db-gold);
             border-radius: 50%;
-            box-shadow: 0 0 8px var(--neon-accent);
-            animation: blink 1.5s infinite alternate;
+            box-shadow: 0 0 10px var(--db-gold);
+            animation: dbPulse 1.2s infinite alternate;
         }
 
-        @keyframes blink { 0% { opacity: 0.3; } 100% { opacity: 1; } }
+        @keyframes dbPulse { 
+            0% { opacity: 0.4; transform: scale(0.9); } 
+            100% { opacity: 1; transform: scale(1.2); } 
+        }
 
         .sys-meta {
             font-size: 0.75rem;
@@ -83,22 +90,24 @@
 
         .audio-btn, .nav-btn {
             background: rgba(0, 229, 255, 0.1);
-            border: 1px solid var(--neon-primary);
-            color: var(--neon-primary);
-            padding: 3px 8px;
+            border: 1px solid var(--db-cyan);
+            color: var(--db-cyan);
+            padding: 4px 10px;
             font-family: var(--font-mono);
             font-size: 0.7rem;
             cursor: pointer;
             text-decoration: none;
             text-transform: uppercase;
+            transition: all 0.2s ease;
         }
 
         .audio-btn:hover, .nav-btn:hover {
-            background: var(--neon-primary);
+            background: var(--db-cyan);
             color: #000;
+            box-shadow: 0 0 10px var(--db-cyan);
         }
 
-        /* CONTROL TABS & THEME TOGGLE */
+        /* CONTROL BAR & FILTERS */
         .control-bar {
             display: flex;
             justify-content: space-between;
@@ -122,16 +131,16 @@
         }
 
         .tab-btn.active {
-            background: rgba(0, 229, 255, 0.2);
-            border-color: var(--neon-primary);
-            color: var(--neon-primary);
+            background: rgba(255, 183, 0, 0.2);
+            border-color: var(--db-gold);
+            color: var(--db-gold);
             font-weight: bold;
         }
 
         .theme-toggle {
-            background: rgba(0, 229, 255, 0.1);
-            border: 1px solid var(--neon-primary);
-            color: var(--neon-primary);
+            background: rgba(255, 183, 0, 0.1);
+            border: 1px solid var(--db-gold);
+            color: var(--db-gold);
             padding: 6px 14px;
             font-size: 0.75rem;
             font-family: var(--font-mono);
@@ -139,7 +148,7 @@
             text-transform: uppercase;
         }
 
-        /* HUD TOP GRID */
+        /* TOP HUD GRID (DRAGON RADAR & SAGA TIMELINE) */
         .hud-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -149,28 +158,29 @@
 
         .hud-card {
             background: var(--panel-bg);
-            border: 1px solid var(--neon-primary);
-            box-shadow: var(--border-glow);
+            border: 1px solid var(--db-gold);
+            box-shadow: var(--scouter-glow);
             padding: 15px;
             clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
         }
 
         .card-header {
             font-size: 0.85rem;
-            color: var(--neon-accent);
-            border-bottom: 1px dashed rgba(0, 229, 255, 0.3);
+            color: var(--db-gold);
+            border-bottom: 1px dashed rgba(255, 183, 0, 0.4);
             padding-bottom: 6px;
             margin-bottom: 12px;
             letter-spacing: 1px;
+            font-weight: bold;
         }
 
-        /* RADAR SIMULATOR */
+        /* DRAGON RADAR SIMULATOR */
         .radar-box {
             width: 100%;
             height: 180px;
             position: relative;
-            background: radial-gradient(circle, rgba(0,255,157,0.05) 0%, rgba(5,7,10,0.95) 80%);
-            border: 1px solid rgba(0, 229, 255, 0.2);
+            background: radial-gradient(circle, rgba(0,255,136,0.1) 0%, rgba(6,9,19,0.95) 80%);
+            border: 1px solid var(--db-ki);
             border-radius: 50%;
             margin: 0 auto;
             overflow: hidden;
@@ -181,7 +191,7 @@
 
         .radar-ring {
             position: absolute;
-            border: 1px solid rgba(0, 255, 157, 0.2);
+            border: 1px solid rgba(0, 255, 136, 0.25);
             border-radius: 50%;
         }
         .ring-1 { width: 40px; height: 40px; }
@@ -192,7 +202,7 @@
             position: absolute;
             width: 100%;
             height: 100%;
-            background: conic-gradient(from 0deg, rgba(0,255,157,0.4) 0deg, transparent 60deg, transparent 360deg);
+            background: conic-gradient(from 0deg, rgba(0,255,136,0.4) 0deg, transparent 60deg, transparent 360deg);
             border-radius: 50%;
             animation: sweep 4s linear infinite;
         }
@@ -200,15 +210,15 @@
         @keyframes sweep { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         .radar-dot {
-            width: 6px;
-            height: 6px;
-            background: var(--neon-accent);
+            width: 7px;
+            height: 7px;
+            background: var(--db-gold);
             border-radius: 50%;
             position: absolute;
-            box-shadow: 0 0 6px var(--neon-accent);
+            box-shadow: 0 0 8px var(--db-gold);
         }
 
-        /* LATTICE MATRIX */
+        /* SAGA TIMELINE MATRIX */
         .lattice-matrix {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -228,7 +238,7 @@
             line-height: 1.6;
         }
 
-        /* SQUAD DOSSIER CARDS WITH SKILL BARS */
+        /* HERO ROSTER CARDS */
         .dossier-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -238,8 +248,8 @@
 
         .dossier-card {
             background: var(--panel-bg);
-            border: 1px solid var(--neon-primary);
-            box-shadow: var(--border-glow);
+            border: 1px solid var(--db-cyan);
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
             padding: 15px;
             clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
         }
@@ -253,16 +263,16 @@
         }
 
         .status-tag {
-            border: 1px solid var(--neon-accent);
-            color: var(--neon-accent);
-            background: rgba(0, 255, 157, 0.1);
+            border: 1px solid var(--db-ki);
+            color: var(--db-ki);
+            background: rgba(0, 255, 136, 0.1);
             padding: 2px 6px;
             font-weight: bold;
         }
 
         .status-tag.standby {
-            border-color: var(--neon-amber);
-            color: var(--neon-amber);
+            border-color: var(--db-gold);
+            color: var(--db-gold);
             background: rgba(255, 183, 0, 0.1);
         }
 
@@ -277,15 +287,16 @@
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            border: 2px solid var(--neon-primary);
+            border: 2px solid var(--db-gold);
             display: flex;
             justify-content: center;
             align-items: center;
             font-weight: bold;
             font-size: 1.1rem;
             color: #ffffff;
-            box-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
+            box-shadow: 0 0 10px rgba(255, 183, 0, 0.4);
             flex-shrink: 0;
+            background: rgba(6, 9, 19, 0.9);
         }
 
         .dossier-info {
@@ -297,15 +308,17 @@
             font-weight: bold;
             color: #ffffff;
             margin: 0;
+            letter-spacing: 1px;
         }
 
         .sub-name {
             font-size: 0.8rem;
-            color: #8a9ba8;
+            color: var(--db-orange);
             margin-top: 2px;
+            font-weight: bold;
         }
 
-        /* SKILL METERS */
+        /* XENOVERSE ATTRIBUTE BARS */
         .skill-group {
             display: flex;
             flex-direction: column;
@@ -320,7 +333,7 @@
         }
 
         .skill-label {
-            width: 90px;
+            width: 100px;
             color: #8a9ba8;
             text-transform: uppercase;
         }
@@ -334,38 +347,44 @@
         .skill-block {
             height: 10px;
             flex: 1;
-            background: rgba(0, 229, 255, 0.15);
-            border: 1px solid rgba(0, 229, 255, 0.3);
+            background: rgba(0, 229, 255, 0.12);
+            border: 1px solid rgba(0, 229, 255, 0.25);
         }
 
         .skill-block.fill {
-            background: var(--neon-accent);
-            box-shadow: 0 0 4px var(--neon-accent);
+            background: var(--db-ki);
+            box-shadow: 0 0 4px var(--db-ki);
         }
 
         .inspect-btn {
             width: 100%;
-            background: rgba(0, 229, 255, 0.08);
-            border: 1px solid var(--neon-primary);
-            color: var(--neon-primary);
+            background: rgba(255, 183, 0, 0.08);
+            border: 1px solid var(--db-gold);
+            color: var(--db-gold);
             padding: 8px;
             font-family: var(--font-mono);
             font-size: 0.75rem;
             cursor: pointer;
             text-transform: uppercase;
             letter-spacing: 1px;
+            font-weight: bold;
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.2s ease;
         }
 
         .inspect-btn:hover {
-            background: var(--neon-primary);
+            background: var(--db-gold);
             color: #000;
+            box-shadow: 0 0 10px var(--db-gold);
         }
 
-        /* MEDIA // PROJECT SHOWCASE */
+        /* MEDIA SHOWCASE CARDS */
         .showcase-card {
             background: var(--panel-bg);
-            border: 1px solid var(--neon-pink);
-            box-shadow: 0 0 12px rgba(255, 0, 127, 0.3);
+            border: 1px solid var(--db-orange);
+            box-shadow: 0 0 12px rgba(255, 85, 0, 0.3);
             padding: 20px;
             margin-bottom: 25px;
             clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
@@ -375,24 +394,25 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px dashed rgba(255, 0, 127, 0.4);
+            border-bottom: 1px dashed rgba(255, 85, 0, 0.4);
             padding-bottom: 8px;
             margin-bottom: 15px;
         }
 
         .showcase-title {
-            color: var(--neon-pink);
+            color: var(--db-orange);
             font-size: 0.95rem;
             font-weight: bold;
             letter-spacing: 1px;
         }
 
         .pipeline-badge {
-            border: 1px solid var(--neon-pink);
-            color: var(--neon-pink);
+            border: 1px solid var(--db-orange);
+            color: var(--db-orange);
             padding: 2px 8px;
             font-size: 0.7rem;
             text-transform: uppercase;
+            font-weight: bold;
         }
 
         .project-grid {
@@ -402,8 +422,8 @@
         }
 
         .project-box {
-            background: rgba(5, 7, 10, 0.9);
-            border: 1px solid rgba(255, 0, 127, 0.4);
+            background: rgba(6, 9, 19, 0.9);
+            border: 1px solid rgba(255, 85, 0, 0.4);
             padding: 10px;
         }
 
@@ -418,8 +438,8 @@
 
         .waveform-graphic {
             height: 70px;
-            border: 1px solid rgba(255, 0, 127, 0.2);
-            background: linear-gradient(135deg, rgba(255,0,127,0.2) 0%, transparent 70%);
+            border: 1px solid rgba(255, 85, 0, 0.2);
+            background: linear-gradient(135deg, rgba(255,85,0,0.2) 0%, transparent 70%);
             margin-bottom: 8px;
             position: relative;
             overflow: hidden;
@@ -429,7 +449,7 @@
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: repeating-linear-gradient(90deg, rgba(255,0,127,0.3) 0px, rgba(255,0,127,0.3) 2px, transparent 2px, transparent 6px);
+            background: repeating-linear-gradient(90deg, rgba(255,85,0,0.3) 0px, rgba(255,85,0,0.3) 2px, transparent 2px, transparent 6px);
         }
 
         .eq-bars {
@@ -441,14 +461,14 @@
 
         .eq-bar {
             flex: 1;
-            background: linear-gradient(to top, var(--neon-primary), var(--neon-pink));
+            background: linear-gradient(to top, var(--db-gold), var(--db-orange));
         }
 
-        /* ENCRYPTED COMMS // PUBLIC LOGS TERMINAL */
+        /* COMMUNITY TRANSMISSION LOGS */
         .terminal-card {
             background: var(--panel-bg);
-            border: 1px solid var(--neon-primary);
-            box-shadow: var(--border-glow);
+            border: 1px solid var(--db-cyan);
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
             padding: 20px;
             margin-bottom: 25px;
             clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
@@ -457,7 +477,7 @@
         .terminal-logs {
             height: 140px;
             overflow-y: auto;
-            background: rgba(5, 7, 10, 0.95);
+            background: rgba(6, 9, 19, 0.95);
             border: 1px solid rgba(0, 229, 255, 0.3);
             padding: 12px;
             font-size: 0.75rem;
@@ -465,7 +485,7 @@
             margin-bottom: 12px;
         }
 
-        .sys-line { color: var(--neon-primary); }
+        .sys-line { color: var(--db-cyan); }
 
         .terminal-input-bar {
             display: flex;
@@ -474,7 +494,7 @@
 
         .terminal-input-bar input {
             flex: 1;
-            background: rgba(5, 7, 10, 0.9);
+            background: rgba(6, 9, 19, 0.9);
             border: 1px solid rgba(0, 229, 255, 0.4);
             color: #ffffff;
             padding: 8px 12px;
@@ -484,7 +504,7 @@
         }
 
         .exec-btn {
-            background: var(--neon-primary);
+            background: var(--db-gold);
             color: #000;
             border: none;
             padding: 8px 18px;
@@ -494,11 +514,11 @@
             text-transform: uppercase;
         }
 
-        /* PUBLIC FEED & COMMENTS */
+        /* PUBLIC MEDIA & LORE FEEDBACK */
         .feed-card {
             background: var(--panel-bg);
-            border: 1px solid var(--neon-primary);
-            box-shadow: var(--border-glow);
+            border: 1px solid var(--db-gold);
+            box-shadow: var(--scouter-glow);
             padding: 20px;
             margin-bottom: 20px;
             clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
@@ -508,13 +528,13 @@
             max-width: 100%;
             max-height: 350px;
             object-fit: contain;
-            border: 1px solid rgba(0, 229, 255, 0.3);
+            border: 1px solid rgba(255, 183, 0, 0.3);
             margin-bottom: 15px;
             background: #000;
         }
 
         .comments-block {
-            background: rgba(5, 7, 10, 0.8);
+            background: rgba(6, 9, 19, 0.8);
             border: 1px solid rgba(0, 229, 255, 0.2);
             padding: 12px;
         }
@@ -523,40 +543,39 @@
 <body class="theme-spectral">
 
 <div class="container">
-    <!-- SYSTEM HEADER -->
+    <!-- STUDIO HEADER -->
     <div class="top-bar">
         <div class="sys-title" id="site-title-banner">
-            <div class="pulse-dot"></div>
-            PANTHEON_OS // SQUAD_DOSSIERS_v2.4
+            <div class="pulse-orb"></div>
+            PANTHEON STUDIOS // HERO & SHOW HUB
         </div>
         <div class="sys-meta">
-            <span>SYSTEM_TIME: <strong id="clock" style="color:#fff;">--:--:-- UTC</strong></span>
-            <span>NET_STATUS: <strong style="color:var(--neon-accent);">ENCRYPTED</strong></span>
-            <span>ACTIVE_NODES: 08</span>
-            <span>LATENCY: 12ms</span>
+            <span>TIME_NEST: <strong id="clock" style="color:#fff;">--:--:-- UTC</strong></span>
+            <span>NET_LINK: <strong style="color:var(--db-ki);">ONLINE</strong></span>
+            <span>ACTIVE_HEROES: 08</span>
             <button class="audio-btn" onclick="toggleAudio()">[AUDIO: OFF]</button>
-            <a href="profile.html" class="nav-btn">[MY_DOSSIER]</a>
-            <a href="login.html" class="nav-btn">[ACCESS_TERMINAL]</a>
-            <a href="admin.html" class="nav-btn" style="border-color: var(--neon-pink); color: var(--neon-pink);">[OMNI_ADMIN]</a>
+            <a href="profile.html" class="nav-btn">[MY_PROFILE]</a>
+            <a href="login.html" class="nav-btn">[LOGIN_GATE]</a>
+            <a href="admin.html" class="nav-btn" style="border-color: var(--db-gold); color: var(--db-gold);">[STUDIO_ADMIN]</a>
         </div>
     </div>
 
     <!-- CONTROL TABS & THEME SWITCHER -->
     <div class="control-bar">
         <div class="filter-group">
-            <button class="tab-btn active" onclick="filterUnits('all', this)">[ALL_UNITS]</button>
-            <button class="tab-btn" onclick="filterUnits('director', this)">[DIRECTORS]</button>
-            <button class="tab-btn" onclick="filterUnits('creative', this)">[CREATIVES]</button>
-            <button class="tab-btn" onclick="filterUnits('operative', this)">[OPERATIVES]</button>
+            <button class="tab-btn active" onclick="filterUnits('all', this)">[ALL_HEROES]</button>
+            <button class="tab-btn" onclick="filterUnits('lead', this)">[MAIN LEADS]</button>
+            <button class="tab-btn" onclick="filterUnits('strike', this)">[STRIKE HEAVY]</button>
+            <button class="tab-btn" onclick="filterUnits('support', this)">[SUPPORT NOISE]</button>
         </div>
-        <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()">[THEME: SPECTRAL]</button>
+        <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()">[MODE: KAI-ENERGY]</button>
     </div>
 
-    <!-- HUD TOP GRID (RADAR & SIGNAL LATTICE) -->
+    <!-- HUD TOP GRID (DRAGON RADAR & SAGA TIMELINE) -->
     <div class="hud-grid">
-        <!-- RADAR OVERLAY -->
+        <!-- DRAGON RADAR -->
         <div class="hud-card" id="mod-radar-card">
-            <div class="card-header">TACTICAL_OVERLAY // CITY SECTOR N-5</div>
+            <div class="card-header">DRAGON RADAR // POWER LEVEL DETECTION</div>
             <div class="radar-box">
                 <div class="radar-sweep"></div>
                 <div class="radar-ring ring-1"></div>
@@ -568,124 +587,120 @@
             </div>
         </div>
 
-        <!-- SIGNAL LATTICE -->
+        <!-- SAGA TIMELINE RELAY -->
         <div class="hud-card" id="mod-lattice-card">
-            <div class="card-header">SIGNAL_LATTICE // THREAT VECTOR</div>
+            <div class="card-header">SAGA TIMELINE // SHOW DISPATCHES</div>
             <div class="lattice-matrix">
                 <div class="matrix-cell"></div><div class="matrix-cell"></div><div class="matrix-cell"></div>
                 <div class="matrix-cell"></div><div class="matrix-cell"></div><div class="matrix-cell"></div>
                 <div class="matrix-cell"></div><div class="matrix-cell"></div><div class="matrix-cell"></div>
             </div>
             <div class="lattice-logs">
-                • Sector pulse spikes detected in quadrant delta.<br>
-                • Ghost packet signature mirrors prior black-site breach.<br>
-                • Creative cell on standby for rapid broadcast pivot.
+                • Energy spikes detected in Episode 07 mixdown render.<br>
+                • New character dossier added to Pantheon Hero Archive.<br>
+                • Creative cell preparing rapid broadcast pivot for next arc.
             </div>
         </div>
     </div>
 
-    <!-- SQUAD DOSSIER CARDS WITH SKILL METERS -->
+    <!-- HERO ROSTER CARDS WITH XENOVERSE ATTRIBUTES -->
     <div class="dossier-grid" id="dossier-container">
-        <!-- DOSSIER 1 -->
-        <div class="dossier-card" data-type="director">
+        <!-- HERO 1: KAIGE -->
+        <div class="dossier-card" data-type="strike">
             <div class="dossier-top">
-                <span style="color:#8a9ba8;">CLEARANCE_LEVEL_01</span>
-                <span>SYS_ID: 0x89F [PWR: OK]</span>
-                <span class="status-tag">ONLINE / IN_FIELD</span>
+                <span style="color:#8a9ba8;">FRIEZA RACE // TITAN</span>
+                <span class="status-tag">UNLEASHED</span>
             </div>
             <div class="dossier-body">
-                <div class="avatar-circle">AK</div>
+                <div class="avatar-circle">KG</div>
                 <div class="dossier-info">
-                    <div class="callsign-title">CALLSIGN: GHOSTWIRE</div>
-                    <div class="sub-name">Aria Kade // Creative Director</div>
+                    <div class="callsign-title">KAIGE</div>
+                    <div class="sub-name">Lead Heavy Strike / Spatial Titan</div>
                 </div>
             </div>
             <div class="skill-group">
-                <div class="skill-row"><span class="skill-label">STRATEGY</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block"></div></div></div>
-                <div class="skill-row"><span class="skill-label">NARRATIVE</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block"></div><div class="skill-block"></div></div></div>
-                <div class="skill-row"><span class="skill-label">OPS_SYNC</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block"></div><div class="skill-block"></div><div class="skill-block"></div></div></div>
+                <div class="skill-row"><span class="skill-label">MAX HEALTH</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block"></div></div></div>
+                <div class="skill-row"><span class="skill-label">STRIKE SUPER</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div></div></div>
+                <div class="skill-row"><span class="skill-label">KI BLAST SUPER</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block"></div><div class="skill-block"></div><div class="skill-block"></div></div></div>
             </div>
-            <button class="inspect-btn">INSPECT_DOSSIER</button>
+            <a href="dossier.html?id=kaige" class="inspect-btn">[VIEW HERO WIKI]</a>
         </div>
 
-        <!-- DOSSIER 2 -->
-        <div class="dossier-card" data-type="creative">
+        <!-- HERO 2: GHOSTWIRE -->
+        <div class="dossier-card" data-type="lead">
             <div class="dossier-top">
-                <span style="color:#8a9ba8;">CLEARANCE_LEVEL_01</span>
-                <span>SYS_ID: 0x895 [PWR: OK]</span>
+                <span style="color:#8a9ba8;">TACTICAL LEAD</span>
+                <span class="status-tag">ACTIVE</span>
+            </div>
+            <div class="dossier-body">
+                <div class="avatar-circle">GW</div>
+                <div class="dossier-info">
+                    <div class="callsign-title">GHOSTWIRE</div>
+                    <div class="sub-name">Aria Kade // Narrative Lead</div>
+                </div>
+            </div>
+            <div class="skill-group">
+                <div class="skill-row"><span class="skill-label">MAX KI</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block"></div></div></div>
+                <div class="skill-row"><span class="skill-label">STAMINA</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block"></div><div class="skill-block"></div></div></div>
+                <div class="skill-row"><span class="skill-label">KI BLAST SUPER</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block"></div><div class="skill-block"></div></div></div>
+            </div>
+            <a href="dossier.html?id=ghostwire" class="inspect-btn">[VIEW HERO WIKI]</a>
+        </div>
+
+        <!-- HERO 3: NOVAFRAME -->
+        <div class="dossier-card" data-type="support">
+            <div class="dossier-top">
+                <span style="color:#8a9ba8;">VISUAL ARCHITECT</span>
                 <span class="status-tag standby">STANDBY</span>
             </div>
             <div class="dossier-body">
                 <div class="avatar-circle">NV</div>
                 <div class="dossier-info">
-                    <div class="callsign-title">CALLSIGN: NOVAFRAME</div>
-                    <div class="sub-name">Nico Vale // Visual Systems Architect</div>
+                    <div class="callsign-title">NOVAFRAME</div>
+                    <div class="sub-name">Nico Vale // Visual Systems</div>
                 </div>
             </div>
             <div class="skill-group">
-                <div class="skill-row"><span class="skill-label">CINEMATICS</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block"></div></div></div>
-                <div class="skill-row"><span class="skill-label">VFX_PIPELINE</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block"></div><div class="skill-block"></div></div></div>
-                <div class="skill-row"><span class="skill-label">COLOR_FORGE</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block"></div><div class="skill-block"></div></div></div>
+                <div class="skill-row"><span class="skill-label">BASIC ATTACK</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block"></div></div></div>
+                <div class="skill-row"><span class="skill-label">KI BLAST SUPER</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block"></div><div class="skill-block"></div></div></div>
+                <div class="skill-row"><span class="skill-label">STAMINA</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block"></div><div class="skill-block"></div><div class="skill-block"></div></div></div>
             </div>
-            <button class="inspect-btn">INSPECT_DOSSIER</button>
+            <a href="dossier.html?id=novaframe" class="inspect-btn">[VIEW HERO WIKI]</a>
         </div>
 
-        <!-- DOSSIER 3 -->
-        <div class="dossier-card" data-type="operative">
+        <!-- HERO 4: RAZORBYTE -->
+        <div class="dossier-card" data-type="strike">
             <div class="dossier-top">
-                <span style="color:#8a9ba8;">CLEARANCE_LEVEL_01</span>
-                <span>SYS_ID: 0x89F [PWR: OK]</span>
-                <span class="status-tag">ONLINE / IN_FIELD</span>
+                <span style="color:#8a9ba8;">STRIKE OPERATIVE</span>
+                <span class="status-tag">ACTIVE</span>
             </div>
             <div class="dossier-body">
                 <div class="avatar-circle">RX</div>
                 <div class="dossier-info">
-                    <div class="callsign-title">CALLSIGN: RAZORBYTE</div>
-                    <div class="sub-name">Rex Onyx // Field Operations Lead</div>
+                    <div class="callsign-title">RAZORBYTE</div>
+                    <div class="sub-name">Rex Onyx // Field Specialist</div>
                 </div>
             </div>
             <div class="skill-group">
-                <div class="skill-row"><span class="skill-label">RECON</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block"></div><div class="skill-block"></div></div></div>
-                <div class="skill-row"><span class="skill-label">INFILTRATION</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block"></div><div class="skill-block"></div><div class="skill-block"></div></div></div>
-                <div class="skill-row"><span class="skill-label">EXFIL_PROTOCOL</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block"></div><div class="skill-block"></div><div class="skill-block"></div></div></div>
+                <div class="skill-row"><span class="skill-label">BASIC ATTACK</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block"></div><div class="skill-block"></div></div></div>
+                <div class="skill-row"><span class="skill-label">STRIKE SUPER</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block"></div></div></div>
+                <div class="skill-row"><span class="skill-label">STAMINA</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block"></div><div class="skill-block"></div></div></div>
             </div>
-            <button class="inspect-btn">INSPECT_DOSSIER</button>
-        </div>
-
-        <!-- DOSSIER 4 -->
-        <div class="dossier-card" data-type="creative">
-            <div class="dossier-top">
-                <span style="color:#8a9ba8;">CLEARANCE_LEVEL_01</span>
-                <span>SYS_ID: 0x895 [PWR: OK]</span>
-                <span class="status-tag standby">STANDBY</span>
-            </div>
-            <div class="dossier-body">
-                <div class="avatar-circle">SL</div>
-                <div class="dossier-info">
-                    <div class="callsign-title">CALLSIGN: SYNTHLACE</div>
-                    <div class="sub-name">Selene Locke // Audio Intel Producer</div>
-                </div>
-            </div>
-            <div class="skill-group">
-                <div class="skill-row"><span class="skill-label">WAVE_DESIGN</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block"></div></div></div>
-                <div class="skill-row"><span class="skill-label">SIGNAL_CLEANUP</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block"></div><div class="skill-block"></div></div></div>
-                <div class="skill-row"><span class="skill-label">STORY_SYNC</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block"></div><div class="skill-block"></div></div></div>
-            </div>
-            <button class="inspect-btn">INSPECT_DOSSIER</button>
+            <a href="dossier.html?id=razorbyte" class="inspect-btn">[VIEW HERO WIKI]</a>
         </div>
     </div>
 
     <!-- MEDIA // PROJECT SHOWCASE -->
     <div class="showcase-card" id="mod-showcase-card">
         <div class="showcase-header">
-            <span class="showcase-title">MEDIA // PROJECT SHOWCASE</span>
+            <span class="showcase-title">PANTHEON MEDIA // SHOW PRODUCTION PIPELINE</span>
             <span class="pipeline-badge">LIVE PIPELINE</span>
         </div>
         <div class="project-grid">
             <div class="project-box">
                 <div class="project-box-header">
                     <span>Project: Neon Archive</span>
-                    <span style="color:var(--neon-pink);">EP_07 READY</span>
+                    <span style="color:var(--db-orange);">EP_07 READY</span>
                 </div>
                 <div class="waveform-graphic"></div>
                 <div class="eq-bars">
@@ -701,7 +716,7 @@
             <div class="project-box">
                 <div class="project-box-header">
                     <span>Project: Phantom Frequency</span>
-                    <span style="color:var(--neon-pink);">MIXDOWN</span>
+                    <span style="color:var(--db-orange);">MIXDOWN</span>
                 </div>
                 <div class="waveform-graphic"></div>
                 <div class="eq-bars">
@@ -717,7 +732,7 @@
             <div class="project-box">
                 <div class="project-box-header">
                     <span>Project: Ghostline Brief</span>
-                    <span style="color:var(--neon-pink);">RENDERING</span>
+                    <span style="color:var(--db-orange);">RENDERING</span>
                 </div>
                 <div class="waveform-graphic"></div>
                 <div class="eq-bars">
@@ -732,19 +747,18 @@
         </div>
     </div>
 
-    <!-- ENCRYPTED COMMS // PUBLIC LOGS TERMINAL -->
+    <!-- COMMUNITY LOGS TRANSMISSION -->
     <div class="terminal-card" id="mod-logs-card">
-        <div class="card-header">ENCRYPTED_COMMS // PUBLIC_LOGS</div>
+        <div class="card-header">COMMUNITY CHAT // TRANSMISSION LOGS</div>
         <div class="terminal-logs" id="terminal-box">
-            <div class="sys-line">SYS: OPS: orbital uplink calibration complete.</div>
-            <div class="sys-line">SYS: CREATIVE_NODE: waveform fingerprints pushed to archive.</div>
-            <div class="sys-line">SYS: SECURITY: no anomaly escalation required.</div>
-            <div class="sys-line">SYS: SIGINT: crowd telemetry normalized across gate-12.</div>
-            <div class="sys-line">SYS: BROADCAST: dossier relay encrypted with rotating keys.</div>
+            <div class="sys-line">LOG: STUDIO: Time Nest broadcast node synchronized.</div>
+            <div class="sys-line">LOG: CREATIVE: Audio waveforms pushed to public archive.</div>
+            <div class="sys-line">LOG: LORE: New hero wiki entry published for Kaige.</div>
+            <div class="sys-line">LOG: MEDIA: Episode render 07 processing at 60 FPS.</div>
         </div>
         <form class="terminal-input-bar" onsubmit="execTerminal(event)">
-            <input type="text" id="term-input" placeholder="$ Enter command..." required autocomplete="off">
-            <button type="submit" class="exec-btn">EXEC</button>
+            <input type="text" id="term-input" placeholder="$ Post to studio transmission feed..." required autocomplete="off">
+            <button type="submit" class="exec-btn">SEND</button>
         </form>
     </div>
 
@@ -758,7 +772,7 @@
 </div>
 
 <script>
-    const activeCallsign = localStorage.getItem('pantheon_active_session') || 'GUEST_OPERATIVE';
+    const activeCallsign = localStorage.getItem('pantheon_active_session') || 'GUEST_FAN';
 
     // Live Clock
     function updateClock() {
@@ -768,18 +782,18 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // Theme Switcher Toggle (SPECTRAL vs OBSIDIAN)
+    // Theme Switcher Toggle
     function toggleTheme() {
         const body = document.body;
         const btn = document.getElementById('theme-btn');
         if (body.classList.contains('theme-spectral')) {
             body.classList.remove('theme-spectral');
             body.classList.add('theme-obsidian');
-            btn.innerText = '[THEME: OBSIDIAN]';
+            btn.innerText = '[MODE: SUPER SAIYAN]';
         } else {
             body.classList.remove('theme-obsidian');
             body.classList.add('theme-spectral');
-            btn.innerText = '[THEME: SPECTRAL]';
+            btn.innerText = '[MODE: KAI-ENERGY]';
         }
     }
 
@@ -790,7 +804,7 @@
         document.querySelector('.audio-btn').innerText = audioState ? '[AUDIO: ON]' : '[AUDIO: OFF]';
     }
 
-    // Filter Dossier Cards
+    // Filter Hero Roster Cards
     function filterUnits(type, btn) {
         document.querySelectorAll('.filter-group .tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
@@ -805,7 +819,7 @@
         });
     }
 
-    // Terminal Exec
+    // Terminal Input
     function execTerminal(e) {
         e.preventDefault();
         const input = document.getElementById('term-input');
@@ -815,7 +829,7 @@
         const box = document.getElementById('terminal-box');
         const line = document.createElement('div');
         line.className = 'sys-line';
-        line.innerHTML = `SYS: [${activeCallsign}]: ${cmd}`;
+        line.innerHTML = `CHAT: [${activeCallsign}]: ${cmd}`;
         box.appendChild(line);
         box.scrollTop = box.scrollHeight;
         input.value = '';
@@ -832,7 +846,7 @@
         if (publicMedia.length === 0) {
             feed.innerHTML = `
                 <div class="feed-card" style="text-align:center; color:#8a9ba8; font-size:0.8rem;">
-                    No public media or lore broadcasts active. Upload an asset marked <strong>PUBLIC_HQ</strong> from your Operative Profile to populate this feed.
+                    No active media uploads broadcasted yet. Upload assets marked <strong>PUBLIC_HQ</strong> from your profile to populate this feed.
                 </div>
             `;
             return;
@@ -851,14 +865,14 @@
                     <img class="media-preview" src="${item.data}" alt="${item.title}">
 
                     <div class="comments-block">
-                        <div style="font-size:0.75rem; color:var(--neon-accent); margin-bottom:8px;">INTEL_FEEDBACK // COMMENTS (${comments.length})</div>
+                        <div style="font-size:0.75rem; color:var(--db-ki); margin-bottom:8px;">COMMUNITY FEEDBACK // COMMENTS (${comments.length})</div>
                         
                         <div style="display:flex; flex-direction:column; gap:8px; max-height:140px; overflow-y:auto; margin-bottom:10px;">
                             ${comments.length === 0 
-                                ? '<div style="color:#607080; font-size:0.75rem;">No operative comments logged yet.</div>' 
+                                ? '<div style="color:#607080; font-size:0.75rem;">No comments logged yet.</div>' 
                                 : comments.map(c => `
                                     <div style="font-size:0.75rem; border-bottom:1px dotted rgba(0,229,255,0.15); padding-bottom:4px;">
-                                        <span style="color:var(--neon-primary); font-weight:bold;">[${c.author}]</span>
+                                        <span style="color:var(--db-gold); font-weight:bold;">[${c.author}]</span>
                                         <span style="color:#607080; font-size:0.65rem; margin-left:6px;">${new Date(c.timestamp).toLocaleTimeString()}</span>
                                         <div style="color:#d0e0f0; margin-top:2px;">${c.text}</div>
                                     </div>
@@ -867,8 +881,8 @@
                         </div>
 
                         <form style="display:flex; gap:10px;" onsubmit="postComment(event, '${item.id}')">
-                            <input type="text" id="input-${item.id}" placeholder="Leave feedback on this intel..." required autocomplete="off" style="flex:1; background:rgba(5,7,10,0.9); border:1px solid rgba(0,229,255,0.4); color:#fff; padding:8px; font-family:var(--font-mono); font-size:0.8rem; outline:none;">
-                            <button type="submit" style="background:var(--neon-primary); color:#000; border:none; padding:8px 16px; font-family:var(--font-mono); font-weight:bold; cursor:pointer; text-transform:uppercase; font-size:0.75rem;">TRANSMIT</button>
+                            <input type="text" id="input-${item.id}" placeholder="Leave feedback on this episode..." required autocomplete="off" style="flex:1; background:rgba(6,9,19,0.9); border:1px solid rgba(0,229,255,0.4); color:#fff; padding:8px; font-family:var(--font-mono); font-size:0.8rem; outline:none;">
+                            <button type="submit" style="background:var(--db-gold); color:#000; border:none; padding:8px 16px; font-family:var(--font-mono); font-weight:bold; cursor:pointer; text-transform:uppercase; font-size:0.75rem;">TRANSMIT</button>
                         </form>
                     </div>
                 </div>
@@ -898,22 +912,19 @@
         loadPublicFeed();
     }
 
-    // APPLY DYNAMIC VISUAL & MODULE CONFIG FROM OMNI ADMIN BUILDER
+    // APPLY DYNAMIC VISUAL & MODULE CONFIG FROM ADMIN STUDIO
     function applySiteConfig() {
         const cfg = JSON.parse(localStorage.getItem('pantheon_site_config') || '{}');
         
-        // Custom Colors from Admin Studio
-        if (cfg.primaryColor) document.documentElement.style.setProperty('--neon-primary', cfg.primaryColor);
-        if (cfg.accentColor) document.documentElement.style.setProperty('--neon-accent', cfg.accentColor);
+        if (cfg.primaryColor) document.documentElement.style.setProperty('--db-cyan', cfg.primaryColor);
+        if (cfg.accentColor) document.documentElement.style.setProperty('--db-gold', cfg.accentColor);
         if (cfg.bgColor) document.documentElement.style.setProperty('--bg-void', cfg.bgColor);
         
-        // Custom Banner Title from Admin Studio
         if (cfg.siteTitle) {
             const banner = document.getElementById('site-title-banner');
-            if (banner) banner.innerHTML = `<div class="pulse-dot"></div> ${cfg.siteTitle}`;
+            if (banner) banner.innerHTML = `<div class="pulse-orb"></div> ${cfg.siteTitle}`;
         }
 
-        // Layout Module Toggles from Admin Studio
         if (cfg.modules) {
             const radar = document.getElementById('mod-radar-card');
             const lattice = document.getElementById('mod-lattice-card');
@@ -926,7 +937,6 @@
             if (logs) logs.style.display = cfg.modules.logs === false ? 'none' : 'block';
         }
 
-        // Custom Script / CSS Injector from Admin Studio
         if (cfg.customCss) {
             let styleTag = document.getElementById('pantheon-custom-css');
             if (!styleTag) {
