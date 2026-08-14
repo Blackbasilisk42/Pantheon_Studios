@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PANTHEON STUDIOS // CHARACTER CREATOR</title>
+    <style>
+        :root {
+            --bg-void: #060913;
+            --db-gold: #ffb700;
+            --db-orange: #ff5500;
+            --db-cyan: #00e5ff;
+            --db-ki: #00ff88;
+            --db-red: #ff3333;
+            --panel-bg: rgba(12, 18, 32, 0.92);
+            --scouter-glow: 0 0 15px rgba(255, 183, 0, 0.35);
+            --font-mono: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            background-color: var(--bg-void);
+            color: var(--db-cyan);
+            font-family: var(--font-mono);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 50% 30%, rgba(255, 183, 0, 0.08) 0%, transparent 70%),
+                linear-gradient(rgba(0, 255, 136, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 4px;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+        }
+
+        /* HEADER BAR */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--db-gold);
+            padding-bottom: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(255, 183, 0, 0.2);
+        }
+
+        .sys-title {
+            font-size: 1.1rem;
+            color: var(--db-gold);
+            letter-spacing: 2px;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+        }
+
+        .pulse-orb {
+            width: 12px;
+            height: 12px;
+            background: var(--db-ki);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--db-ki);
+            animation: dbPulse 1.2s infinite alternate;
+        }
+
+        @keyframes dbPulse { 
+            0% { opacity: 0.4; transform: scale(0.9); } 
+            100% { opacity: 1; transform: scale(1.2); } 
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            background: rgba(0, 229, 255, 0.1);
+            border: 1px solid var(--db-cyan);
+            color: var(--db-cyan);
+            padding: 6px 12px;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            text-decoration: none;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover {
+            background: var(--db-cyan);
+            color: #000;
+            box-shadow: 0 0 10px var(--db-cyan);
+        }
+
+        /* CARD CONTAINERS */
+        .card {
+            background: var(--panel-bg);
+            border: 1px solid var(--db-gold);
+            box-shadow: var(--scouter-glow);
+            padding: 22px;
+            margin-bottom: 25px;
+            clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
+        }
+
+        .card-header {
+            font-size: 0.95rem;
+            color: var(--db-gold);
+            border-bottom: 1px dashed rgba(255, 183, 0, 0.4);
+            padding-bottom: 8px;
+            margin-bottom: 18px;
+            letter-spacing: 1px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-row {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+
+        .form-row label {
+            font-size: 0.75rem;
+            color: var(--db-cyan);
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        input[type="text"], select, textarea {
+            background: rgba(6, 9, 19, 0.95);
+            border: 1px solid rgba(0, 229, 255, 0.4);
+            color: #ffffff;
+            padding: 9px 12px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            outline: none;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus, select:focus, textarea:focus {
+            border-color: var(--db-ki);
+            box-shadow: 0 0 8px rgba(0, 255, 136, 0.4);
+        }
+
+        /* SLIDERS */
+        .slider-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .slider-row label {
+            width: 130px;
+            font-size: 0.7rem;
+            color: var(--db-ki);
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .slider-row input[type="range"] {
+            flex: 1;
+            accent-color: var(--db-gold);
+            cursor: pointer;
+        }
+
+        .slider-val {
+            width: 35px;
+            text-align: right;
+            font-size: 0.8rem;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        /* ACTION BUTTONS */
+        .btn-submit {
+            background: var(--db-gold);
+            color: #000000;
+            border: none;
+            padding: 14px;
+            font-family: var(--font-mono);
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            width: 100%;
+            margin-top: 10px;
+            box-shadow: 0 0 12px rgba(255, 183, 0, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        .btn-submit:hover {
+            background: var(--db-ki);
+            box-shadow: 0 0 18px rgba(0, 255, 136, 0.7);
+        }
+
+        .status-banner {
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(0, 255, 136, 0.15);
+            border: 1px solid var(--db-ki);
+            color: var(--db-ki);
+            font-size: 0.8rem;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+
+        .status-banner a {
+            color: #ffffff;
+            text-decoration: underline;
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- HEADER -->
+    <div class="top-bar">
+        <div class="sys-title">
+            <div class="pulse-orb"></div>
+            PANTHEON STUDIOS // HERO DOSSIER GENERATOR
+        </div>
+        <div class="nav-links">
+            <a href="index.html" class="nav-btn">[SHOWCASE_HUB]</a>
+            <a href="dossier.html" class="nav-btn" style="border-color: var(--db-gold); color: var(--db-gold);">[HERO_WIKI]</a>
+            <a href="profile.html" class="nav-btn">[MY_PROFILE]</a>
+            <a href="admin.html" class="nav-btn">[TIME_NEST_ADMIN]</a>
+        </div>
+    </div>
+
+    <!-- MAIN CREATOR FORM -->
+    <form id="hero-builder-form" onsubmit="saveCharacter(event)">
+        <!-- LOAD EXISTING OR CREATE NEW -->
+        <div class="card">
+            <div class="card-header">
+                <span>SELECT ACTION OR HERO TO EDIT</span>
+                <span style="color: var(--db-ki); font-size: 0.75rem;">CAPSULE CORP GENERATOR</span>
+            </div>
+            <div class="form-row">
+                <label>Target Fighter Slot</label>
+                <select id="char-selector" onchange="loadSelectedHero()">
+                    <option value="NEW">[ CREATE NEW HERO ]</option>
+                    <!-- Saved heroes populates dynamically -->
+                </select>
+            </div>
+        </div>
+
+        <!-- IDENTITY & SPECS -->
+        <div class="card">
+            <div class="card-header">1. IDENTITY & PHYSICAL PROFILE</div>
+            <div class="grid-2">
+                <div class="form-row">
+                    <label>Hero Callsign / Name *</label>
+                    <input type="text" id="field-callsign" placeholder="e.g. KAIGE" required autocomplete="off">
+                </div>
+
+                <div class="form-row">
+                    <label>Real Name</label>
+                    <input type="text" id="field-realName" placeholder="e.g. Restricted or Classified">
+                </div>
+
+                <div class="form-row">
+                    <label>Show Title / Saga Project *</label>
+                    <input type="text" id="field-showTitle" placeholder="e.g. Project: Phantom Frequency" required>
+                </div>
+
+                <div class="form-row">
+                    <label>Race / Species</label>
+                    <input type="text" id="field-race" placeholder="e.g. Frieza Race, Saiyan, Android">
+                </div>
+
+                <div class="form-row">
+                    <label>Physical Height</label>
+                    <input type="text" id="field-height" placeholder="e.g. Twice Frieza's Height, 6'5&quot;">
+                </div>
+
+                <div class="form-row">
+                    <label>Combat Class / Role</label>
+                    <input type="text" id="field-role" placeholder="e.g. Lead Heavy Strike / Spatial Titan">
+                </div>
+
+                <div class="form-row">
+                    <label>Roster Status</label>
+                    <select id="field-status">
+                        <option value="UNLEASHED / ACTIVE">UNLEASHED / ACTIVE</option>
+                        <option value="STANDBY / TRAINING">STANDBY / TRAINING</option>
+                        <option value="RESERVE / SEALED">RESERVE / SEALED</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <label>Portrait Image URL (Optional)</label>
+                    <input type="text" id="field-avatarUrl" placeholder="https://example.com/character_art.png">
+                </div>
+            </div>
+        </div>
+
+        <!-- LORE & NARRATIVE -->
+        <div class="card">
+            <div class="card-header">2. DEEP LORE & NARRATIVE ARCS</div>
+            <div class="form-row">
+                <label>Origin & Backstory</label>
+                <textarea id="field-bio" rows="4" placeholder="Enter history, character origins, and background story..." required></textarea>
+            </div>
+
+            <div class="form-row">
+                <label>Show Saga & Narrative Arc Trajectory</label>
+                <textarea id="field-narrative" rows="3" placeholder="Describe their role in current show episodes, rivalries, and plot arcs..."></textarea>
+            </div>
+
+            <div class="form-row">
+                <label>Combat Style & Special Capabilities</label>
+                <textarea id="field-capabilities" rows="3" placeholder="Describe spatial awareness techniques, fighting stance, and transformation modes..."></textarea>
+            </div>
+        </div>
+
+        <!-- XENOVERSE ATTRIBUTES & MOVES -->
+        <div class="card">
+            <div class="card-header">3. XENOVERSE ATTRIBUTES & SIGNATURE MOVES</div>
+            
+            <div class="grid-2">
+                <!-- ATTRIBUTE SLIDERS -->
+                <div class="slider-group">
+                    <div style="font-size:0.75rem; color:var(--db-gold); font-weight:bold; margin-bottom:8px;">POWER GRID METERS</div>
+                    
+                    <div class="slider-row">
+                        <label>Max Health</label>
+                        <input type="range" id="stat-health" min="0" max="100" value="85" oninput="updateVal('val-health', this.value)">
+                        <span class="slider-val" id="val-health">85</span>
+                    </div>
+
+                    <div class="slider-row">
+                        <label>Max Ki</label>
+                        <input type="range" id="stat-ki" min="0" max="100" value="80" oninput="updateVal('val-ki', this.value)">
+                        <span class="slider-val" id="val-ki">80</span>
+                    </div>
+
+                    <div class="slider-row">
+                        <label>Max Stamina</label>
+                        <input type="range" id="stat-stamina" min="0" max="100" value="90" oninput="updateVal('val-stamina', this.value)">
+                        <span class="slider-val" id="val-stamina">90</span>
+                    </div>
+
+                    <div class="slider-row">
+                        <label>Basic Attack</label>
+                        <input type="range" id="stat-basic" min="0" max="100" value="88" oninput="updateVal('val-basic', this.value)">
+                        <span class="slider-val" id="val-basic">88</span>
+                    </div>
+
+                    <div class="slider-row">
+                        <label>Strike Super</label>
+                        <input type="range" id="stat-strike" min="0" max="100" value="95" oninput="updateVal('val-strike', this.value)">
+                        <span class="slider-val" id="val-strike">95</span>
+                    </div>
+
+                    <div class="slider-row">
+                        <label>Ki Blast Super</label>
+                        <input type="range" id="stat-kiblast" min="0" max="100" value="75" oninput="updateVal('val-kiblast', this.value)">
+                        <span class="slider-val" id="val-kiblast">75</span>
+                    </div>
+                </div>
+
+                <!-- SIGNATURE MOVES & EQUIPMENT -->
+                <div>
+                    <div style="font-size:0.75rem; color:var(--db-gold); font-weight:bold; margin-bottom:8px;">SIGNATURE SKILLS & GEAR</div>
+                    <div class="form-row">
+                        <label>Skills & Modules (Comma-Separated)</label>
+                        <textarea id="field-equipment" rows="6" placeholder="Dark Inscription, Center of Gravity System, Gigantic Nova, Strike Boost Super Soul"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit">GENERATE & PUBLISH DOSSIER PAGE</button>
+            <div id="status-banner" class="status-banner"></div>
+        </div>
+    </form>
+</div>
+
+<script>
+    // UPDATE SLIDER NUMBER DISPLAY
+    function updateVal(id, value) {
+        document.getElementById(id).innerText = value;
+    }
+
+    // LOAD ALL SAVED HEROES INTO SELECTOR DROPDOWN
+    function populateSelector() {
+        const selector = document.getElementById('char-selector');
+        const saved = JSON.parse(localStorage.getItem('pantheon_characters') || '{}');
+        
+        // Keep "NEW" as first option
+        selector.innerHTML = '<option value="NEW">[ CREATE NEW HERO ]</option>';
+
+        // Default Kaige if not in saved
+        if (!saved['kaige']) {
+            const opt = document.createElement('option');
+            opt.value = 'kaige';
+            opt.innerText = 'KAIGE (Default Lead)';
+            selector.appendChild(opt);
+        }
+
+        Object.keys(saved).forEach(id => {
+            const opt = document.createElement('option');
+            opt.value = id;
+            opt.innerText = `${saved[id].callsign.toUpperCase()} (${saved[id].showTitle || 'Show Fighter'})`;
+            selector.appendChild(opt);
+        });
+    }
+
+    // LOAD SELECTED HERO INTO FORM FOR EDITING
+    function loadSelectedHero() {
+        const selectedId = document.getElementById('char-selector').value;
+        const saved = JSON.parse(localStorage.getItem('pantheon_characters') || '{}');
+
+        if (selectedId === 'NEW') {
+            document.getElementById('hero-builder-form').reset();
+            return;
+        }
+
+        const hero = saved[selectedId] || {
+            id: "kaige",
+            callsign: "KAIGE",
+            realName: "RESTRICTED",
+            showTitle: "Project: Phantom Frequency",
+            role: "Lead Heavy Strike / Spatial Titan",
+            race: "Frieza Race",
+            status: "UNLEASHED / ACTIVE",
+            height: "Twice Frieza's Height",
+            avatarUrl: "",
+            bio: "Standing nearly twice the height of Frieza, Kaige is a towering powerhouse built for brutal close-quarters dominance.",
+            narrative: "Anchor fighter in 'Project: Phantom Frequency'. Leads front-line battles and turns the tide of major saga conflicts.",
+            capabilities: "Master of the Center of Gravity technique, giving him supreme control over surrounding battle positioning.",
+            skills: [
+                { label: "MAX HEALTH", value: 95 },
+                { label: "MAX KI", value: 85 },
+                { label: "MAX STAMINA", value: 90 },
+                { label: "BASIC ATTACK", value: 88 },
+                { label: "STRIKE SUPER", value: 98 },
+                { label: "KI BLAST SUPER", value: 75 }
+            ],
+            equipment: ["Dark Inscription", "Center of Gravity System", "Gigantic Nova", "Strike Boost Super Soul"]
+        };
+
+        // Populate Text Fields
+        document.getElementById('field-callsign').value = hero.callsign || '';
+        document.getElementById('field-realName').value = hero.realName || '';
+        document.getElementById('field-showTitle').value = hero.showTitle || '';
+        document.getElementById('field-race').value = hero.race || '';
+        document.getElementById('field-height').value = hero.height || '';
+        document.getElementById('field-role').value = hero.role || '';
+        document.getElementById('field-status').value = hero.status || 'UNLEASHED / ACTIVE';
+        document.getElementById('field-avatarUrl').value = hero.avatarUrl || '';
+        document.getElementById('field-bio').value = hero.bio || '';
+        document.getElementById('field-narrative').innerText = hero.narrative || hero.showRole || '';
+        document.getElementById('field-capabilities').value = hero.capabilities || '';
+
+        // Populate Attributes Sliders
+        const skillMap = {};
+        if (hero.skills) {
+            hero.skills.forEach(s => skillMap[s.label] = s.value);
+        }
+
+        document.getElementById('stat-health').value = skillMap['MAX HEALTH'] || 85;
+        document.getElementById('val-health').innerText = skillMap['MAX HEALTH'] || 85;
+
+        document.getElementById('stat-ki').value = skillMap['MAX KI'] || 80;
+        document.getElementById('val-ki').innerText = skillMap['MAX KI'] || 80;
+
+        document.getElementById('stat-stamina').value = skillMap['MAX STAMINA'] || 90;
+        document.getElementById('val-stamina').innerText = skillMap['MAX STAMINA'] || 90;
+
+        document.getElementById('stat-basic').value = skillMap['BASIC ATTACK'] || 88;
+        document.getElementById('val-basic').innerText = skillMap['BASIC ATTACK'] || 88;
+
+        document.getElementById('stat-strike').value = skillMap['STRIKE SUPER'] || 95;
+        document.getElementById('val-strike').innerText = skillMap['STRIKE SUPER'] || 95;
+
+        document.getElementById('stat-kiblast').value = skillMap['KI BLAST SUPER'] || 75;
+        document.getElementById('val-kiblast').innerText = skillMap['KI BLAST SUPER'] || 75;
+
+        // Populate Equipment Tag Cloud
+        document.getElementById('field-equipment').value = hero.equipment ? hero.equipment.join(', ') : '';
+    }
+
+    // SAVE / UPDATE CHARACTER IN LOCALSTORAGE
+    function saveCharacter(e) {
+        e.preventDefault();
+
+        const callsign = document.getElementById('field-callsign').value.trim();
+        const heroId = callsign.toLowerCase().replace(/[^a-z0-9]/g, '_');
+
+        const equipmentRaw = document.getElementById('field-equipment').value;
+        const equipmentArray = equipmentRaw.split(',').map(s => s.trim()).filter(s => s.length > 0);
+
+        const heroObj = {
+            id: heroId,
+            callsign: callsign,
+            realName: document.getElementById('field-realName').value.trim() || 'Restricted',
+            showTitle: document.getElementById('field-showTitle').value.trim(),
+            race: document.getElementById('field-race').value.trim() || 'Unspecified Race',
+            height: document.getElementById('field-height').value.trim() || 'N/A',
+            role: document.getElementById('field-role').value.trim() || 'Hero Fighter',
+            status: document.getElementById('field-status').value,
+            avatarUrl: document.getElementById('field-avatarUrl').value.trim(),
+            bio: document.getElementById('field-bio').value.trim(),
+            narrative: document.getElementById('field-narrative').value.trim(),
+            capabilities: document.getElementById('field-capabilities').value.trim(),
+            skills: [
+                { label: "MAX HEALTH", value: parseInt(document.getElementById('stat-health').value) },
+                { label: "MAX KI", value: parseInt(document.getElementById('stat-ki').value) },
+                { label: "MAX STAMINA", value: parseInt(document.getElementById('stat-stamina').value) },
+                { label: "BASIC ATTACK", value: parseInt(document.getElementById('stat-basic').value) },
+                { label: "STRIKE SUPER", value: parseInt(document.getElementById('stat-strike').value) },
+                { label: "KI BLAST SUPER", value: parseInt(document.getElementById('stat-kiblast').value) }
+            ],
+            equipment: equipmentArray.length > 0 ? equipmentArray : ["Standard Issue Ki Modules"]
+        };
+
+        const saved = JSON.parse(localStorage.getItem('pantheon_characters') || '{}');
+        saved[heroId] = heroObj;
+        localStorage.setItem('pantheon_characters', JSON.stringify(saved));
+
+        // Show Success Banner
+        const banner = document.getElementById('status-banner');
+        banner.style.display = 'block';
+        banner.innerHTML = `
+            HERO DOSSIER [${callsign}] PUBLISHED SUCCESSFULLY! 
+            <a href="dossier.html?id=${heroId}" target="_blank">[OPEN HERO WIKI PAGE ↗]</a>
+        `;
+
+        populateSelector();
+        document.getElementById('char-selector').value = heroId;
+    }
+
+    // INITIALIZATION
+    populateSelector();
+</script>
+
+</body>
+</html>
