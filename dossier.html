@@ -168,7 +168,7 @@
 
         .spec-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 12px;
             margin-top: 15px;
             background: rgba(6, 9, 19, 0.8);
@@ -215,6 +215,15 @@
             background: rgba(6, 9, 19, 0.6);
             padding: 12px;
             border-left: 3px solid var(--db-gold);
+        }
+
+        .lore-text ul {
+            margin: 8px 0 0 0;
+            padding-left: 20px;
+        }
+
+        .lore-text li {
+            margin-bottom: 6px;
         }
 
         /* XENOVERSE POWER GRID */
@@ -311,17 +320,19 @@
     const defaultHeroes = {
         "kaige": {
             id: "kaige",
-            callsign: "KAIGE",
+            callsign: "KAIGE // THE MULTIVERSE TITAN",
             realName: "RESTRICTED",
-            showTitle: "Project: Phantom Frequency",
-            role: "Lead Heavy Strike / Spatial Titan",
-            race: "Frieza Race",
-            status: "UNLEASHED / ACTIVE",
-            height: "Twice Frieza's Height",
+            showTitle: "Dragonball Legacy Reborn (DBLR)",
+            role: "Primary Background Antagonist / Main Character",
+            race: "Frieza Race (Titan Anomaly)",
+            status: "ACTIVE / UNSEEN SHADOW",
+            height: "~2x Standard Frieza Scale",
+            primaryGamertag: "blackbasilisk42",
+            affiliation: "Pantheon Core // Dragonball Legacy Reborn (DBLR)",
             avatarUrl: "",
-            bio: "Standing nearly twice the height of Frieza, Kaige is a towering Frieza-Race powerhouse built for dominant close-quarters strike combat. Operating inside the Time Nest, Kaige uses sheer physical mass paired with precision spatial awareness.",
-            narrative: "Serves as the front-line anchor in 'Project: Phantom Frequency'. Kaige leads the high-impact Future Saga DLC missions inside the Time Nest, turning chaotic battlefield dynamics in favor of the Time Patrol.",
-            capabilities: "Master of the Center of Gravity system for spatial control. Known for manually landing the Dark Inscription move and dropping massive ultimate damage via Gigantic Nova.",
+            bio: `<strong>I. OVERVIEW & PHYSICAL ANATOMY</strong><br>Standing at nearly twice the height of a conventional Frieza Race warrior, Kaige’s sheer physical scale transforms standard arena geometry. He isn't just another custom character in Conton City; his massive physical frame makes even basic neutral stances look imposing.<br><br><ul><li><strong>Signature Aura:</strong> Manifests a distinct dark energy signature featuring a piercing emerald-green core framed by obsidian black undertones.</li><li><strong>The Golden Override:</strong> Rarely accesses the Frieza Race <em>Golden Form</em>, treating it not as a standard transformation crutch, but as an extraordinarily rare power override reserved for narrative-altering threats.</li></ul><br><strong>II. COMMUNITY STANDING & ORIGIN DEBATES</strong><br>Across competitive gaming circles and large creative networks like the 160+ member <em>Dragonball Legacy Reborn</em> (DBLR) writer and voice-actor ecosystem, Kaige is established as a true community pillar.<br><br><ul><li><strong>The Precursor Fact:</strong> The gamertag <code>blackbasilisk42</code> and the Kaige persona directly pre-date the official reveal of Black Frieza in the <em>Dragon Ball Super</em> manga saga. He didn't copy official media—he established the community benchmark for the dark Frieza Race aesthetic long before official channels caught up.</li><li><strong>The Modding Community Debate:</strong> Because Kaige operates with high-tier efficiency, players frequently debate whether he is a standard player character or a custom "lobby boss" engineered by modders to test the limits of what a Frieza Race character can do.</li><li><strong>OG Standing:</strong> Within group chats and creative leadership hubs, Kaige functions as a respected veteran voice, focusing on talent development, team structure, and group cohesion over personal clout.</li></ul>`,
+            narrative: `<strong>V. SHOW ROLE & MULTIVERSE NARRATIVE ARC</strong><br><em>(PENDING PRODUCTION TEAM DISPATCHES // STRUCTURE PREPARED FOR FULL SCRIPT INPUT)</em><br><br><strong>A. Narrative Position</strong><br><ul><li><strong>Role:</strong> Primary Background Antagonist / Unseen Shadow</li><li><strong>Overview:</strong> Positioned as the mastermind driving multiversal ripples behind the scenes in the <em>Dragonball Legacy Reborn</em> series.</li></ul><br><strong>B. Production Arc Blueprint</strong><br><ul><li><strong>Phase 1 (The Shadow Era):</strong> Operates from the background, leaving energy signatures and subtle shifts across timelines.</li><li><strong>Phase 2 (Direct Engagement):</strong> Stepping into matches for high-stakes encounters to test protagonist characters.</li><li><strong>Phase 3 (Climax Trajectory):</strong> <em>(Awaiting final script notes and fight scene layouts)</em></li></ul>`,
+            capabilities: `<strong>III. COMBAT METHODOLOGY & PLAYSTYLE</strong><br>Kaige’s playstyle relies on aggressive territorial dominance, precise timing, and spatial calculations rather than passive zoning.<br><br><ul><li><strong>Center of Gravity System:</strong> A specialized spatial awareness approach that calculates tracking arcs, opponent vanish frames, and deadzones in real time to shut down movement before it happens.</li><li><strong>Heavy Ki-Blast Compression:</strong> Employs high-impact, max-optimized ki bursts designed to shatter defense meters and punish opponents during extended vanish trades.</li><li><strong>Manual Counter-Casting:</strong> Relies on strict manual timing to intercept aggressive rushes mid-animation (using skills like <em>Dark Inscription</em>), instantly turning an opponent's momentum back against them.</li></ul><br><strong>IV. THE "ENTITY" ATMOSPHERE & THE VOLDEMORT EFFECT</strong><br>To an outsider looking at text on a screen, the "Voldemort Effect" can sound like an exaggeration—until they witness how high-ranking group leaders and veteran players actually speak to him in private channels.<br><br><ul><li><strong>Calculated Presence:</strong> Kaige doesn't spam public lobbies or constantly speak in group chats. His interactions are rare, deliberate, and measured, giving his sudden appearance in a room immediate weight.</li><li><strong>Elevated Manner of Speech:</strong> Speaking with formal, composed authority rather than casual slang, his presence commands natural quiet and respect. When he drops a message in a 20-person room, high-level leaders instantly step up, align with his points, and offer full backing.</li><li><strong>The "Dark Lord" Archetype:</strong> Much like a high-tier entity whose name alone shifts the room's energy, his rare appearances create an atmosphere where players either show immediate deferential respect or actively avoid entering his match queue altogether.</li></ul>`,
             skills: [
                 { label: "MAX HEALTH", value: 95 },
                 { label: "MAX KI", value: 85 },
@@ -330,7 +341,7 @@
                 { label: "STRIKE SUPER", value: 98 },
                 { label: "KI BLAST SUPER", value: 75 }
             ],
-            equipment: ["Dark Inscription", "Center of Gravity System", "Gigantic Nova", "Strike Boost Super Soul", "Deadzone Adjust Script"]
+            equipment: ["blackbasilisk42", "Dark Inscription", "Center of Gravity System", "Gigantic Nova", "Strike Boost Super Soul", "Pantheon Core"]
         },
         "ghostwire": {
             id: "ghostwire",
@@ -444,8 +455,8 @@
                         <span class="spec-val">${hero.showTitle || 'N/A'}</span>
                     </div>
                     <div class="spec-item">
-                        <span class="spec-label">REAL NAME</span>
-                        <span class="spec-val">${hero.realName || 'Restricted'}</span>
+                        <span class="spec-label">GAMERTAG</span>
+                        <span class="spec-val">${hero.primaryGamertag || 'N/A'}</span>
                     </div>
                     <div class="spec-item">
                         <span class="spec-label">RACE / SPECIES</span>
@@ -455,6 +466,14 @@
                         <span class="spec-label">HEIGHT</span>
                         <span class="spec-val">${hero.height || 'N/A'}</span>
                     </div>
+                    <div class="spec-item">
+                        <span class="spec-label">AFFILIATION</span>
+                        <span class="spec-val">${hero.affiliation || 'Pantheon Core'}</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">REAL NAME</span>
+                        <span class="spec-val">${hero.realName || 'Restricted'}</span>
+                    </div>
                 </div>
             </div>
 
@@ -463,7 +482,7 @@
                 <div class="card-header">DEEP LORE & SHOW ARCS</div>
                 
                 <div class="lore-block">
-                    <div class="lore-title">1. ORIGIN & CHARACTER BACKSTORY</div>
+                    <div class="lore-title">1. OVERVIEW & COMMUNITY MYTHOS</div>
                     <div class="lore-text">${hero.bio || 'No backstory registered.'}</div>
                 </div>
 
