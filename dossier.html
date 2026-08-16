@@ -117,6 +117,109 @@
             align-items: center;
         }
 
+        /* ROSTER SELECTION GRID */
+        .roster-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .roster-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--db-cyan);
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 12px;
+            transition: all 0.2s ease;
+            clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+        }
+
+        .roster-card:hover {
+            border-color: var(--db-gold);
+            box-shadow: 0 0 15px rgba(255, 183, 0, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .roster-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .roster-avatar {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            border: 2px solid var(--db-gold);
+            background: rgba(6, 9, 19, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: #ffffff;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .roster-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .roster-meta {
+            flex: 1;
+        }
+
+        .roster-name {
+            font-size: 1.1rem;
+            color: #ffffff;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .roster-role {
+            font-size: 0.75rem;
+            color: var(--db-orange);
+            margin-top: 2px;
+            font-weight: bold;
+        }
+
+        .roster-spec {
+            font-size: 0.75rem;
+            color: #8a9ba8;
+            background: rgba(6, 9, 19, 0.8);
+            padding: 8px;
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .roster-select-btn {
+            background: rgba(0, 229, 255, 0.15);
+            border: 1px solid var(--db-cyan);
+            color: var(--db-cyan);
+            padding: 8px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            transition: all 0.2s ease;
+        }
+
+        .roster-select-btn:hover {
+            background: var(--db-gold);
+            color: #000;
+            border-color: var(--db-gold);
+            box-shadow: 0 0 10px var(--db-gold);
+        }
+
         /* HERO HEADER BLOCK */
         .hero-banner {
             display: flex;
@@ -352,6 +455,8 @@
             race: "Earthling / Cyber-Enhanced",
             status: "ACTIVE",
             height: "5'9\"",
+            primaryGamertag: "ghostwire_v2",
+            affiliation: "Pantheon Intelligence",
             avatarUrl: "",
             bio: "A strategic mastermind skilled in long-range Ki manipulation and signal disruption.",
             narrative: "Coordinates tactical intel during intense squad engagements across show episodes.",
@@ -375,6 +480,8 @@
             race: "Android Class",
             status: "STANDBY / TRAINING",
             height: "6'1\"",
+            primaryGamertag: "nova_frame_cx",
+            affiliation: "Pantheon Defense Unit",
             avatarUrl: "",
             bio: "Constructed for visual data processing and rapid-fire defensive counters.",
             narrative: "Protects team assets while rendering real-time battle capture feeds.",
@@ -398,6 +505,8 @@
             race: "Saiyan",
             status: "ACTIVE",
             height: "6'0\"",
+            primaryGamertag: "razor_onyx",
+            affiliation: "Pantheon Core",
             avatarUrl: "",
             bio: "An aggressive frontline combatant specializing in fast combo strings.",
             narrative: "Provides high-speed backup during Time Patrol raid encounters.",
@@ -414,21 +523,72 @@
         }
     };
 
-    function renderDossier() {
+    function initPage() {
         const urlParams = new URLSearchParams(window.location.search);
-        let heroId = urlParams.get('id');
+        const heroId = urlParams.get('id');
 
-        if (!heroId) {
-            heroId = 'kaige'; // Default fallback hero
-        }
-
-        // Checks defaultHeroes first so hardcoded file edits take priority over stored browser memory
+        // Merge default database with any custom creations saved in localStorage
         const savedCharacters = JSON.parse(localStorage.getItem('pantheon_characters') || '{}');
-        const hero = defaultHeroes[heroId] || savedCharacters[heroId] || defaultHeroes['kaige'];
+        const allHeroes = { ...defaultHeroes, ...savedCharacters };
 
         const container = document.getElementById('dossier-content');
-        const initials = hero.callsign.substring(0, 2).toUpperCase();
 
+        // IF NO HERO SELECTED: Render Character Selection Grid
+        if (!heroId || !allHeroes[heroId]) {
+            renderRosterGrid(container, allHeroes);
+        } else {
+            // IF HERO SELECTED: Render That Hero's Dossier
+            renderDossierView(container, allHeroes[heroId]);
+        }
+    }
+
+    // 1. ROSTER SELECTION MENU VIEW
+    function renderRosterGrid(container, heroes) {
+        const heroKeys = Object.keys(heroes);
+
+        const cardsHTML = heroKeys.map(key => {
+            const h = heroes[key];
+            const initials = h.callsign.substring(0, 2).toUpperCase();
+            const avatar = h.avatarUrl ? `<img src="${h.avatarUrl}" alt="${h.callsign}">` : initials;
+
+            return `
+                <div class="roster-card">
+                    <div class="roster-header">
+                        <div class="roster-avatar">${avatar}</div>
+                        <div class="roster-meta">
+                            <div class="roster-name">${h.callsign}</div>
+                            <div class="roster-role">${h.role || 'Unspecified Role'}</div>
+                        </div>
+                    </div>
+                    <div class="roster-spec">
+                        <div><strong>RACE:</strong> ${h.race || 'N/A'}</div>
+                        <div><strong>PROJECT:</strong> ${h.showTitle || 'N/A'}</div>
+                        <div><strong>GAMERTAG:</strong> ${h.primaryGamertag || 'N/A'}</div>
+                    </div>
+                    <a href="dossier.html?id=${h.id}" class="roster-select-btn">[ VIEW DOSSIER ]</a>
+                </div>
+            `;
+        }).join('');
+
+        container.innerHTML = `
+            <div class="card">
+                <div class="card-header">
+                    <span>SELECT CHARACTER // TIME NEST ARCHIVES</span>
+                    <a href="builder.html" style="color:var(--db-gold); font-size:0.75rem; text-decoration:none;">[ CREATE NEW CHARACTER ↗ ]</a>
+                </div>
+                <div style="font-size:0.85rem; color:#8a9ba8; margin-bottom:10px;">
+                    Select an active character profile below to view full scouter attributes, deep lore, and narrative saga arcs.
+                </div>
+                <div class="roster-grid">
+                    ${cardsHTML}
+                </div>
+            </div>
+        `;
+    }
+
+    // 2. SINGLE CHARACTER DOSSIER VIEW
+    function renderDossierView(container, hero) {
+        const initials = hero.callsign.substring(0, 2).toUpperCase();
         const avatarHTML = hero.avatarUrl 
             ? `<img src="${hero.avatarUrl}" alt="${hero.callsign}">` 
             : initials;
@@ -437,8 +597,8 @@
             <!-- HERO HEADER CARD -->
             <div class="card">
                 <div class="card-header">
-                    <span>HERO PROFILE // SCOUTER ANALYSIS</span>
-                    <a href="builder.html" style="color:var(--db-gold); font-size:0.75rem; text-decoration:none;">[EDIT IN HERO BUILDER ↗]</a>
+                    <a href="dossier.html" style="color:var(--db-cyan); font-size:0.8rem; text-decoration:none; font-weight:bold;">[ ← BACK TO ROSTER SELECT ]</a>
+                    <a href="builder.html?id=${hero.id}" style="color:var(--db-gold); font-size:0.75rem; text-decoration:none;">[EDIT IN HERO BUILDER ↗]</a>
                 </div>
 
                 <div class="hero-banner">
@@ -530,7 +690,7 @@
         `;
     }
 
-    renderDossier();
+    initPage();
 </script>
 
 </body>
