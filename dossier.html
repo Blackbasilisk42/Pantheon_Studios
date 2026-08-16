@@ -422,9 +422,9 @@
             heroId = 'kaige'; // Default fallback hero
         }
 
-        // Check LocalStorage custom creations first, then fallback to defaultHeroes
+        // Checks defaultHeroes first so hardcoded file edits take priority over stored browser memory
         const savedCharacters = JSON.parse(localStorage.getItem('pantheon_characters') || '{}');
-        const hero = savedCharacters[heroId] || defaultHeroes[heroId] || defaultHeroes['kaige'];
+        const hero = defaultHeroes[heroId] || savedCharacters[heroId] || defaultHeroes['kaige'];
 
         const container = document.getElementById('dossier-content');
         const initials = hero.callsign.substring(0, 2).toUpperCase();
