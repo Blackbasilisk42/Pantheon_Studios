@@ -334,6 +334,11 @@
                 <label>Combat Style & Special Capabilities</label>
                 <textarea id="field-capabilities" rows="3" placeholder="Describe spatial awareness techniques, fighting stance, and transformation modes..."></textarea>
             </div>
+
+            <div class="form-row">
+                <label>Community Lore & Atmosphere</label>
+                <textarea id="field-communityLore" rows="3" placeholder="Describe community standing, blackbasilisk42 origin, and presence in group chats..."></textarea>
+            </div>
         </div>
 
         <!-- XENOVERSE ATTRIBUTES & MOVES -->
@@ -448,9 +453,10 @@
             status: "UNLEASHED / ACTIVE",
             height: "Twice Frieza's Height",
             avatarUrl: "",
-            bio: "Standing nearly twice the height of Frieza, Kaige is a towering powerhouse built for brutal close-quarters dominance.",
-            narrative: "Anchor fighter in 'Project: Phantom Frequency'. Leads front-line battles and turns the tide of major saga conflicts.",
-            capabilities: "Master of the Center of Gravity technique, giving him supreme control over surrounding battle positioning.",
+            bio: "Kaige is a Frieza Race character standing nearly twice the height of a standard model. He runs a dark aura with a green core and black undertones, and rarely uses Golden Form—saving it for specific high-stakes moments rather than relying on it every match.",
+            narrative: "He serves as the primary background antagonist and main character driving events behind the scenes in Dragonball Legacy Reborn (DBLR). Rather than being front-and-center constantly, he operates from the shadows, stepping in directly only when it matters to test other characters.",
+            capabilities: "Built around spatial control with a primary focus on Ki blasts. Uses the Center of Gravity (COG) system to track opponent movement, heavy Ki blasts to break defense meters, and timed counters like Dark Inscription or Shadow Crusher to intercept aggressive rushes.",
+            communityLore: "A long-time veteran in the 160+ member DBLR community operating under blackbasilisk42. The character persona pre-dates official Black Frieza media. He keeps a low profile in public chats, so when he shows up in lobbies or group calls, people take notice.",
             skills: [
                 { label: "MAX HEALTH", value: 95 },
                 { label: "MAX KI", value: 85 },
@@ -472,8 +478,9 @@
         document.getElementById('field-status').value = hero.status || 'UNLEASHED / ACTIVE';
         document.getElementById('field-avatarUrl').value = hero.avatarUrl || '';
         document.getElementById('field-bio').value = hero.bio || '';
-        document.getElementById('field-narrative').innerText = hero.narrative || hero.showRole || '';
+        document.getElementById('field-narrative').value = hero.narrative || hero.showRole || '';
         document.getElementById('field-capabilities').value = hero.capabilities || '';
+        document.getElementById('field-communityLore').value = hero.communityLore || '';
 
         // Populate Attributes Sliders
         const skillMap = {};
@@ -526,6 +533,7 @@
             bio: document.getElementById('field-bio').value.trim(),
             narrative: document.getElementById('field-narrative').value.trim(),
             capabilities: document.getElementById('field-capabilities').value.trim(),
+            communityLore: document.getElementById('field-communityLore').value.trim(),
             skills: [
                 { label: "MAX HEALTH", value: parseInt(document.getElementById('stat-health').value) },
                 { label: "MAX KI", value: parseInt(document.getElementById('stat-ki').value) },
@@ -555,6 +563,11 @@
 
     // INITIALIZATION
     populateSelector();
+    const requestedHeroId = new URLSearchParams(window.location.search).get('id');
+    if (requestedHeroId && document.querySelector(`#char-selector option[value="${requestedHeroId}"]`)) {
+        document.getElementById('char-selector').value = requestedHeroId;
+        loadSelectedHero();
+    }
 </script>
 
 </body>
