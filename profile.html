@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PANTHEON STUDIOS // HERO PROFILE & CAPSULE VAULT</title>
+    <title>PANTHEON STUDIOS // USER PROFILE & OC CREATOR</title>
     <style>
         :root {
             --bg-void: #060913;
@@ -14,7 +14,7 @@
             --db-purple: #a100ff;
             --db-red: #ff3333;
             --panel-bg: rgba(12, 18, 32, 0.92);
-            --scouter-glow: 0 0 12px rgba(0, 229, 255, 0.35);
+            --scouter-glow: 0 0 12px rgba(255, 183, 0, 0.35);
             --font-mono: 'Courier New', Courier, monospace;
         }
 
@@ -26,752 +26,578 @@
             padding: 20px;
             min-height: 100vh;
             background-image: 
-                radial-gradient(circle at 50% 30%, rgba(0, 229, 255, 0.08) 0%, transparent 70%),
-                linear-gradient(rgba(0, 255, 136, 0.03) 1px, transparent 1px);
+                radial-gradient(circle at 50% 30%, rgba(255, 183, 0, 0.08) 0%, transparent 70%),
+                linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px);
             background-size: 100% 100%, 100% 4px;
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1100px;
             margin: 0 auto;
         }
 
-        /* HEADER BAR */
-        .header-bar {
+        /* NAV HEADER */
+        .nav-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid var(--db-gold);
-            padding-bottom: 15px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 15px rgba(255, 183, 0, 0.2);
+            padding: 15px 0 25px 0;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+            margin-bottom: 30px;
         }
 
-        .header-bar h1 {
-            margin: 0;
-            font-size: 1.1rem;
-            color: var(--db-gold);
+        .nav-brand {
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: #00ff88;
             letter-spacing: 2px;
-            font-weight: bold;
         }
 
-        .btn-logout {
-            background: rgba(255, 51, 51, 0.15);
-            border: 1px solid var(--db-red);
-            color: var(--db-red);
-            padding: 8px 16px;
-            font-family: var(--font-mono);
-            cursor: pointer;
-            text-transform: uppercase;
+        .nav-menu {
+            display: flex;
+            gap: 18px;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            color: #c0daf0;
+            text-decoration: none;
             font-size: 0.8rem;
             font-weight: bold;
-            transition: all 0.2s ease;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            transition: color 0.2s ease;
         }
 
-        .btn-logout:hover {
-            background: var(--db-red);
-            color: #ffffff;
-            box-shadow: 0 0 12px var(--db-red);
+        .nav-menu a:hover, .nav-menu a.active {
+            color: var(--db-gold);
         }
 
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .card {
+        /* USER SESSION CARD */
+        .session-card {
             background: var(--panel-bg);
             border: 1px solid var(--db-cyan);
-            box-shadow: var(--scouter-glow);
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
             padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
         }
 
-        .card h2 {
-            margin-top: 0;
-            font-size: 0.95rem;
-            color: var(--db-gold);
-            border-bottom: 1px rgba(255, 183, 0, 0.3) dashed;
-            padding-bottom: 8px;
-            letter-spacing: 1px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: bold;
-        }
-
-        .field-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-            font-size: 0.85rem;
-        }
-
-        .field-label { color: #8a9ba8; text-transform: uppercase; }
-        .field-val { color: #ffffff; font-weight: bold; }
-
-        .full-width {
-            grid-column: span 2;
-        }
-
-        /* ENERGY RELAY STYLES */
-        .social-section {
-            margin-top: 15px;
-            border-top: 1px dashed rgba(0, 229, 255, 0.3);
-            padding-top: 10px;
-        }
-
-        .social-badges-wrapper {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 8px;
-            margin-bottom: 8px;
-        }
-
-        .social-badge {
-            display: inline-block;
-            background: rgba(0, 229, 255, 0.1);
-            border: 1px solid var(--db-cyan);
-            color: var(--db-cyan);
-            padding: 4px 8px;
-            font-size: 0.7rem;
-            text-decoration: none;
-            text-transform: uppercase;
-            font-weight: bold;
-            transition: all 0.2s ease;
-        }
-
-        .social-badge:hover {
-            background: var(--db-cyan);
-            color: #000;
-            box-shadow: 0 0 8px var(--db-cyan);
-        }
-
-        .social-input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-top: 10px;
-        }
-
-        .social-input-group input {
-            background: rgba(6, 9, 19, 0.9);
-            border: 1px solid rgba(0, 229, 255, 0.4);
-            color: #ffffff;
-            padding: 6px 10px;
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            outline: none;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        /* SCOUTER COMMS TABS */
-        .comms-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-
-        .tab-btn {
-            background: rgba(0, 229, 255, 0.08);
-            border: 1px solid rgba(0, 229, 255, 0.3);
-            color: #8a9ba8;
-            padding: 6px 12px;
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            cursor: pointer;
-            text-transform: uppercase;
-            font-weight: bold;
-            transition: all 0.2s ease;
-        }
-
-        .tab-btn:hover {
-            background: rgba(0, 229, 255, 0.2);
-            color: var(--db-cyan);
-        }
-
-        .tab-btn.active {
-            background: rgba(255, 183, 0, 0.2);
-            border-color: var(--db-gold);
-            color: var(--db-gold);
-        }
-
-        .dm-select-wrapper {
-            margin-bottom: 10px;
+        .user-identity {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 0.8rem;
-        }
-
-        .dm-select-wrapper select, .upload-form select, .upload-form input[type="text"] {
-            background: rgba(6, 9, 19, 0.9);
-            border: 1px solid rgba(0, 229, 255, 0.4);
-            color: #ffffff;
-            padding: 6px 10px;
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
-            outline: none;
-        }
-
-        .comms-log {
-            height: 160px;
-            overflow-y: auto;
-            background: rgba(6, 9, 19, 0.95);
-            border: 1px solid rgba(0, 229, 255, 0.3);
-            padding: 12px;
-            margin-bottom: 15px;
-            font-size: 0.8rem;
-        }
-
-        .msg-entry {
-            margin-bottom: 10px;
-            border-bottom: 1px dotted rgba(0, 229, 255, 0.15);
-            padding-bottom: 6px;
-        }
-
-        .msg-sender { color: var(--db-ki); font-weight: bold; }
-        .msg-sender.dm-me { color: var(--db-gold); }
-        .msg-time { color: #607080; font-size: 0.7rem; margin-left: 8px; }
-        .msg-body { color: #d0e0f0; margin-top: 4px; }
-
-        .comms-input-group {
-            display: flex;
-            gap: 10px;
-        }
-
-        .comms-input-group input {
-            flex: 1;
-            background: rgba(6, 9, 19, 0.9);
-            border: 1px solid rgba(0, 229, 255, 0.4);
-            color: #ffffff;
-            padding: 10px;
-            font-family: var(--font-mono);
-            outline: none;
-        }
-
-        .comms-input-group button, .action-btn-sm {
-            background: var(--db-gold);
-            color: #000;
-            border: none;
-            padding: 10px 18px;
-            font-family: var(--font-mono);
-            font-weight: bold;
-            cursor: pointer;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            transition: all 0.2s ease;
-        }
-
-        .comms-input-group button:hover, .action-btn-sm:hover {
-            box-shadow: 0 0 10px var(--db-gold);
-        }
-
-        /* CAPSULE VAULT STYLES */
-        .upload-form {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            background: rgba(6, 9, 19, 0.6);
-            padding: 15px;
-            border: 1px solid rgba(0, 229, 255, 0.2);
-            margin-bottom: 20px;
-        }
-
-        .upload-row {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .media-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 15px;
         }
 
-        .media-item {
-            background: rgba(6, 9, 19, 0.9);
-            border: 1px solid rgba(0, 229, 255, 0.3);
-            padding: 10px;
-            position: relative;
+        .user-avatar {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            border: 2px solid var(--db-ki);
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: #fff;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.4);
         }
 
-        .media-item img {
-            width: 100%;
-            height: 130px;
-            object-fit: cover;
-            border: 1px solid rgba(0, 229, 255, 0.2);
-        }
-
-        .media-badge {
-            font-size: 0.65rem;
-            padding: 2px 6px;
-            text-transform: uppercase;
-            font-weight: bold;
-            display: inline-block;
-            margin-top: 6px;
-        }
-
-        .badge-private { background: rgba(255, 51, 51, 0.2); color: var(--db-red); border: 1px solid var(--db-red); }
-        .badge-restricted { background: rgba(255, 183, 0, 0.2); color: var(--db-gold); border: 1px solid var(--db-gold); }
-        .badge-public { background: rgba(0, 255, 136, 0.2); color: var(--db-ki); border: 1px solid var(--db-ki); }
-
-        .media-title {
-            font-size: 0.8rem;
+        .user-callsign {
+            font-size: 1.2rem;
+            font-weight: 900;
             color: #ffffff;
-            margin-top: 5px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            letter-spacing: 1.5px;
+        }
+
+        .user-badge {
+            font-size: 0.75rem;
+            color: var(--db-gold);
+            margin-top: 4px;
+        }
+
+        .logout-btn {
+            background: rgba(255, 51, 51, 0.15);
+            border: 1px solid var(--db-red);
+            color: var(--db-red);
+            padding: 8px 14px;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        /* GRID LAYOUT */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .profile-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--db-gold);
+            box-shadow: var(--scouter-glow);
+            padding: 22px;
+            clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
+        }
+
+        .card-header {
+            font-size: 0.9rem;
+            color: var(--db-gold);
+            border-bottom: 1px dashed rgba(255, 183, 0, 0.4);
+            padding-bottom: 8px;
+            margin-bottom: 18px;
+            letter-spacing: 1.5px;
             font-weight: bold;
         }
 
-        .hidden { display: none !important; }
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.75rem;
+            color: #8a9ba8;
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            background: rgba(6, 9, 19, 0.9);
+            border: 1px solid rgba(0, 229, 255, 0.4);
+            color: #ffffff;
+            padding: 9px 12px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            border-color: var(--db-gold);
+            box-shadow: 0 0 8px rgba(255, 183, 0, 0.3);
+        }
+
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .slider-row label {
+            width: 120px;
+            font-size: 0.7rem;
+            color: #8a9ba8;
+        }
+
+        .slider-row input[type="range"] {
+            flex: 1;
+            accent-color: var(--db-ki);
+        }
+
+        .slider-val {
+            width: 35px;
+            font-size: 0.75rem;
+            color: var(--db-ki);
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .btn-action {
+            width: 100%;
+            background: #00ff88;
+            color: #000;
+            border: none;
+            padding: 12px;
+            font-family: var(--font-mono);
+            font-weight: 900;
+            font-size: 0.8rem;
+            cursor: pointer;
+            letter-spacing: 1.5px;
+            margin-top: 10px;
+            clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+        }
+
+        /* ASSETS DISPLAY SECTION */
+        .assets-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--db-cyan);
+            padding: 22px;
+            margin-bottom: 30px;
+            clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
+        }
+
+        .asset-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .asset-box {
+            background: rgba(6, 9, 19, 0.95);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            padding: 12px;
+        }
+
+        .asset-box img {
+            width: 100%;
+            max-height: 180px;
+            object-fit: cover;
+            border: 1px solid rgba(255, 183, 0, 0.2);
+            margin-bottom: 8px;
+        }
+
+        .asset-title {
+            color: #fff;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        .asset-meta {
+            color: #8a9ba8;
+            font-size: 0.7rem;
+            margin-top: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn-del {
+            background: transparent;
+            border: none;
+            color: var(--db-red);
+            font-size: 0.7rem;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* MAINTENANCE LOCKOUT OVERLAY */
+        #maintenance-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #060913;
+            z-index: 99999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .maint-card {
+            background: rgba(12, 18, 32, 0.96);
+            border: 2px solid var(--db-red);
+            box-shadow: 0 0 25px rgba(255, 51, 51, 0.4);
+            width: 420px;
+            padding: 30px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 
+<!-- MAINTENANCE LOCKOUT OVERLAY -->
+<div id="maintenance-overlay">
+    <div class="maint-card">
+        <div style="color:var(--db-red); font-weight:bold; margin-bottom:10px;">⚠️ PROFILE RESTRICTED</div>
+        <div style="color:#8a9ba8; font-size:0.8rem; margin-bottom:15px;">ENTER DEVELOPER PASSKEY TO UNLOCK</div>
+        <form onsubmit="unlockMaintenance(event)" style="display:flex; gap:10px;">
+            <input type="password" id="maint-key-input" placeholder="PASSKEY..." required style="flex:1; background:#000; border:1px solid var(--db-red); color:#fff; padding:8px;">
+            <button type="submit" style="background:var(--db-gold); border:none; padding:8px 12px; font-weight:bold; cursor:pointer;">UNSEAL</button>
+        </form>
+        <div id="maint-error" style="color:var(--db-red); font-size:0.75rem; margin-top:10px;"></div>
+    </div>
+</div>
+
 <div class="container">
-    <div class="header-bar">
-        <h1>PANTHEON STUDIOS // HERO PROFILE</h1>
-        <div style="display: flex; gap: 10px; align-items: center;">
-            <a href="index.html" class="tab-btn" style="text-decoration: none;">[SHOWCASE_HUB]</a>
-            <a href="admin.html" class="tab-btn" style="text-decoration: none; border-color: var(--db-gold); color: var(--db-gold);">[TIME_NEST_ADMIN]</a>
-            <button class="btn-logout" onclick="logout()">[POWER_DOWN_SESSION]</button>
+    <!-- NAV HEADER -->
+    <div class="nav-header">
+        <div class="nav-brand">PANTHEON STUDIOS // USER HQ</div>
+        <div class="nav-menu">
+            <a href="index.html">HUB</a>
+            <a href="login.html">LOGIN</a>
+            <a href="dossier.html">ROSTER</a>
+            <a href="dossier.html">ARCHIVES</a>
+            <a href="builder.html">SHOW BUILDER</a>
+            <a href="profile.html" class="active">MEDIA</a>
+            <a href="admin.html">COMMUNITY</a>
         </div>
     </div>
 
-    <div class="grid">
-        <!-- HERO DOSSIER DETAILS -->
-        <div class="card">
-            <h2>HERO DOSSIER // IDENTITY & KI CLASS</h2>
-            <div class="field-row">
-                <span class="field-label">HERO CALLSIGN:</span>
-                <span class="field-val" id="disp-callsign">---</span>
+    <!-- USER SESSION BANNER -->
+    <div class="session-card">
+        <div class="user-identity">
+            <div class="user-avatar" id="user-avatar-circle">GF</div>
+            <div>
+                <div class="user-callsign" id="display-callsign">GUEST_FAN</div>
+                <div class="user-badge">COMMUNITY MEMBER // ACCESS LEVEL 01</div>
             </div>
-            <div class="field-row">
-                <span class="field-label">FIGHTING STYLE / ROLE:</span>
-                <span class="field-val" id="disp-role">---</span>
-            </div>
-            <div class="field-row">
-                <span class="field-label">COMBAT CLASS:</span>
-                <span class="field-val" id="disp-clearance">---</span>
-            </div>
-            <div class="field-row">
-                <span class="field-label">AURA STATUS:</span>
-                <span class="field-val" id="disp-status" style="color: var(--db-ki);">---</span>
-            </div>
+        </div>
+        <button class="logout-btn" onclick="logoutUser()">LOGOUT SESSION</button>
+    </div>
 
-            <!-- EXTERNAL SOCIAL ENERGY RELAYS -->
-            <div class="social-section">
-                <div class="field-label" style="font-size:0.75rem; color:var(--db-ki); font-weight:bold;">EXTERNAL ENERGY RELAYS:</div>
-                <div id="disp-socials-container" class="social-badges-wrapper">
-                    <!-- Dynamic Badges Render Here -->
+    <div class="profile-grid">
+        <!-- PERSONAL OC BUILDER (COMMUNITY OC) -->
+        <div class="profile-card">
+            <div class="card-header">PERSONAL OC CREATOR // COMMUNITY AVATAR</div>
+            <form id="oc-builder-form" oninput="updateOcPreview()">
+                <div class="form-group">
+                    <label class="form-label">AVATAR CALLSIGN / OC NAME</label>
+                    <input type="text" id="oc-name" class="form-input" value="SHADOW_STRIKER" required>
                 </div>
-                <button class="tab-btn" onclick="toggleSocialEdit()" style="width:100%; margin-top:5px;">[CONFIGURE ENERGY RELAYS]</button>
 
-                <form id="social-edit-form" class="social-input-group hidden" onsubmit="saveSocials(event)">
-                    <input type="text" id="input-discord" placeholder="Discord Tag / Server Link">
-                    <input type="text" id="input-youtube" placeholder="YouTube URL or @Channel">
-                    <input type="text" id="input-patreon" placeholder="Patreon Page Link">
-                    <input type="text" id="input-facebook" placeholder="Facebook Profile Link">
-                    <button type="submit" class="action-btn-sm" style="padding:6px;">SAVE RELAYS</button>
-                </form>
-            </div>
-        </div>
-
-        <!-- SCOUTER METRICS -->
-        <div class="card">
-            <h2>SCOUTER METRICS // TELEMETRY</h2>
-            <div class="field-row">
-                <span class="field-label">KI ENCRYPTION:</span>
-                <span class="field-val">AES-256-GCM</span>
-            </div>
-            <div class="field-row">
-                <span class="field-label">TIME NEST HUB:</span>
-                <span class="field-val">PANTHEON_HQ_01</span>
-            </div>
-            <div class="field-row">
-                <span class="field-label">AWAKENED DATE:</span>
-                <span class="field-val" id="disp-date">---</span>
-            </div>
-        </div>
-
-        <!-- SCOUTER COMMS & TELEPATHIC DM TERMINAL -->
-        <div class="card full-width">
-            <h2>SCOUTER COMMS // TRANSMISSION RELAY</h2>
-
-            <div class="comms-tabs">
-                <button class="tab-btn active" id="tab-broadcast" onclick="setMode('broadcast')">[TIME NEST BROADCAST]</button>
-                <button class="tab-btn" id="tab-dm" onclick="setMode('dm')">[ENCRYPTED TELEPATHY (DM)]</button>
-            </div>
-
-            <div id="dm-recipient-bar" class="dm-select-wrapper hidden">
-                <span style="color: var(--db-ki); font-weight:bold;">TARGET HERO:</span>
-                <select id="dm-target" onchange="loadDMs()">
-                    <!-- Hero fighters auto-populate here -->
-                </select>
-            </div>
-
-            <div class="comms-log" id="comms-box">
-                <!-- Messages render here -->
-            </div>
-
-            <form class="comms-input-group" onsubmit="postMessage(event)">
-                <input type="text" id="msg-input" placeholder="Transmit Ki Signal..." required autocomplete="off">
-                <button type="submit">TRANSMIT</button>
-            </form>
-        </div>
-
-        <!-- CAPSULE VAULT & ASSET DISPLAY -->
-        <div class="card full-width">
-            <h2>CAPSULE VAULT // SHOW & LORE ASSETS</h2>
-
-            <!-- UPLOAD FORM -->
-            <form class="upload-form" onsubmit="uploadMedia(event)">
-                <div class="upload-row">
-                    <input type="text" id="media-title" placeholder="Capsule Asset Caption/Title..." required style="flex:1;">
-                    <input type="file" id="media-file" accept="image/*" required style="color:#8a9ba8;">
-                </div>
-                <div class="upload-row">
-                    <label style="font-size:0.75rem; color:var(--db-ki); font-weight:bold;">CAPSULE VISIBILITY:</label>
-                    <select id="media-privacy" onchange="toggleRestrictedTarget()">
-                        <option value="private">CLASSIFIED CAPSULE (Only Me)</option>
-                        <option value="restricted">RESTRICTED CAPSULE (Specific Hero)</option>
-                        <option value="public">PUBLIC SHOWCASE (All Time Patrollers)</option>
+                <div class="form-group">
+                    <label class="form-label">SPECIES / ORIGIN</label>
+                    <select id="oc-race" class="form-select">
+                        <option value="Saiyan">Saiyan</option>
+                        <option value="Frieza Race">Frieza Race</option>
+                        <option value="Earthling">Earthling</option>
+                        <option value="Majin">Majin</option>
+                        <option value="Namekian">Namekian</option>
                     </select>
-
-                    <div id="restricted-wrapper" class="hidden">
-                        <select id="media-target-user">
-                            <!-- Populated dynamically -->
-                        </select>
-                    </div>
-
-                    <button type="submit" class="action-btn-sm" style="margin-left:auto;">STORE IN CAPSULE</button>
                 </div>
-            </form>
 
-            <!-- MEDIA GALLERY DISPLAY -->
-            <div class="media-grid" id="media-gallery">
-                <!-- Uploaded assets render here -->
-            </div>
+                <div class="form-group">
+                    <label class="form-label">BUILD POWER RATING</label>
+                    <input type="text" id="oc-power" class="form-input" value="5,400,000">
+                </div>
+
+                <div class="slider-row"><label>HEALTH</label><input type="range" id="oc-hp" min="10" max="100" value="80"><span class="slider-val" id="v-hp">80</span></div>
+                <div class="slider-row"><label>KI SPECS</label><input type="range" id="oc-ki" min="10" max="100" value="85"><span class="slider-val" id="v-ki">85</span></div>
+                <div class="slider-row"><label>STAMINA</label><input type="range" id="oc-stm" min="10" max="100" value="75"><span class="slider-val" id="v-stm">75</span></div>
+                <div class="slider-row"><label>STRIKE SUPER</label><input type="range" id="oc-str" min="10" max="100" value="90"><span class="slider-val" id="v-str">90</span></div>
+
+                <div class="form-group" style="margin-top:10px;">
+                    <label class="form-label">PRIMARY SKILL LOADOUT</label>
+                    <input type="text" id="oc-skills" class="form-input" value="Shadow Crusher, Sledgehammer">
+                </div>
+
+                <button type="button" class="btn-action" onclick="savePersonalOC()">SAVE PERSONAL OC</button>
+            </form>
+            <div id="oc-status" style="margin-top:10px; font-size:0.75rem; color:var(--db-ki); display:none; text-align:center; font-weight:bold;">✓ PERSONAL OC SAVED TO PROFILE</div>
+        </div>
+
+        <!-- MEDIA UPLOAD CENTER -->
+        <div class="profile-card">
+            <div class="card-header">MEDIA DISPATCH // PUBLIC FEED UPLOADER</div>
+            <form onsubmit="uploadMediaAsset(event)">
+                <div class="form-group">
+                    <label class="form-label">DISPATCH TITLE / SHOW EPISODE FEEDBACK</label>
+                    <input type="text" id="media-title" class="form-input" placeholder="e.g., Episode 07 Reaction Art" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">SELECT IMAGE ASSET (FILE)</label>
+                    <input type="file" id="media-file" accept="image/*" class="form-input" required style="padding:6px;">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">DISPATCH PRIVACY</label>
+                    <select id="media-privacy" class="form-select">
+                        <option value="public">PUBLIC_HQ // DISPATCH TO HUB FEED</option>
+                        <option value="private">PRIVATE_ARCHIVE // USER PROFILE ONLY</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-action" style="background:var(--db-gold);">TRANSMIT MEDIA ASSET</button>
+            </form>
+            <div id="media-status" style="margin-top:10px; font-size:0.75rem; color:var(--db-ki); display:none; text-align:center; font-weight:bold;">✓ MEDIA TRANSMITTED TO FEED</div>
+        </div>
+    </div>
+
+    <!-- SAVED ASSETS & PERSONAL OCs -->
+    <div class="assets-card">
+        <div class="card-header" style="margin-bottom:10px;">YOUR SAVED COMMUNITY OCs & UPLOADED MEDIA</div>
+        
+        <div style="color:var(--db-gold); font-size:0.8rem; font-weight:bold; margin-top:15px;">SAVED PERSONAL OCs</div>
+        <div class="asset-list" id="user-oc-list">
+            <!-- User OCs render here -->
+        </div>
+
+        <div style="color:var(--db-gold); font-size:0.8rem; font-weight:bold; margin-top:25px;">YOUR DISPATCHED MEDIA ASSETS</div>
+        <div class="asset-list" id="user-media-list">
+            <!-- User Media renders here -->
         </div>
     </div>
 </div>
 
 <script>
-    let activeCallsign = localStorage.getItem('pantheon_active_session');
-    let currentMode = 'broadcast';
+    const DEV_PASSCODE = '@jimbo21';
+    let currentCallsign = localStorage.getItem('pantheon_active_session') || 'GUEST_FAN';
 
-    if (!activeCallsign) {
+    function checkMaintenanceGate() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const passParam = urlParams.get('pass');
+        const overlay = document.getElementById('maintenance-overlay');
+
+        if (passParam === DEV_PASSCODE || localStorage.getItem('pantheon_maint_unlocked') === 'true') {
+            localStorage.setItem('pantheon_maint_unlocked', 'true');
+            if (overlay) overlay.style.display = 'none';
+        } else {
+            if (overlay) overlay.style.display = 'flex';
+        }
+    }
+
+    function unlockMaintenance(e) {
+        e.preventDefault();
+        const inputVal = document.getElementById('maint-key-input').value.trim();
+        if (inputVal === DEV_PASSCODE) {
+            localStorage.setItem('pantheon_maint_unlocked', 'true');
+            document.getElementById('maintenance-overlay').style.display = 'none';
+        } else {
+            document.getElementById('maint-error').innerText = 'INVALID KEY';
+        }
+    }
+
+    function loadUserProfile() {
+        document.getElementById('display-callsign').innerText = currentCallsign.toUpperCase();
+        document.getElementById('user-avatar-circle').innerText = currentCallsign.substring(0, 2).toUpperCase();
+        renderUserAssets();
+    }
+
+    function logoutUser() {
+        localStorage.removeItem('pantheon_active_session');
         window.location.href = 'login.html';
     }
 
-    function loadProfile() {
-        const users = JSON.parse(localStorage.getItem('pantheon_operatives') || '{}');
-        const user = users[activeCallsign];
-
-        if (!user) {
-            logout();
-            return;
-        }
-
-        document.getElementById('disp-callsign').innerText = user.callsign;
-        document.getElementById('disp-role').innerText = user.role || 'Hero Fighter';
-        document.getElementById('disp-clearance').innerText = user.clearance || 'CLASS_01';
-        document.getElementById('disp-status').innerText = user.status || 'ACTIVE_TIME_PATROLLER';
-        document.getElementById('disp-date').innerText = new Date(user.registered || Date.now()).toLocaleDateString();
-
-        // Load Socials Data
-        const socials = user.socials || {};
-        document.getElementById('input-discord').value = socials.discord || '';
-        document.getElementById('input-youtube').value = socials.youtube || '';
-        document.getElementById('input-patreon').value = socials.patreon || '';
-        document.getElementById('input-facebook').value = socials.facebook || '';
-
-        renderSocialBadges(socials);
-
-        populateRecipientLists(users);
-        loadBroadcast();
-        loadMediaGallery();
+    function updateOcPreview() {
+        document.getElementById('v-hp').innerText = document.getElementById('oc-hp').value;
+        document.getElementById('v-ki').innerText = document.getElementById('oc-ki').value;
+        document.getElementById('v-stm').innerText = document.getElementById('oc-stm').value;
+        document.getElementById('v-str').innerText = document.getElementById('oc-str').value;
     }
 
-    function renderSocialBadges(socials) {
-        const container = document.getElementById('disp-socials-container');
-        container.innerHTML = '';
-        let count = 0;
-
-        if (socials.discord) {
-            container.innerHTML += `<span class="social-badge">[DISCORD] ${socials.discord}</span>`;
-            count++;
-        }
-        if (socials.youtube) {
-            const url = socials.youtube.startsWith('http') ? socials.youtube : `https://${socials.youtube}`;
-            container.innerHTML += `<a href="${url}" target="_blank" class="social-badge">[YOUTUBE] ↗</a>`;
-            count++;
-        }
-        if (socials.patreon) {
-            const url = socials.patreon.startsWith('http') ? socials.patreon : `https://${socials.patreon}`;
-            container.innerHTML += `<a href="${url}" target="_blank" class="social-badge">[PATREON] ↗</a>`;
-            count++;
-        }
-        if (socials.facebook) {
-            const url = socials.facebook.startsWith('http') ? socials.facebook : `https://${socials.facebook}`;
-            container.innerHTML += `<a href="${url}" target="_blank" class="social-badge">[FACEBOOK] ↗</a>`;
-            count++;
-        }
-
-        if (count === 0) {
-            container.innerHTML = '<span style="color:#607080; font-size:0.75rem;">NO ENERGY RELAYS CONFIGURED</span>';
-        }
-    }
-
-    function toggleSocialEdit() {
-        const form = document.getElementById('social-edit-form');
-        form.classList.toggle('hidden');
-    }
-
-    function saveSocials(e) {
-        e.preventDefault();
-        const users = JSON.parse(localStorage.getItem('pantheon_operatives') || '{}');
-        if (!users[activeCallsign]) return;
-
-        users[activeCallsign].socials = {
-            discord: document.getElementById('input-discord').value.trim(),
-            youtube: document.getElementById('input-youtube').value.trim(),
-            patreon: document.getElementById('input-patreon').value.trim(),
-            facebook: document.getElementById('input-facebook').value.trim()
+    function savePersonalOC() {
+        const ocData = {
+            id: 'oc_' + Date.now(),
+            owner: currentCallsign,
+            name: document.getElementById('oc-name').value,
+            race: document.getElementById('oc-race').value,
+            power: document.getElementById('oc-power').value,
+            stats: {
+                hp: document.getElementById('oc-hp').value,
+                ki: document.getElementById('oc-ki').value,
+                stm: document.getElementById('oc-stm').value,
+                str: document.getElementById('oc-str').value
+            },
+            skills: document.getElementById('oc-skills').value,
+            timestamp: new Date().toISOString()
         };
 
-        localStorage.setItem('pantheon_operatives', JSON.stringify(users));
-        renderSocialBadges(users[activeCallsign].socials);
-        toggleSocialEdit();
+        const allOcs = JSON.parse(localStorage.getItem('pantheon_user_oc') || '[]');
+        allOcs.push(ocData);
+        localStorage.setItem('pantheon_user_oc', JSON.stringify(allOcs));
+
+        const status = document.getElementById('oc-status');
+        status.style.display = 'block';
+        setTimeout(() => { status.style.display = 'none'; }, 2500);
+
+        renderUserAssets();
     }
 
-    function populateRecipientLists(users) {
-        const dmSelect = document.getElementById('dm-target');
-        const mediaTargetSelect = document.getElementById('media-target-user');
-        
-        dmSelect.innerHTML = '';
-        mediaTargetSelect.innerHTML = '';
-
-        const otherOperatives = Object.keys(users).filter(c => c !== activeCallsign);
-
-        if (otherOperatives.length === 0) {
-            dmSelect.innerHTML = '<option value="">NO OTHER HEROES</option>';
-            mediaTargetSelect.innerHTML = '<option value="">NO OTHER HEROES</option>';
-            return;
-        }
-
-        otherOperatives.forEach(c => {
-            const opt1 = document.createElement('option');
-            opt1.value = c;
-            opt1.innerText = c;
-            dmSelect.appendChild(opt1);
-
-            const opt2 = document.createElement('option');
-            opt2.value = c;
-            opt2.innerText = c;
-            mediaTargetSelect.appendChild(opt2);
-        });
-    }
-
-    function toggleRestrictedTarget() {
+    function uploadMediaAsset(e) {
+        e.preventDefault();
+        const title = document.getElementById('media-title').value;
         const privacy = document.getElementById('media-privacy').value;
-        const wrapper = document.getElementById('restricted-wrapper');
-        if (privacy === 'restricted') {
-            wrapper.classList.remove('hidden');
-        } else {
-            wrapper.classList.add('hidden');
-        }
-    }
-
-    function setMode(mode) {
-        currentMode = mode;
-        const bBtn = document.getElementById('tab-broadcast');
-        const dBtn = document.getElementById('tab-dm');
-        const dmBar = document.getElementById('dm-recipient-bar');
-
-        if (mode === 'broadcast') {
-            bBtn.classList.add('active');
-            dBtn.classList.remove('active');
-            dmBar.classList.add('hidden');
-            loadBroadcast();
-        } else {
-            dBtn.classList.add('active');
-            bBtn.classList.remove('active');
-            dmBar.classList.remove('hidden');
-            loadDMs();
-        }
-    }
-
-    function loadBroadcast() {
-        const msgs = JSON.parse(localStorage.getItem('pantheon_comms') || '[]');
-        const box = document.getElementById('comms-box');
-        
-        if (msgs.length === 0) {
-            box.innerHTML = '<div style="color: #607080;">No broadcast transmissions logged.</div>';
-            return;
-        }
-
-        box.innerHTML = msgs.map(m => `
-            <div class="msg-entry">
-                <span class="msg-sender">[${m.sender}]</span>
-                <span class="msg-time">${new Date(m.timestamp).toLocaleTimeString()}</span>
-                <div class="msg-body">${m.text}</div>
-            </div>
-        `).join('');
-
-        box.scrollTop = box.scrollHeight;
-    }
-
-    function loadDMs() {
-        const target = document.getElementById('dm-target').value;
-        const box = document.getElementById('comms-box');
-
-        if (!target) {
-            box.innerHTML = '<div style="color: #607080;">Register a second hero to test Telepathic Direct Messaging.</div>';
-            return;
-        }
-
-        const allDms = JSON.parse(localStorage.getItem('pantheon_dms') || '[]');
-        const thread = allDms.filter(m => 
-            (m.sender === activeCallsign && m.recipient === target) ||
-            (m.sender === target && m.recipient === activeCallsign)
-        );
-
-        if (thread.length === 0) {
-            box.innerHTML = `<div style="color: #607080;">Encrypted channel open with [${target}]. No signals exchanged yet.</div>`;
-            return;
-        }
-
-        box.innerHTML = thread.map(m => `
-            <div class="msg-entry">
-                <span class="msg-sender ${m.sender === activeCallsign ? 'dm-me' : ''}">[${m.sender} -> ${m.recipient}]</span>
-                <span class="msg-time">${new Date(m.timestamp).toLocaleTimeString()}</span>
-                <div class="msg-body">${m.text}</div>
-            </div>
-        `).join('');
-
-        box.scrollTop = box.scrollHeight;
-    }
-
-    function postMessage(e) {
-        e.preventDefault();
-        const input = document.getElementById('msg-input');
-        const text = input.value.trim();
-        if (!text) return;
-
-        if (currentMode === 'broadcast') {
-            const msgs = JSON.parse(localStorage.getItem('pantheon_comms') || '[]');
-            msgs.push({
-                sender: activeCallsign,
-                text: text,
-                timestamp: new Date().toISOString()
-            });
-            localStorage.setItem('pantheon_comms', JSON.stringify(msgs));
-            loadBroadcast();
-        } else {
-            const target = document.getElementById('dm-target').value;
-            if (!target) return;
-
-            const allDms = JSON.parse(localStorage.getItem('pantheon_dms') || '[]');
-            allDms.push({
-                sender: activeCallsign,
-                recipient: target,
-                text: text,
-                timestamp: new Date().toISOString()
-            });
-            localStorage.setItem('pantheon_dms', JSON.stringify(allDms));
-            loadDMs();
-        }
-
-        input.value = '';
-    }
-
-    function uploadMedia(e) {
-        e.preventDefault();
-        const title = document.getElementById('media-title').value.trim();
         const fileInput = document.getElementById('media-file');
-        const privacy = document.getElementById('media-privacy').value;
-        const targetUser = document.getElementById('media-target-user').value;
 
         if (!fileInput.files || !fileInput.files[0]) return;
 
         const reader = new FileReader();
         reader.onload = function(evt) {
-            const mediaData = evt.target.result;
-            const allMedia = JSON.parse(localStorage.getItem('pantheon_media') || '[]');
-
-            allMedia.push({
+            const mediaData = {
                 id: 'media_' + Date.now(),
-                owner: activeCallsign,
+                owner: currentCallsign,
                 title: title,
-                data: mediaData,
-                privacy: privacy, // 'private', 'restricted', 'public'
-                targetUser: privacy === 'restricted' ? targetUser : null,
+                privacy: privacy,
+                data: evt.target.result,
                 timestamp: new Date().toISOString()
-            });
+            };
 
+            const allMedia = JSON.parse(localStorage.getItem('pantheon_media') || '[]');
+            allMedia.push(mediaData);
             localStorage.setItem('pantheon_media', JSON.stringify(allMedia));
+
+            const status = document.getElementById('media-status');
+            status.style.display = 'block';
+            setTimeout(() => { status.style.display = 'none'; }, 2500);
+
             document.getElementById('media-title').value = '';
             fileInput.value = '';
-            loadMediaGallery();
+            renderUserAssets();
         };
 
         reader.readAsDataURL(fileInput.files[0]);
     }
 
-    function loadMediaGallery() {
-        const gallery = document.getElementById('media-gallery');
-        const allMedia = JSON.parse(localStorage.getItem('pantheon_media') || '[]');
+    function renderUserAssets() {
+        // Render Personal OCs
+        const ocBox = document.getElementById('user-oc-list');
+        const allOcs = JSON.parse(localStorage.getItem('pantheon_user_oc') || '[]');
+        const myOcs = allOcs.filter(o => o.owner === currentCallsign);
 
-        const visibleMedia = allMedia.filter(item => {
-            if (item.owner === activeCallsign) return true;
-            if (item.privacy === 'public') return true;
-            if (item.privacy === 'restricted' && item.targetUser === activeCallsign) return true;
-            return false;
-        });
-
-        if (visibleMedia.length === 0) {
-            gallery.innerHTML = '<div style="color:#607080; grid-column:span 2;">No show assets found in capsule vault. Upload an image above to test.</div>';
-            return;
+        if (myOcs.length === 0) {
+            ocBox.innerHTML = '<div style="color:#607080; font-size:0.75rem;">No personal OCs created yet.</div>';
+        } else {
+            ocBox.innerHTML = myOcs.map(oc => `
+                <div class="asset-box">
+                    <div class="asset-title">${oc.name.toUpperCase()}</div>
+                    <div style="font-size:0.7rem; color:var(--db-ki); margin-top:2px;">${oc.race} // POWER: ${oc.power}</div>
+                    <div style="font-size:0.7rem; color:#8a9ba8; margin-top:4px;">Skills: ${oc.skills}</div>
+                    <div class="asset-meta">
+                        <span>Created: ${new Date(oc.timestamp).toLocaleDateString()}</span>
+                        <button class="btn-del" onclick="deleteOc('${oc.id}')">[DELETE]</button>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        gallery.innerHTML = visibleMedia.map(item => {
-            let badgeClass = 'badge-private';
-            let badgeText = 'CLASSIFIED CAPSULE';
+        // Render Uploaded Media
+        const mediaBox = document.getElementById('user-media-list');
+        const allMedia = JSON.parse(localStorage.getItem('pantheon_media') || '[]');
+        const myMedia = allMedia.filter(m => m.owner === currentCallsign);
 
-            if (item.privacy === 'public') {
-                badgeClass = 'badge-public';
-                badgeText = 'PUBLIC SHOWCASE';
-            } else if (item.privacy === 'restricted') {
-                badgeClass = 'badge-restricted';
-                badgeText = `RESTRICTED -> ${item.targetUser}`;
-            }
-
-            return `
-                <div class="media-item">
-                    <img src="${item.data}" alt="${item.title}">
-                    <div class="media-title">${item.title}</div>
-                    <span class="media-badge ${badgeClass}">${badgeText}</span>
-                    <div style="font-size:0.65rem; color:#607080; margin-top:4px;">BY: [${item.owner}]</div>
+        if (myMedia.length === 0) {
+            mediaBox.innerHTML = '<div style="color:#607080; font-size:0.75rem;">No media assets transmitted yet.</div>';
+        } else {
+            mediaBox.innerHTML = myMedia.map(m => `
+                <div class="asset-box">
+                    <img src="${m.data}" alt="${m.title}">
+                    <div class="asset-title">${m.title}</div>
+                    <div class="asset-meta">
+                        <span style="color:${m.privacy === 'public' ? 'var(--db-ki)' : 'var(--db-gold)'};">[${m.privacy.toUpperCase()}]</span>
+                        <button class="btn-del" onclick="deleteMedia('${m.id}')">[DELETE]</button>
+                    </div>
                 </div>
-            `;
-        }).join('');
+            `).join('');
+        }
     }
 
-    function logout() {
-        localStorage.removeItem('pantheon_active_session');
-        window.location.href = 'login.html';
+    function deleteOc(id) {
+        let allOcs = JSON.parse(localStorage.getItem('pantheon_user_oc') || '[]');
+        allOcs = allOcs.filter(o => o.id !== id);
+        localStorage.setItem('pantheon_user_oc', JSON.stringify(allOcs));
+        renderUserAssets();
     }
 
-    loadProfile();
+    function deleteMedia(id) {
+        let allMedia = JSON.parse(localStorage.getItem('pantheon_media') || '[]');
+        allMedia = allMedia.filter(m => m.id !== id);
+        localStorage.setItem('pantheon_media', JSON.stringify(allMedia));
+        renderUserAssets();
+    }
+
+    checkMaintenanceGate();
+    loadUserProfile();
 </script>
 
 </body>
