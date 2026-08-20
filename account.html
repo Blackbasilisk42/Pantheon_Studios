@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PANTHEON STUDIOS // ACCOUNT MANAGEMENT</title>
+    <style>
+        :root {
+            --bg-void: #060913;
+            --db-gold: #ffb700;
+            --db-orange: #ff5500;
+            --db-cyan: #00e5ff;
+            --db-ki: #00ff88;
+            --db-red: #ff3333;
+            --panel-bg: rgba(12, 18, 32, 0.95);
+            --font-mono: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            background-color: var(--bg-void);
+            color: var(--db-cyan);
+            font-family: var(--font-mono);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 50% 30%, rgba(255, 183, 0, 0.08) 0%, transparent 70%),
+                linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 4px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* NAV HEADER */
+        .nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0 25px 0;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .nav-brand {
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: #00ff88;
+            letter-spacing: 2px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 18px;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            color: #c0daf0;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: bold;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .nav-menu a.active, .nav-menu a:hover {
+            color: var(--db-gold);
+        }
+
+        /* DASHBOARD BANNER */
+        .session-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--db-cyan);
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
+        }
+
+        .user-identity {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            border: 2px solid var(--db-ki);
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: #fff;
+        }
+
+        .btn-view-profile {
+            background: var(--db-gold);
+            color: #000;
+            border: none;
+            padding: 10px 16px;
+            font-family: var(--font-mono);
+            font-weight: 900;
+            font-size: 0.8rem;
+            cursor: pointer;
+            letter-spacing: 1px;
+            text-decoration: none;
+        }
+
+        .logout-btn {
+            background: rgba(255, 51, 51, 0.15);
+            border: 1px solid var(--db-red);
+            color: var(--db-red);
+            padding: 10px 14px;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* WORKSPACE GRID */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: var(--panel-bg);
+            border: 1px solid var(--db-gold);
+            padding: 22px;
+            clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
+        }
+
+        .card-title {
+            font-size: 0.9rem;
+            color: var(--db-gold);
+            border-bottom: 1px dashed rgba(255, 183, 0, 0.4);
+            padding-bottom: 8px;
+            margin-bottom: 18px;
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.75rem;
+            color: #8a9ba8;
+            margin-bottom: 6px;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            background: rgba(6, 9, 19, 0.9);
+            border: 1px solid rgba(0, 229, 255, 0.4);
+            color: #ffffff;
+            padding: 9px 12px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .slider-row label {
+            width: 110px;
+            font-size: 0.7rem;
+            color: #8a9ba8;
+        }
+
+        .slider-row input[type="range"] {
+            flex: 1;
+            accent-color: var(--db-ki);
+        }
+
+        .btn-save {
+            width: 100%;
+            background: var(--db-ki);
+            color: #000;
+            border: none;
+            padding: 12px;
+            font-family: var(--font-mono);
+            font-weight: 900;
+            font-size: 0.8rem;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="nav-header">
+        <div class="nav-brand">PANTHEON STUDIOS // USER DASHBOARD</div>
+        <div class="nav-menu">
+            <a href="index.html">HUB</a>
+            <a href="dossier.html">ROSTER</a>
+            <a href="builder.html">SHOW BUILDER</a>
+            <a href="account.html" class="active">ACCOUNT WORKSPACE</a>
+        </div>
+    </div>
+
+    <!-- USER SESSION BANNER -->
+    <div class="session-card">
+        <div class="user-identity">
+            <div class="user-avatar" id="user-avatar">?</div>
+            <div>
+                <div style="font-size:1.1rem; font-weight:900; color:#fff;" id="user-callsign">LOADING...</div>
+                <div style="font-size:0.75rem; color:var(--db-gold);">COMMUNITY MEMBER MANAGEMENT</div>
+            </div>
+        </div>
+        <div style="display:flex; gap:10px;">
+            <a id="btn-public-link" class="btn-view-profile" href="#">VIEW MY PUBLIC PROFILE ↗</a>
+            <button class="logout-btn" onclick="logout()">LOGOUT</button>
+        </div>
+    </div>
+
+    <div class="grid">
+        <!-- EDIT PUBLIC OC FORM -->
+        <div class="card">
+            <div class="card-title">EDIT PUBLIC OC SHOWCASE</div>
+            <form id="oc-form" oninput="updateSliders()">
+                <div class="form-group">
+                    <label class="form-label">OC CALLSIGN / NAME</label>
+                    <input type="text" id="oc-name" class="form-input" placeholder="e.g., SHADOW_STRIKER" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">RACE / SPECIES</label>
+                    <select id="oc-race" class="form-select">
+                        <option value="Saiyan">Saiyan</option>
+                        <option value="Frieza Race">Frieza Race</option>
+                        <option value="Earthling">Earthling</option>
+                        <option value="Majin">Majin</option>
+                        <option value="Namekian">Namekian</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">POWER LEVEL RATING</label>
+                    <input type="text" id="oc-power" class="form-input" placeholder="5,400,000">
+                </div>
+
+                <div class="slider-row"><label>HEALTH</label><input type="range" id="oc-hp" min="10" max="100" value="80"><span id="val-hp" style="color:var(--db-ki);">80</span></div>
+                <div class="slider-row"><label>KI SPECS</label><input type="range" id="oc-ki" min="10" max="100" value="85"><span id="val-ki" style="color:var(--db-ki);">85</span></div>
+                <div class="slider-row"><label>STAMINA</label><input type="range" id="oc-stm" min="10" max="100" value="75"><span id="val-stm" style="color:var(--db-ki);">75</span></div>
+
+                <div class="form-group" style="margin-top:10px;">
+                    <label class="form-label">EQUIPPED SKILLS</label>
+                    <input type="text" id="oc-skills" class="form-input" placeholder="Shadow Crusher, Sledgehammer">
+                </div>
+
+                <button type="button" class="btn-save" onclick="saveOC()">PUBLISH TO PUBLIC PROFILE</button>
+            </form>
+            <div id="save-msg" style="margin-top:10px; color:var(--db-ki); font-size:0.75rem; display:none; text-align:center; font-weight:bold;">✓ UPDATES PUBLISHED TO PUBLIC SHOWCASE</div>
+        </div>
+
+        <!-- UPLOAD PUBLIC MEDIA -->
+        <div class="card">
+            <div class="card-title">UPLOAD MEDIA TO PUBLIC PROFILE</div>
+            <form onsubmit="uploadMedia(event)">
+                <div class="form-group">
+                    <label class="form-label">CAPTION / MEDIA TITLE</label>
+                    <input type="text" id="media-title" class="form-input" placeholder="Custom Xenoverse Build Screen" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">IMAGE FILE</label>
+                    <input type="file" id="media-file" accept="image/*" class="form-input" style="padding:6px;" required>
+                </div>
+
+                <button type="submit" class="btn-save" style="background:var(--db-gold);">ATTACH TO PUBLIC PROFILE</button>
+            </form>
+            <div id="media-msg" style="margin-top:10px; color:var(--db-ki); font-size:0.75rem; display:none; text-align:center; font-weight:bold;">✓ MEDIA ATTACHED TO PUBLIC PROFILE</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const activeUser = localStorage.getItem('pantheon_active_session');
+
+    if (!activeUser) {
+        window.location.href = 'login.html';
+    }
+
+    function init() {
+        document.getElementById('user-callsign').innerText = activeUser.toUpperCase();
+        document.getElementById('user-avatar').innerText = activeUser.substring(0, 2).toUpperCase();
+        document.getElementById('btn-public-link').href = `profile.html?user=${encodeURIComponent(activeUser)}`;
+
+        // Load existing OC data if present
+        const accounts = JSON.parse(localStorage.getItem('pantheon_accounts') || '{}');
+        const userData = accounts[activeUser.toLowerCase()] || {};
+        if (userData.oc) {
+            document.getElementById('oc-name').value = userData.oc.name || '';
+            document.getElementById('oc-race').value = userData.oc.race || 'Saiyan';
+            document.getElementById('oc-power').value = userData.oc.power || '';
+            document.getElementById('oc-hp').value = userData.oc.hp || 80;
+            document.getElementById('oc-ki').value = userData.oc.ki || 85;
+            document.getElementById('oc-stm').value = userData.oc.stm || 75;
+            document.getElementById('oc-skills').value = userData.oc.skills || '';
+            updateSliders();
+        }
+    }
+
+    function updateSliders() {
+        document.getElementById('val-hp').innerText = document.getElementById('oc-hp').value;
+        document.getElementById('val-ki').innerText = document.getElementById('oc-ki').value;
+        document.getElementById('val-stm').innerText = document.getElementById('oc-stm').value;
+    }
+
+    function saveOC() {
+        let accounts = JSON.parse(localStorage.getItem('pantheon_accounts') || '{}');
+        const key = activeUser.toLowerCase();
+
+        if (!accounts[key]) accounts[key] = { callsign: activeUser };
+
+        accounts[key].oc = {
+            name: document.getElementById('oc-name').value,
+            race: document.getElementById('oc-race').value,
+            power: document.getElementById('oc-power').value,
+            hp: document.getElementById('oc-hp').value,
+            ki: document.getElementById('oc-ki').value,
+            stm: document.getElementById('oc-stm').value,
+            skills: document.getElementById('oc-skills').value
+        };
+
+        localStorage.setItem('pantheon_accounts', JSON.stringify(accounts));
+        
+        const msg = document.getElementById('save-msg');
+        msg.style.display = 'block';
+        setTimeout(() => { msg.style.display = 'none'; }, 2500);
+    }
+
+    function uploadMedia(e) {
+        e.preventDefault();
+        const title = document.getElementById('media-title').value;
+        const fileInput = document.getElementById('media-file');
+
+        if (!fileInput.files || !fileInput.files[0]) return;
+
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+            let accounts = JSON.parse(localStorage.getItem('pantheon_accounts') || '{}');
+            const key = activeUser.toLowerCase();
+
+            if (!accounts[key]) accounts[key] = { callsign: activeUser };
+            if (!accounts[key].media) accounts[key].media = [];
+
+            accounts[key].media.push({
+                title: title,
+                img: evt.target.result,
+                date: new Date().toLocaleDateString()
+            });
+
+            localStorage.setItem('pantheon_accounts', JSON.stringify(accounts));
+
+            document.getElementById('media-title').value = '';
+            fileInput.value = '';
+
+            const msg = document.getElementById('media-msg');
+            msg.style.display = 'block';
+            setTimeout(() => { msg.style.display = 'none'; }, 2500);
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+    }
+
+    function logout() {
+        localStorage.removeItem('pantheon_active_session');
+        window.location.href = 'login.html';
+    }
+
+    init();
+</script>
+
+</body>
+</html>
