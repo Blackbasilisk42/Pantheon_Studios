@@ -170,10 +170,9 @@
         <div class="nav-brand">PANTHEON STUDIOS // AUTH GATE</div>
         <div class="nav-menu">
             <a href="index.html">HUB</a>
-            <a href="login.html" class="active">LOGIN</a>
-            <a href="dossier.html">ROSTER</a>
-            <a href="builder.html">SHOW BUILDER</a>
-            <a href="profile.html">ACCOUNT</a>
+            <a href="login.html" class="active">LOGIN/SIGN UP</a>
+            <a href="archives.html">ARCHIVES</a>
+            <a href="community.html">COMMUNITY</a>
         </div>
     </div>
 
@@ -216,7 +215,7 @@
 <script>
     // Check if user is already logged in
     if (localStorage.getItem('pantheon_active_session')) {
-        window.location.href = 'profile.html';
+        window.location.href = 'account.html';
     }
 
     function switchTab(mode) {
@@ -267,10 +266,10 @@
         localStorage.setItem('pantheon_active_session', callsign);
 
         msg.style.color = 'var(--db-ki)';
-        msg.innerText = 'ACCOUNT CREATED. REDIRECTING TO PROFILE...';
+        msg.innerText = 'ACCOUNT CREATED. REDIRECTING TO ACCOUNT WORKSPACE...';
 
         setTimeout(() => {
-            window.location.href = 'profile.html';
+            window.location.href = 'account.html';
         }, 1200);
     }
 
@@ -293,10 +292,10 @@
         localStorage.setItem('pantheon_active_session', user.callsign);
 
         msg.style.color = 'var(--db-ki)';
-        msg.innerText = 'AUTHENTICATED. ACCESSING PROFILE...';
+        msg.innerText = 'AUTHENTICATED. ACCESSING WORKSPACE...';
 
         setTimeout(() => {
-            window.location.href = 'profile.html';
+            window.location.href = 'account.html';
         }, 1000);
     }
 </script>
