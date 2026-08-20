@@ -18,7 +18,6 @@
             --font-mono: 'Courier New', Courier, monospace;
         }
 
-        /* OBSIDIAN / SUPER SAIYAN OVERRIDE THEME */
         body.theme-obsidian {
             --db-gold: #ffea00;
             --db-cyan: #ff5500;
@@ -45,67 +44,128 @@
             margin: 0 auto;
         }
 
-        /* STUDIO HEADER BAR */
-        .top-bar {
+        /* MODERN HERO HEADER & NAV OVERHAUL */
+        .nav-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid var(--db-gold);
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 15px rgba(255, 183, 0, 0.2);
+            padding: 15px 0 25px 0;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+            margin-bottom: 30px;
         }
 
-        .sys-title {
-            font-size: 1.1rem;
-            color: var(--db-gold);
+        .nav-brand {
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: #00ff88;
             letter-spacing: 2px;
-            margin: 0;
+        }
+
+        .nav-menu {
             display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: bold;
-        }
-
-        .pulse-orb {
-            width: 12px;
-            height: 12px;
-            background: var(--db-gold);
-            border-radius: 50%;
-            box-shadow: 0 0 10px var(--db-gold);
-            animation: dbPulse 1.2s infinite alternate;
-        }
-
-        @keyframes dbPulse { 
-            0% { opacity: 0.4; transform: scale(0.9); } 
-            100% { opacity: 1; transform: scale(1.2); } 
-        }
-
-        .sys-meta {
-            font-size: 0.75rem;
-            color: #8a9ba8;
-            display: flex;
-            gap: 12px;
+            gap: 18px;
             align-items: center;
         }
 
-        .audio-btn, .nav-btn {
-            background: rgba(0, 229, 255, 0.1);
-            border: 1px solid var(--db-cyan);
-            color: var(--db-cyan);
-            padding: 4px 10px;
-            font-family: var(--font-mono);
-            font-size: 0.7rem;
-            cursor: pointer;
+        .nav-menu a {
+            color: #c0daf0;
             text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: bold;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
-            transition: all 0.2s ease;
+            transition: color 0.2s ease;
         }
 
-        .audio-btn:hover, .nav-btn:hover {
-            background: var(--db-cyan);
-            color: #000;
-            box-shadow: 0 0 10px var(--db-cyan);
+        .nav-menu a:hover, .nav-menu a.active {
+            color: var(--db-gold);
+        }
+
+        /* HERO BANNER SECTION */
+        .hero-section {
+            margin-bottom: 35px;
+        }
+
+        .hero-title {
+            font-size: 2.8rem;
+            font-weight: 900;
+            color: #00ff88;
+            letter-spacing: 3px;
+            margin: 0 0 12px 0;
+            text-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .hero-desc {
+            color: #8a9ba8;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            max-width: 600px;
+            margin-bottom: 25px;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .btn-hero-green {
+            background: #00ff88;
+            color: #000000;
+            padding: 10px 20px;
+            font-weight: 900;
+            font-size: 0.8rem;
+            text-decoration: none;
+            letter-spacing: 1.5px;
+            border: none;
+            clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+        }
+
+        .btn-hero-gold {
+            background: rgba(6, 9, 19, 0.8);
+            color: #ffb700;
+            border: 1px solid #ffb700;
+            padding: 10px 20px;
+            font-weight: 900;
+            font-size: 0.8rem;
+            text-decoration: none;
+            letter-spacing: 1.5px;
+            clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+        }
+
+        /* STAT METRIC CARDS */
+        .stat-box-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .stat-box {
+            background: rgba(12, 18, 32, 0.85);
+            padding: 18px;
+            border-radius: 4px;
+        }
+
+        .stat-box.green { border: 1px solid rgba(0, 255, 136, 0.3); }
+        .stat-box.gold { border: 1px solid rgba(255, 183, 0, 0.3); }
+        .stat-box.pink { border: 1px solid rgba(255, 51, 102, 0.3); }
+
+        .stat-lbl {
+            font-size: 0.68rem;
+            font-weight: bold;
+            letter-spacing: 1.5px;
+            margin-bottom: 8px;
+        }
+
+        .stat-box.green .stat-lbl { color: #00ff88; }
+        .stat-box.gold .stat-lbl { color: #ffb700; }
+        .stat-box.pink .stat-lbl { color: #ff3366; }
+
+        .stat-val {
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: #ffffff;
+            letter-spacing: 2px;
         }
 
         /* CONTROL BAR & FILTERS */
@@ -149,7 +209,7 @@
             text-transform: uppercase;
         }
 
-        /* TOP HUD GRID (DRAGON RADAR & SAGA TIMELINE) */
+        /* HUD GRID */
         .hud-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -175,7 +235,7 @@
             font-weight: bold;
         }
 
-        /* DRAGON RADAR SIMULATOR */
+        /* DRAGON RADAR */
         .radar-box {
             width: 100%;
             height: 180px;
@@ -319,7 +379,7 @@
             font-weight: bold;
         }
 
-        /* XENOVERSE ATTRIBUTE BARS */
+        /* ATTRIBUTE BARS */
         .skill-group {
             display: flex;
             flex-direction: column;
@@ -465,7 +525,7 @@
             background: linear-gradient(to top, var(--db-gold), var(--db-orange));
         }
 
-        /* COMMUNITY TRANSMISSION LOGS */
+        /* COMMUNITY LOGS */
         .terminal-card {
             background: var(--panel-bg);
             border: 1px solid var(--db-cyan);
@@ -515,7 +575,7 @@
             text-transform: uppercase;
         }
 
-        /* PUBLIC MEDIA & LORE FEEDBACK */
+        /* PUBLIC FEED */
         .feed-card {
             background: var(--panel-bg);
             border: 1px solid var(--db-gold);
@@ -540,7 +600,7 @@
             padding: 12px;
         }
 
-        /* MAINTENANCE LOCKOUT OVERLAY STYLES */
+        /* MAINTENANCE LOCKOUT OVERLAY */
         #maintenance-overlay {
             position: fixed;
             top: 0;
@@ -645,22 +705,46 @@
 </div>
 
 <div class="container">
-    <!-- STUDIO HEADER -->
-    <div class="top-bar">
-        <div class="sys-title" id="site-title-banner">
-            <div class="pulse-orb"></div>
-            PANTHEON STUDIOS // HERO & SHOW HUB
+    <!-- NAV HEADER -->
+    <div class="nav-header">
+        <div class="nav-brand">PANTHEON STUDIOS</div>
+        <div class="nav-menu">
+            <a href="index.html" class="active">HUB</a>
+            <a href="login.html">LOGIN</a>
+            <a href="dossier.html">ROSTER</a>
+            <a href="dossier.html">ARCHIVES</a>
+            <a href="builder.html">CHARACTER BUILDER</a>
+            <a href="profile.html">MEDIA</a>
+            <a href="admin.html">COMMUNITY</a>
         </div>
-        <div class="sys-meta">
-            <span>TIME_NEST: <strong id="clock" style="color:#fff;">--:--:-- UTC</strong></span>
-            <span>NET_LINK: <strong style="color:var(--db-ki);">ONLINE</strong></span>
-            <span>ACTIVE_HEROES: 08</span>
-            <button class="audio-btn" onclick="toggleAudio()">[AUDIO: OFF]</button>
-            <a href="dossier.html" class="nav-btn">[HERO_WIKI]</a>
-            <a href="builder.html" class="nav-btn" style="border-color: var(--db-gold); color: var(--db-gold);">[HERO_BUILDER]</a>
-            <a href="profile.html" class="nav-btn">[MY_PROFILE]</a>
-            <a href="login.html" class="nav-btn">[LOGIN_GATE]</a>
-            <a href="admin.html" class="nav-btn" style="border-color: var(--db-gold); color: var(--db-gold);">[STUDIO_ADMIN]</a>
+    </div>
+
+    <!-- HERO BANNER -->
+    <div class="hero-section">
+        <h1 class="hero-title">DRAGONBALL LEGACY REBORN</h1>
+        <div class="hero-desc">
+            Explore Xenoverse roster archives, examine Ki & Strike combat specs, and build custom character dossiers.
+        </div>
+        
+        <div class="hero-actions">
+            <a href="builder.html" class="btn-hero-green">OPEN CHARACTER BUILDER</a>
+            <a href="dossier.html" class="btn-hero-gold">VIEW ROSTER ARCHIVES</a>
+        </div>
+
+        <!-- STAT METRICS -->
+        <div class="stat-box-grid">
+            <div class="stat-box green">
+                <div class="stat-lbl">TOTAL ROSTER COUNT</div>
+                <div class="stat-val">006 // ACTIVE</div>
+            </div>
+            <div class="stat-box gold">
+                <div class="stat-lbl">MAX POWER RECORDED</div>
+                <div class="stat-val">9,240,000</div>
+            </div>
+            <div class="stat-box pink">
+                <div class="stat-lbl">ACTIVE COMBAT TEAMS</div>
+                <div class="stat-val">03 // DEPLOYED</div>
+            </div>
         </div>
     </div>
 
@@ -879,7 +963,7 @@
     const activeCallsign = localStorage.getItem('pantheon_active_session') || 'GUEST_FAN';
 
     // MAINTENANCE GATE CHECK LOGIC
-    const DEV_PASSCODE = '@jimbo21'; // Passkey to bypass maintenance overlay
+    const DEV_PASSCODE = '@jimbo21';
 
     function checkMaintenanceGate() {
         const urlParams = new URLSearchParams(window.location.search);
@@ -907,14 +991,6 @@
         }
     }
 
-    // Live Clock
-    function updateClock() {
-        const now = new Date();
-        document.getElementById('clock').innerText = now.toISOString().substring(11, 19) + ' UTC';
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
-
     // Theme Switcher Toggle
     function toggleTheme() {
         const body = document.body;
@@ -928,13 +1004,6 @@
             body.classList.add('theme-spectral');
             btn.innerText = '[MODE: KAI-ENERGY]';
         }
-    }
-
-    // Audio Toggle Mock
-    let audioState = false;
-    function toggleAudio() {
-        audioState = !audioState;
-        document.querySelector('.audio-btn').innerText = audioState ? '[AUDIO: ON]' : '[AUDIO: OFF]';
     }
 
     // Filter Hero Roster Cards
@@ -1052,11 +1121,6 @@
         if (cfg.primaryColor) document.documentElement.style.setProperty('--db-cyan', cfg.primaryColor);
         if (cfg.accentColor) document.documentElement.style.setProperty('--db-gold', cfg.accentColor);
         if (cfg.bgColor) document.documentElement.style.setProperty('--bg-void', cfg.bgColor);
-        
-        if (cfg.siteTitle) {
-            const banner = document.getElementById('site-title-banner');
-            if (banner) banner.innerHTML = `<div class="pulse-orb"></div> ${cfg.siteTitle}`;
-        }
 
         if (cfg.modules) {
             const radar = document.getElementById('mod-radar-card');

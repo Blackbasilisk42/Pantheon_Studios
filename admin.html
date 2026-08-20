@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PANTHEON STUDIOS // TIME NEST CONTROL ROOM</title>
+    <title>PANTHEON STUDIOS // DIRECTOR ADMIN DASHBOARD</title>
     <style>
         :root {
             --bg-void: #060913;
@@ -14,7 +14,7 @@
             --db-purple: #a100ff;
             --db-red: #ff3333;
             --panel-bg: rgba(12, 18, 32, 0.92);
-            --scouter-glow: 0 0 15px rgba(255, 183, 0, 0.35);
+            --scouter-glow: 0 0 12px rgba(255, 183, 0, 0.35);
             --font-mono: 'Courier New', Courier, monospace;
         }
 
@@ -36,624 +36,389 @@
             margin: 0 auto;
         }
 
-        /* STUDIO HEADER BAR */
-        .top-bar {
+        /* NAV HEADER */
+        .nav-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid var(--db-gold);
-            padding-bottom: 12px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 15px rgba(255, 183, 0, 0.2);
+            padding: 15px 0 25px 0;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+            margin-bottom: 30px;
         }
 
-        .sys-title {
-            font-size: 1.1rem;
-            color: var(--db-gold);
+        .nav-brand {
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: #00ff88;
             letter-spacing: 2px;
-            margin: 0;
+        }
+
+        .nav-menu {
             display: flex;
+            gap: 18px;
             align-items: center;
-            gap: 10px;
-            font-weight: bold;
         }
 
-        .pulse-orb {
-            width: 12px;
-            height: 12px;
-            background: var(--db-red);
-            border-radius: 50%;
-            box-shadow: 0 0 10px var(--db-red);
-            animation: warningPulse 1s infinite alternate;
-        }
-
-        @keyframes warningPulse { 
-            0% { opacity: 0.3; transform: scale(0.9); } 
-            100% { opacity: 1; transform: scale(1.2); } 
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 10px;
-        }
-
-        .nav-btn {
-            background: rgba(0, 229, 255, 0.1);
-            border: 1px solid var(--db-cyan);
-            color: var(--db-cyan);
-            padding: 6px 12px;
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
+        .nav-menu a {
+            color: #c0daf0;
             text-decoration: none;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .nav-btn:hover {
-            background: var(--db-cyan);
-            color: #000;
-            box-shadow: 0 0 10px var(--db-cyan);
-        }
-
-        .btn-danger-nav {
-            background: rgba(255, 51, 51, 0.2);
-            border: 1px solid var(--db-red);
-            color: var(--db-red);
-        }
-
-        .btn-danger-nav:hover {
-            background: var(--db-red);
-            color: #ffffff;
-            box-shadow: 0 0 12px var(--db-red);
-        }
-
-        /* LOGIN GATE CARD */
-        .auth-card {
-            max-width: 450px;
-            margin: 80px auto;
-            background: var(--panel-bg);
-            border: 2px solid var(--db-gold);
-            box-shadow: var(--scouter-glow);
-            padding: 30px;
-            clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
-        }
-
-        .auth-header {
-            font-size: 1rem;
-            color: var(--db-gold);
-            border-bottom: 1px dashed var(--db-gold);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-            letter-spacing: 1.5px;
-            text-align: center;
-            font-weight: bold;
-        }
-
-        /* SUB TABS */
-        .admin-tabs {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 25px;
-        }
-
-        .admin-tab-btn {
-            background: rgba(12, 18, 32, 0.8);
-            border: 1px solid rgba(255, 183, 0, 0.4);
-            color: #8a9ba8;
-            padding: 10px 18px;
-            font-family: var(--font-mono);
             font-size: 0.8rem;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 1px;
             font-weight: bold;
-            transition: all 0.2s ease;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            transition: color 0.2s ease;
         }
 
-        .admin-tab-btn.active {
-            background: rgba(255, 183, 0, 0.2);
-            border-color: var(--db-gold);
-            color: #ffffff;
-            box-shadow: 0 0 10px rgba(255, 183, 0, 0.4);
+        .nav-menu a:hover, .nav-menu a.active {
+            color: var(--db-gold);
         }
 
-        /* CARDS & PANELS */
-        .card {
+        /* ADMIN GRID LAYOUT */
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .admin-card {
             background: var(--panel-bg);
             border: 1px solid var(--db-gold);
             box-shadow: var(--scouter-glow);
-            padding: 20px;
-            margin-bottom: 25px;
+            padding: 22px;
             clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
         }
 
+        .admin-card.full-width {
+            grid-column: span 2;
+        }
+
         .card-header {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: var(--db-gold);
             border-bottom: 1px dashed rgba(255, 183, 0, 0.4);
             padding-bottom: 8px;
             margin-bottom: 18px;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             font-weight: bold;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
-        }
-
-        /* LOCKDOWN CONTROLS */
-        .killswitch-box {
-            background: rgba(20, 5, 10, 0.9);
-            border: 2px solid var(--db-red);
-            padding: 20px;
-            box-shadow: inset 0 0 15px rgba(255, 51, 51, 0.2);
-        }
-
-        .btn-killswitch {
-            width: 100%;
-            background: var(--db-red);
-            color: #ffffff;
-            border: none;
-            padding: 14px;
-            font-family: var(--font-mono);
-            font-weight: bold;
-            font-size: 0.85rem;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            box-shadow: 0 0 15px rgba(255, 51, 51, 0.6);
-            margin-top: 10px;
-        }
-
-        .btn-killswitch:hover {
-            background: #ff0000;
-            box-shadow: 0 0 25px rgba(255, 0, 0, 0.9);
-        }
-
-        .btn-purge {
-            background: rgba(255, 183, 0, 0.15);
-            border: 1px solid var(--db-gold);
-            color: var(--db-gold);
-            padding: 8px 12px;
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            cursor: pointer;
-            text-transform: uppercase;
-            width: 100%;
-            margin-top: 8px;
-            font-weight: bold;
-        }
-
-        .btn-purge:hover {
-            background: var(--db-gold);
-            color: #000000;
-        }
-
-        /* HERO TABLE */
-        .user-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.8rem;
-        }
-
-        .user-table th, .user-table td {
-            border: 1px solid rgba(0, 229, 255, 0.2);
-            padding: 10px;
-            text-align: left;
-        }
-
-        .user-table th {
-            background: rgba(0, 229, 255, 0.1);
-            color: var(--db-ki);
-        }
-
-        .action-btn-danger {
-            background: rgba(255, 51, 51, 0.2);
-            border: 1px solid var(--db-red);
-            color: var(--db-red);
-            padding: 4px 8px;
-            cursor: pointer;
-            font-family: var(--font-mono);
-            font-size: 0.7rem;
-            font-weight: bold;
-        }
-
-        .action-btn-danger:hover {
-            background: var(--db-red);
-            color: #ffffff;
-        }
-
-        /* SITE BUILDER & THEME FORM */
-        .form-row {
+        /* TOGGLE MODULE CONTROL */
+        .toggle-row {
             display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-bottom: 14px;
-        }
-
-        .form-row label {
-            font-size: 0.75rem;
-            color: var(--db-cyan);
-            text-transform: uppercase;
-            font-weight: bold;
-        }
-
-        .form-input, select, textarea {
-            background: rgba(6, 9, 19, 0.95);
-            border: 1px solid rgba(0, 229, 255, 0.4);
-            color: #ffffff;
-            padding: 8px 10px;
-            font-family: var(--font-mono);
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px dotted rgba(0, 229, 255, 0.2);
             font-size: 0.8rem;
-            outline: none;
-            width: 100%;
-            box-sizing: border-box;
         }
 
-        .form-input:focus, textarea:focus {
+        .toggle-label {
+            color: #d0e0f0;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 22px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255, 51, 51, 0.3);
+            border: 1px solid var(--db-red);
+            transition: .3s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: #ffffff;
+            transition: .3s;
+        }
+
+        input:checked + .slider {
+            background-color: rgba(0, 255, 136, 0.3);
             border-color: var(--db-ki);
         }
 
-        .toggle-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-top: 10px;
+        input:checked + .slider:before {
+            transform: translateX(22px);
+            background-color: var(--db-ki);
         }
 
-        .toggle-item {
-            background: rgba(6, 9, 19, 0.8);
-            border: 1px solid rgba(0, 229, 255, 0.3);
-            padding: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        /* FORM CONTROLS */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
             font-size: 0.75rem;
-            font-weight: bold;
+            color: #8a9ba8;
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
-        .btn-save-builder {
-            background: var(--db-ki);
-            color: #000000;
+        .form-input, .form-textarea {
+            width: 100%;
+            background: rgba(6, 9, 19, 0.9);
+            border: 1px solid rgba(0, 229, 255, 0.4);
+            color: #ffffff;
+            padding: 9px 12px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .form-input:focus, .form-textarea:focus {
+            border-color: var(--db-gold);
+            box-shadow: 0 0 8px rgba(255, 183, 0, 0.3);
+        }
+
+        /* BUTTONS */
+        .btn-action {
+            background: var(--db-gold);
+            color: #000;
             border: none;
-            padding: 12px;
+            padding: 10px 18px;
             font-family: var(--font-mono);
             font-weight: bold;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             cursor: pointer;
+            letter-spacing: 1px;
             text-transform: uppercase;
-            width: 100%;
-            margin-top: 15px;
         }
 
-        .btn-save-builder:hover {
-            box-shadow: 0 0 15px rgba(0, 255, 136, 0.6);
+        .btn-danger {
+            background: rgba(255, 51, 51, 0.2);
+            border: 1px solid var(--db-red);
+            color: var(--db-red);
+            padding: 8px 14px;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: bold;
+            cursor: pointer;
         }
 
-        .hidden { 
-            display: none !important; 
+        /* SYSTEM LOG CONSOLE */
+        .sys-console {
+            height: 160px;
+            background: rgba(6, 9, 19, 0.95);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            padding: 12px;
+            font-size: 0.75rem;
+            line-height: 1.6;
+            overflow-y: auto;
+            color: var(--db-ki);
+        }
+
+        /* DIRECTOR AUTH OVERLAY */
+        #admin-auth-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #060913;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(255, 183, 0, 0.12) 0%, transparent 80%),
+                linear-gradient(rgba(0, 229, 255, 0.04) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 4px;
+            z-index: 99999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .auth-card {
+            background: rgba(12, 18, 32, 0.96);
+            border: 2px solid var(--db-gold);
+            box-shadow: 0 0 25px rgba(255, 183, 0, 0.4);
+            width: 440px;
+            padding: 30px;
+            text-align: center;
+            clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <!-- TOP HEADER -->
-    <div class="top-bar">
-        <div class="sys-title">
-            <div class="pulse-orb"></div>
-            PANTHEON STUDIOS // TIME NEST CONTROL ROOM
-        </div>
-        <div class="nav-links">
-            <a href="index.html" class="nav-btn">[SHOWCASE_HUB]</a>
-            <a href="profile.html" class="nav-btn">[MY_PROFILE]</a>
-            <button class="nav-btn btn-danger-nav" id="lock-session-btn" onclick="lockAdminSession()">[LOCK_SESSION]</button>
-        </div>
-    </div>
-
-    <!-- SECURITY GATE // AUTH FORM -->
-    <div id="admin-auth-gate" class="auth-card">
-        <div class="auth-header">STUDIO DIRECTOR // TIME NEST ACCESS</div>
-        <p style="font-size: 0.75rem; color: #8a9ba8; text-align: center; margin-bottom: 20px;">
-            Enter director credentials to access studio layout & show parameters.
-        </p>
-        <form onsubmit="authenticateAdmin(event)">
-            <div class="form-row">
-                <label>Director Callsign / Name</label>
-                <input type="text" id="auth-username" class="form-input" placeholder="e.g. Kaige" required autocomplete="off">
-            </div>
-            <div class="form-row">
-                <label>Access Passkey</label>
-                <input type="password" id="auth-password" class="form-input" placeholder="••••••••••••" required>
-            </div>
-            <div id="auth-error" style="color: var(--db-red); font-size: 0.75rem; margin-bottom: 10px; display: none;">
-                [ERROR]: INVALID DIRECTOR PASSKEY.
-            </div>
-            <button type="submit" class="btn-killswitch" style="background: var(--db-gold); color: #000000; box-shadow: 0 0 10px var(--db-gold);">
-                ENTER TIME NEST
-            </button>
+<!-- DIRECTOR AUTHENTICATION GATE OVERLAY -->
+<div id="admin-auth-overlay">
+    <div class="auth-card">
+        <div style="color:var(--db-gold); font-size:1.1rem; font-weight:bold; letter-spacing:2px; margin-bottom:8px;">🔒 DIRECTOR ACCESS LOCK</div>
+        <div style="color:var(--db-ki); font-size:0.75rem; margin-bottom:20px; letter-spacing:1px;">STUDIO ADMIN & OVERRIDE CONTROLS</div>
+        <form onsubmit="authenticateDirector(event)">
+            <input type="password" id="director-key-input" placeholder="ENTER DIRECTOR PASSKEY..." required style="width:100%; background:#000; border:1px solid var(--db-gold); color:#fff; padding:10px; font-family:var(--font-mono); font-size:0.8rem; box-sizing:border-box; margin-bottom:15px; outline:none;">
+            <button type="submit" class="btn-action" style="width:100%;">AUTHENTICATE DIRECTOR</button>
         </form>
+        <div id="auth-error" style="color:var(--db-red); font-size:0.75rem; margin-top:12px; font-weight:bold;"></div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- NAV HEADER -->
+    <div class="nav-header">
+        <div class="nav-brand">PANTHEON STUDIOS // DIRECTOR SUITE</div>
+        <div class="nav-menu">
+            <a href="index.html">HUB</a>
+            <a href="login.html">LOGIN</a>
+            <a href="dossier.html">ROSTER</a>
+            <a href="dossier.html">ARCHIVES</a>
+            <a href="builder.html">CHARACTER BUILDER</a>
+            <a href="profile.html">MEDIA</a>
+            <a href="admin.html" class="active">COMMUNITY</a>
+        </div>
     </div>
 
-    <!-- MAIN ADMIN DASHBOARD (UNLOCKED AFTER AUTH) -->
-    <div id="admin-dashboard" class="hidden">
-        <!-- TABS -->
-        <div class="admin-tabs">
-            <button class="admin-tab-btn active" id="tab-security-btn" onclick="switchTab('security')">[STUDIO_LOCKDOWN_&_RESET]</button>
-            <button class="admin-tab-btn" id="tab-builder-btn" onclick="switchTab('builder')">[CAPSULE_CORP_THEME_STUDIO]</button>
-            <button class="admin-tab-btn" id="tab-users-btn" onclick="switchTab('users')">[STUDIO_HERO_ROSTER]</button>
-        </div>
+    <div class="admin-grid">
+        <!-- MODULE VISIBILITY CONTROLS -->
+        <div class="admin-card">
+            <div class="card-header">
+                <span>HUB MODULE TOGGLES</span>
+                <span style="font-size:0.7rem; color:var(--db-ki);">LIVE UPDATES</span>
+            </div>
 
-        <!-- TAB 1: LOCKDOWN & PURGE PROTOCOLS -->
-        <div id="tab-security">
-            <div class="grid-2">
-                <!-- LOCKDOWN CONTROL PANEL -->
-                <div class="card killswitch-box">
-                    <div class="card-header" style="color:var(--db-red); border-bottom-color:var(--db-red);">
-                        STUDIO LOCKDOWN // TIME NEST FREEZE
-                    </div>
-                    <p style="font-size:0.75rem; color:#d0e0f0; line-height:1.5;">
-                        Activating Studio Lockdown freezes public transmission feeds, community comments, and hero registration terminals across the site.
-                    </p>
+            <div class="toggle-row">
+                <span class="toggle-label">Dragon Radar Detection Node</span>
+                <label class="switch">
+                    <input type="checkbox" id="mod-radar" checked onchange="saveConfig()">
+                    <span class="slider"></span>
+                </label>
+            </div>
 
-                    <div style="margin: 15px 0;">
-                        <span style="font-size:0.75rem; color:#8a9ba8;">LOCKDOWN_STATUS:</span>
-                        <strong id="lockdown-state-indicator" style="color:var(--db-ki); margin-left:8px;">STUDIO_NORMAL</strong>
-                    </div>
+            <div class="toggle-row">
+                <span class="toggle-label">Saga Timeline Dispatch Matrix</span>
+                <label class="switch">
+                    <input type="checkbox" id="mod-lattice" checked onchange="saveConfig()">
+                    <span class="slider"></span>
+                </label>
+            </div>
 
-                    <button class="btn-killswitch" id="master-kill-btn" onclick="toggleMasterLockdown()">
-                        FREEZE TIME NEST OPERATIONS
-                    </button>
-                </div>
+            <div class="toggle-row">
+                <span class="toggle-label">Show Production Pipeline Showcase</span>
+                <label class="switch">
+                    <input type="checkbox" id="mod-showcase" checked onchange="saveConfig()">
+                    <span class="slider"></span>
+                </label>
+            </div>
 
-                <!-- TARGETED DATA PURGES -->
-                <div class="card">
-                    <div class="card-header">STUDIO ARCHIVE PURGE PROTOCOLS</div>
-                    <p style="font-size:0.75rem; color:#8a9ba8;">Selectively clear local logs, community messages, or stored media assets.</p>
-
-                    <button class="btn-purge" onclick="purgeComms()">[PURGE_COMMUNITY_CHAT_LOGS]</button>
-                    <button class="btn-purge" onclick="purgeDMs()">[PURGE_HERO_DIRECT_MESSAGES]</button>
-                    <button class="btn-purge" onclick="purgeVault()">[WIPE_MEDIA_VAULT_ASSETS]</button>
-
-                    <div style="margin-top:20px; border-top:1px dashed var(--db-red); padding-top:12px;">
-                        <span style="font-size:0.75rem; color:var(--db-red); font-weight:bold;">TOTAL STUDIO RESET // SHENRON OVERRIDE</span>
-                        <button class="btn-killswitch" style="padding:8px; font-size:0.75rem; margin-top:8px;" onclick="nuclearReset()">
-                            WIPE ENTIRE STUDIO MEMORY
-                        </button>
-                    </div>
-                </div>
+            <div class="toggle-row">
+                <span class="toggle-label">Community Terminal Logs</span>
+                <label class="switch">
+                    <input type="checkbox" id="mod-logs" checked onchange="saveConfig()">
+                    <span class="slider"></span>
+                </label>
             </div>
         </div>
 
-        <!-- TAB 2: CAPSULE CORP THEME STUDIO & MODULE BUILDER -->
-        <div id="tab-builder" class="hidden">
-            <div class="grid-2">
-                <!-- THEME & STYLE TUNER -->
-                <div class="card">
-                    <div class="card-header">CAPSULE CORP // VISUAL THEME STUDIO</div>
-                    <form onsubmit="saveSiteConfig(event)">
-                        <div class="form-row">
-                            <label>Primary Scouter Accent Color</label>
-                            <input type="color" id="cfg-primary-color" value="#00e5ff" class="form-input" style="height:40px; padding:2px;">
-                        </div>
+        <!-- VISUAL STYLE OVERRIDES -->
+        <div class="admin-card">
+            <div class="card-header">THEME & COLOR OVERRIDES</div>
+            
+            <div class="form-group">
+                <label class="form-label">PRIMARY CYAN ACCENT COLOR</label>
+                <input type="text" id="cfg-primary" class="form-input" value="#00e5ff" onchange="saveConfig()">
+            </div>
 
-                        <div class="form-row">
-                            <label>Dragon Ball Gold Highlight</label>
-                            <input type="color" id="cfg-accent-color" value="#ffb700" class="form-input" style="height:40px; padding:2px;">
-                        </div>
+            <div class="form-group">
+                <label class="form-label">SECONDARY GOLD ACCENT COLOR</label>
+                <input type="text" id="cfg-accent" class="form-input" value="#ffb700" onchange="saveConfig()">
+            </div>
 
-                        <div class="form-row">
-                            <label>Background Void Shade</label>
-                            <input type="color" id="cfg-bg-color" value="#060913" class="form-input" style="height:40px; padding:2px;">
-                        </div>
-
-                        <div class="form-row">
-                            <label>Custom Studio Banner Title</label>
-                            <input type="text" id="cfg-site-title" class="form-input" placeholder="PANTHEON STUDIOS // HERO & SHOW HUB">
-                        </div>
-
-                        <button type="submit" class="btn-save-builder">APPLY VISUAL OVERRIDES</button>
-                    </form>
-                </div>
-
-                <!-- MODULE LAYOUT TOGGLE GRID & CUSTOM SCRIPT INJECTOR -->
-                <div class="card">
-                    <div class="card-header">HUB MODULES & CUSTOM KI SCRIPT INJECTOR</div>
-                    <div style="font-size:0.75rem; color:#8a9ba8; margin-bottom:10px;">Enable or disable UI blocks on the Showcase Hub:</div>
-
-                    <div class="toggle-grid">
-                        <div class="toggle-item">
-                            <span>DRAGON_RADAR</span>
-                            <input type="checkbox" id="mod-radar" checked>
-                        </div>
-                        <div class="toggle-item">
-                            <span>SAGA_TIMELINE</span>
-                            <input type="checkbox" id="mod-lattice" checked>
-                        </div>
-                        <div class="toggle-item">
-                            <span>SHOW_SHOWCASE</span>
-                            <input type="checkbox" id="mod-showcase" checked>
-                        </div>
-                        <div class="toggle-item">
-                            <span>COMMUNITY_CHAT</span>
-                            <input type="checkbox" id="mod-logs" checked>
-                        </div>
-                    </div>
-
-                    <div class="form-row" style="margin-top:15px;">
-                        <label style="color:var(--db-gold);">CUSTOM CSS / SCRIPT INJECTOR (ADVANCED)</label>
-                        <textarea id="cfg-custom-css" rows="4" placeholder="/* Inject custom CSS or third-party visual widgets directly */&#10;body { font-size: 14px; }"></textarea>
-                    </div>
-
-                    <button type="button" class="btn-save-builder" style="background:var(--db-cyan);" onclick="saveModulesAndScripts()">
-                        SAVE LAYOUT & SCRIPT OVERRIDES
-                    </button>
-                </div>
+            <div class="form-group">
+                <label class="form-label">BACKGROUND VOID COLOR</label>
+                <input type="text" id="cfg-bg" class="form-input" value="#060913" onchange="saveConfig()">
             </div>
         </div>
 
-        <!-- TAB 3: REGISTERED HERO ROSTER -->
-        <div id="tab-users" class="hidden">
-            <div class="card">
-                <div class="card-header">REGISTERED HERO ROSTER</div>
-                <table class="user-table">
-                    <thead>
-                        <tr>
-                            <th>CALLSIGN</th>
-                            <th>FIGHTING STYLE / ROLE</th>
-                            <th>HERO CLASS</th>
-                            <th>REGISTRATION DATE</th>
-                            <th>MANAGEMENT ACTIONS</th>
-                        </tr>
-                    </thead>
-                    <tbody id="user-roster-body">
-                        <!-- Dynamic rendering -->
-                    </tbody>
-                </table>
+        <!-- CUSTOM CSS INJECTION -->
+        <div class="admin-card full-width">
+            <div class="card-header">CUSTOM CSS STYLESHEET INJECTION</div>
+            <div class="form-group">
+                <label class="form-label">GLOBAL CSS OVERRIDE RULES</label>
+                <textarea id="cfg-custom-css" class="form-textarea" rows="4" placeholder="/* Enter custom CSS rules here to inject across all pages */" onchange="saveConfig()"></textarea>
+            </div>
+        </div>
+
+        <!-- LOCALSTORAGE DATA MANAGEMENT -->
+        <div class="admin-card full-width">
+            <div class="card-header">LOCAL REPOSITORY DATA MANAGEMENT</div>
+            
+            <div style="display:flex; gap:15px; flex-wrap:wrap;">
+                <button class="btn-danger" onclick="clearCustomHeroes()">CLEAR CUSTOM HEROES</button>
+                <button class="btn-danger" onclick="clearMediaUploads()">CLEAR MEDIA UPLOADS</button>
+                <button class="btn-danger" onclick="clearComments()">CLEAR COMMUNITY COMMENTS</button>
+                <button class="btn-danger" onclick="resetAllConfig()" style="background:var(--db-red); color:#000;">PURGE ENTIRE LOCAL STORAGE</button>
+            </div>
+        </div>
+
+        <!-- TELEMETRY & SYSTEM CONSOLE -->
+        <div class="admin-card full-width">
+            <div class="card-header">SYSTEM DIAGNOSTICS & TELEMETRY LOGS</div>
+            <div class="sys-console" id="sys-log">
+                [SYSTEM]: Admin telemetry online.<br>
+                [STORAGE]: Pantheon local repository synchronized.<br>
+                [AUTHENTICATION]: Director session validated via passkey.
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    // HARDCODED DIRECTOR CREDENTIALS
-    const ADMIN_USER = "Kaige";
-    const ADMIN_PASS = "@Sammyzzz3Jimbo21";
+    const DIRECTOR_PASSCODE = '@Sammyzzz3Jimbo21';
 
-    // AUTHENTICATION CHECK
-    function checkAdminAuth() {
-        const isAuthed = localStorage.getItem('pantheon_admin_auth') === 'true';
-        const gate = document.getElementById('admin-auth-gate');
-        const dash = document.getElementById('admin-dashboard');
-
-        if (isAuthed) {
-            gate.classList.add('hidden');
-            dash.classList.remove('hidden');
-            checkLockdownStatus();
-            loadSiteConfig();
+    function checkDirectorAuth() {
+        if (localStorage.getItem('pantheon_director_authenticated') === 'true') {
+            document.getElementById('admin-auth-overlay').style.display = 'none';
+            loadConfig();
         } else {
-            gate.classList.remove('hidden');
-            dash.classList.add('hidden');
+            document.getElementById('admin-auth-overlay').style.display = 'flex';
         }
     }
 
-    function authenticateAdmin(e) {
+    function authenticateDirector(e) {
         e.preventDefault();
-        const u = document.getElementById('auth-username').value.trim();
-        const p = document.getElementById('auth-password').value.trim();
-        const err = document.getElementById('auth-error');
-
-        if (u.toLowerCase() === ADMIN_USER.toLowerCase() && p === ADMIN_PASS) {
-            localStorage.setItem('pantheon_admin_auth', 'true');
-            err.style.display = 'none';
-            checkAdminAuth();
+        const inputKey = document.getElementById('director-key-input').value.trim();
+        if (inputKey === DIRECTOR_PASSCODE) {
+            localStorage.setItem('pantheon_director_authenticated', 'true');
+            document.getElementById('admin-auth-overlay').style.display = 'none';
+            logConsole("Director authorization granted.");
+            loadConfig();
         } else {
-            err.style.display = 'block';
+            document.getElementById('auth-error').innerText = 'ACCESS DENIED: INVALID DIRECTOR PASSKEY';
         }
     }
 
-    function lockAdminSession() {
-        localStorage.removeItem('pantheon_admin_auth');
-        checkAdminAuth();
+    function logConsole(msg) {
+        const consoleBox = document.getElementById('sys-log');
+        const timestamp = new Date().toLocaleTimeString();
+        consoleBox.innerHTML += `<br>[${timestamp}]: ${msg}`;
+        consoleBox.scrollTop = consoleBox.scrollHeight;
     }
 
-    // TAB SWITCHING
-    function switchTab(tabName) {
-        document.getElementById('tab-security').classList.add('hidden');
-        document.getElementById('tab-builder').classList.add('hidden');
-        document.getElementById('tab-users').classList.add('hidden');
-
-        document.getElementById('tab-security-btn').classList.remove('active');
-        document.getElementById('tab-builder-btn').classList.remove('active');
-        document.getElementById('tab-users-btn').classList.remove('active');
-
-        if (tabName === 'security') {
-            document.getElementById('tab-security').classList.remove('hidden');
-            document.getElementById('tab-security-btn').classList.add('active');
-        } else if (tabName === 'builder') {
-            document.getElementById('tab-builder').classList.remove('hidden');
-            document.getElementById('tab-builder-btn').classList.add('active');
-        } else if (tabName === 'users') {
-            document.getElementById('tab-users').classList.remove('hidden');
-            document.getElementById('tab-users-btn').classList.add('active');
-            renderUserRoster();
-        }
-    }
-
-    // LOCKDOWN CONTROLS
-    function checkLockdownStatus() {
-        const isLocked = localStorage.getItem('pantheon_lockdown') === 'true';
-        const indicator = document.getElementById('lockdown-state-indicator');
-        const btn = document.getElementById('master-kill-btn');
-
-        if (isLocked) {
-            indicator.innerText = 'LOCKDOWN_ENGAGED // OPERATIONS_FROZEN';
-            indicator.style.color = 'var(--db-red)';
-            btn.innerText = 'UNFREEZE TIME NEST OPERATIONS';
-            btn.style.background = 'var(--db-ki)';
-            btn.style.color = '#000000';
-        } else {
-            indicator.innerText = 'STUDIO_NORMAL';
-            indicator.style.color = 'var(--db-ki)';
-            btn.innerText = 'FREEZE TIME NEST OPERATIONS';
-            btn.style.background = 'var(--db-red)';
-            btn.style.color = '#ffffff';
-        }
-    }
-
-    function toggleMasterLockdown() {
-        const isLocked = localStorage.getItem('pantheon_lockdown') === 'true';
-        localStorage.setItem('pantheon_lockdown', !isLocked ? 'true' : 'false');
-        checkLockdownStatus();
-        alert(!isLocked ? 'TIME NEST OPERATIONS FROZEN. SITE RESTRICTIONS ACTIVE.' : 'LOCKDOWN DISENGAGED. NORMAL OPERATIONS RESTORED.');
-    }
-
-    // PURGE PROTOCOLS
-    function purgeComms() {
-        if (confirm('PURGE ALL COMMUNITY CHAT TRANSMISSIONS FROM LOCAL MEMORY?')) {
-            localStorage.removeItem('pantheon_comms');
-            alert('COMMUNITY CHAT LOGS CLEARED.');
-        }
-    }
-
-    function purgeDMs() {
-        if (confirm('PURGE ALL HERO DIRECT MESSAGES FROM LOCAL MEMORY?')) {
-            localStorage.removeItem('pantheon_dms');
-            alert('DIRECT MESSAGES WIPED.');
-        }
-    }
-
-    function purgeVault() {
-        if (confirm('PURGE ALL MEDIA VAULT ASSETS FROM LOCAL MEMORY?')) {
-            localStorage.removeItem('pantheon_media');
-            alert('MEDIA VAULT PURGED.');
-        }
-    }
-
-    function nuclearReset() {
-        const verification = prompt('TYPE "OVERRIDE-PURGE" TO CONFIRM FULL SITE FACTORY RESET:');
-        if (verification === 'OVERRIDE-PURGE') {
-            localStorage.clear();
-            alert('STUDIO MEMORY WIPED.');
-            location.reload();
-        } else {
-            alert('VERIFICATION FAILED. OVERRIDE ABORTED.');
-        }
-    }
-
-    // SITE BUILDER & CONFIG SAVING
-    function loadSiteConfig() {
+    function loadConfig() {
         const cfg = JSON.parse(localStorage.getItem('pantheon_site_config') || '{}');
-        if (cfg.primaryColor) document.getElementById('cfg-primary-color').value = cfg.primaryColor;
-        if (cfg.accentColor) document.getElementById('cfg-accent-color').value = cfg.accentColor;
-        if (cfg.bgColor) document.getElementById('cfg-bg-color').value = cfg.bgColor;
-        if (cfg.siteTitle) document.getElementById('cfg-site-title').value = cfg.siteTitle;
+
+        if (cfg.primaryColor) document.getElementById('cfg-primary').value = cfg.primaryColor;
+        if (cfg.accentColor) document.getElementById('cfg-accent').value = cfg.accentColor;
+        if (cfg.bgColor) document.getElementById('cfg-bg').value = cfg.bgColor;
         if (cfg.customCss) document.getElementById('cfg-custom-css').value = cfg.customCss;
 
         if (cfg.modules) {
@@ -664,72 +429,54 @@
         }
     }
 
-    function saveSiteConfig(e) {
-        e.preventDefault();
-        const cfg = JSON.parse(localStorage.getItem('pantheon_site_config') || '{}');
-        
-        cfg.primaryColor = document.getElementById('cfg-primary-color').value;
-        cfg.accentColor = document.getElementById('cfg-accent-color').value;
-        cfg.bgColor = document.getElementById('cfg-bg-color').value;
-        cfg.siteTitle = document.getElementById('cfg-site-title').value.trim();
-
-        localStorage.setItem('pantheon_site_config', JSON.stringify(cfg));
-        alert('VISUAL PARAMETERS SAVED TO STUDIO CONFIG.');
-    }
-
-    function saveModulesAndScripts() {
-        const cfg = JSON.parse(localStorage.getItem('pantheon_site_config') || '{}');
-        
-        cfg.customCss = document.getElementById('cfg-custom-css').value;
-        cfg.modules = {
-            radar: document.getElementById('mod-radar').checked,
-            lattice: document.getElementById('mod-lattice').checked,
-            showcase: document.getElementById('mod-showcase').checked,
-            logs: document.getElementById('mod-logs').checked
+    function saveConfig() {
+        const cfg = {
+            primaryColor: document.getElementById('cfg-primary').value,
+            accentColor: document.getElementById('cfg-accent').value,
+            bgColor: document.getElementById('cfg-bg').value,
+            customCss: document.getElementById('cfg-custom-css').value,
+            modules: {
+                radar: document.getElementById('mod-radar').checked,
+                lattice: document.getElementById('mod-lattice').checked,
+                showcase: document.getElementById('mod-showcase').checked,
+                logs: document.getElementById('mod-logs').checked
+            }
         };
 
         localStorage.setItem('pantheon_site_config', JSON.stringify(cfg));
-        alert('LAYOUT MODULES & CUSTOM SCRIPTS INJECTED INTO STUDIO CONFIG.');
+        logConsole("Site configuration saved to LocalStorage.");
     }
 
-    // HERO ROSTER MANAGEMENT
-    function renderUserRoster() {
-        const tbody = document.getElementById('user-roster-body');
-        const users = JSON.parse(localStorage.getItem('pantheon_operatives') || '{}');
-        const userKeys = Object.keys(users);
-
-        if (userKeys.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#8a9ba8;">NO REGISTERED HEROES FOUND IN MEMORY.</td></tr>';
-            return;
-        }
-
-        tbody.innerHTML = userKeys.map(k => {
-            const u = users[k];
-            return `
-                <tr>
-                    <td style="font-weight:bold; color:#ffffff;">${u.callsign}</td>
-                    <td>${u.role || 'Hero Fighter'}</td>
-                    <td style="color:var(--db-ki);">${u.clearance || 'CLASS_01'}</td>
-                    <td>${new Date(u.registered || Date.now()).toLocaleDateString()}</td>
-                    <td>
-                        <button class="action-btn-danger" onclick="purgeOperative('${u.callsign}')">REMOVE HERO</button>
-                    </td>
-                </tr>
-            `;
-        }).join('');
-    }
-
-    function purgeOperative(callsign) {
-        if (confirm(`REMOVE HERO [${callsign}] FROM REGISTERED ROSTER?`)) {
-            const users = JSON.parse(localStorage.getItem('pantheon_operatives') || '{}');
-            delete users[callsign];
-            localStorage.setItem('pantheon_operatives', JSON.stringify(users));
-            renderUserRoster();
+    function clearCustomHeroes() {
+        if (confirm("Purge all custom created hero dossiers?")) {
+            localStorage.removeItem('pantheon_custom_heroes');
+            logConsole("Cleared custom hero repository.");
         }
     }
 
-    // INITIALIZATION
-    checkAdminAuth();
+    function clearMediaUploads() {
+        if (confirm("Purge all public and private uploaded media files?")) {
+            localStorage.removeItem('pantheon_media');
+            logConsole("Cleared media upload cache.");
+        }
+    }
+
+    function clearComments() {
+        if (confirm("Purge all community comments?")) {
+            localStorage.removeItem('pantheon_comments');
+            logConsole("Cleared community comment database.");
+        }
+    }
+
+    function resetAllConfig() {
+        if (confirm("CRITICAL WARNING: Purge ALL Pantheon LocalStorage data and lock director session?")) {
+            localStorage.clear();
+            alert("LocalStorage purged. Reloading...");
+            window.location.reload();
+        }
+    }
+
+    checkDirectorAuth();
 </script>
 
 </body>

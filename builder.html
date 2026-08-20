@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PANTHEON STUDIOS // CHARACTER CREATOR</title>
+    <title>PANTHEON STUDIOS // CHARACTER BUILDER</title>
     <style>
         :root {
             --bg-void: #060913;
@@ -11,9 +11,10 @@
             --db-orange: #ff5500;
             --db-cyan: #00e5ff;
             --db-ki: #00ff88;
+            --db-purple: #a100ff;
             --db-red: #ff3333;
             --panel-bg: rgba(12, 18, 32, 0.92);
-            --scouter-glow: 0 0 15px rgba(255, 183, 0, 0.35);
+            --scouter-glow: 0 0 12px rgba(255, 183, 0, 0.35);
             --font-mono: 'Courier New', Courier, monospace;
         }
 
@@ -26,548 +27,508 @@
             min-height: 100vh;
             background-image: 
                 radial-gradient(circle at 50% 30%, rgba(255, 183, 0, 0.08) 0%, transparent 70%),
-                linear-gradient(rgba(0, 255, 136, 0.03) 1px, transparent 1px);
+                linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px);
             background-size: 100% 100%, 100% 4px;
         }
 
         .container {
-            max-width: 950px;
+            max-width: 1100px;
             margin: 0 auto;
         }
 
-        /* HEADER BAR */
-        .top-bar {
+        /* NAV HEADER */
+        .nav-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid var(--db-gold);
-            padding-bottom: 12px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 15px rgba(255, 183, 0, 0.2);
+            padding: 15px 0 25px 0;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+            margin-bottom: 30px;
         }
 
-        .sys-title {
-            font-size: 1.1rem;
-            color: var(--db-gold);
+        .nav-brand {
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: #00ff88;
             letter-spacing: 2px;
-            margin: 0;
+        }
+
+        .nav-menu {
             display: flex;
+            gap: 18px;
             align-items: center;
-            gap: 10px;
-            font-weight: bold;
         }
 
-        .pulse-orb {
-            width: 12px;
-            height: 12px;
-            background: var(--db-ki);
-            border-radius: 50%;
-            box-shadow: 0 0 10px var(--db-ki);
-            animation: dbPulse 1.2s infinite alternate;
-        }
-
-        @keyframes dbPulse { 
-            0% { opacity: 0.4; transform: scale(0.9); } 
-            100% { opacity: 1; transform: scale(1.2); } 
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 10px;
-        }
-
-        .nav-btn {
-            background: rgba(0, 229, 255, 0.1);
-            border: 1px solid var(--db-cyan);
-            color: var(--db-cyan);
-            padding: 6px 12px;
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
+        .nav-menu a {
+            color: #c0daf0;
             text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: bold;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.2s ease;
+            transition: color 0.2s ease;
         }
 
-        .nav-btn:hover {
-            background: var(--db-cyan);
-            color: #000;
-            box-shadow: 0 0 10px var(--db-cyan);
+        .nav-menu a:hover, .nav-menu a.active {
+            color: var(--db-gold);
         }
 
-        /* CARD CONTAINERS */
-        .card {
+        /* BUILDER GRID LAYOUT */
+        .builder-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .builder-card {
             background: var(--panel-bg);
             border: 1px solid var(--db-gold);
             box-shadow: var(--scouter-glow);
             padding: 22px;
-            margin-bottom: 25px;
             clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
         }
 
         .card-header {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: var(--db-gold);
             border-bottom: 1px dashed rgba(255, 183, 0, 0.4);
             padding-bottom: 8px;
             margin-bottom: 18px;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
 
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+        /* FORM ELEMENTS */
+        .form-group {
+            margin-bottom: 15px;
         }
 
-        .form-row {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-bottom: 14px;
-        }
-
-        .form-row label {
+        .form-label {
+            display: block;
             font-size: 0.75rem;
-            color: var(--db-cyan);
-            text-transform: uppercase;
-            font-weight: bold;
+            color: #8a9ba8;
+            margin-bottom: 6px;
             letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
-        input[type="text"], select, textarea {
-            background: rgba(6, 9, 19, 0.95);
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            background: rgba(6, 9, 19, 0.9);
             border: 1px solid rgba(0, 229, 255, 0.4);
             color: #ffffff;
             padding: 9px 12px;
             font-family: var(--font-mono);
             font-size: 0.8rem;
             outline: none;
-            width: 100%;
             box-sizing: border-box;
         }
 
-        input[type="text"]:focus, select:focus, textarea:focus {
-            border-color: var(--db-ki);
-            box-shadow: 0 0 8px rgba(0, 255, 136, 0.4);
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            border-color: var(--db-gold);
+            box-shadow: 0 0 8px rgba(255, 183, 0, 0.3);
         }
 
-        /* SLIDERS */
-        .slider-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
+        /* SLIDER CONTROL */
         .slider-row {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
+            margin-bottom: 10px;
         }
 
         .slider-row label {
-            width: 130px;
+            width: 120px;
             font-size: 0.7rem;
-            color: var(--db-ki);
-            text-transform: uppercase;
-            font-weight: bold;
+            color: #8a9ba8;
         }
 
         .slider-row input[type="range"] {
             flex: 1;
-            accent-color: var(--db-gold);
-            cursor: pointer;
+            accent-color: var(--db-ki);
         }
 
         .slider-val {
             width: 35px;
-            text-align: right;
-            font-size: 0.8rem;
-            color: #ffffff;
+            font-size: 0.75rem;
+            color: var(--db-ki);
             font-weight: bold;
+            text-align: right;
         }
 
-        /* ACTION BUTTONS */
-        .btn-submit {
-            background: var(--db-gold);
-            color: #000000;
+        /* PREVIEW CARD STYLING */
+        .preview-box {
+            background: rgba(6, 9, 19, 0.95);
+            border: 1px solid var(--db-cyan);
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.15);
+        }
+
+        .preview-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .preview-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid var(--db-gold);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #ffffff;
+            background: #000;
+            box-shadow: 0 0 10px rgba(255, 183, 0, 0.4);
+        }
+
+        .attr-bar-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 15px 0;
+        }
+
+        .attr-bar-item {
+            display: flex;
+            align-items: center;
+            font-size: 0.7rem;
+        }
+
+        .attr-label {
+            width: 110px;
+            color: #8a9ba8;
+        }
+
+        .attr-bar-bg {
+            flex: 1;
+            height: 10px;
+            background: rgba(0, 229, 255, 0.1);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .attr-bar-fill {
+            height: 100%;
+            background: var(--db-ki);
+            box-shadow: 0 0 6px var(--db-ki);
+            width: 50%;
+            transition: width 0.2s ease;
+        }
+
+        .btn-action-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn-save {
+            flex: 1;
+            background: #00ff88;
+            color: #000;
             border: none;
-            padding: 14px;
+            padding: 12px;
+            font-family: var(--font-mono);
+            font-weight: 900;
+            font-size: 0.8rem;
+            cursor: pointer;
+            letter-spacing: 1.5px;
+            clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+        }
+
+        .btn-reset {
+            background: rgba(255, 51, 51, 0.15);
+            border: 1px solid var(--db-red);
+            color: var(--db-red);
+            padding: 12px 18px;
             font-family: var(--font-mono);
             font-weight: bold;
-            font-size: 0.9rem;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            width: 100%;
-            margin-top: 10px;
-            box-shadow: 0 0 12px rgba(255, 183, 0, 0.4);
-            transition: all 0.2s ease;
-        }
-
-        .btn-submit:hover {
-            background: var(--db-ki);
-            box-shadow: 0 0 18px rgba(0, 255, 136, 0.7);
-        }
-
-        .status-banner {
-            margin-top: 15px;
-            padding: 12px;
-            background: rgba(0, 255, 136, 0.15);
-            border: 1px solid var(--db-ki);
-            color: var(--db-ki);
             font-size: 0.8rem;
-            text-align: center;
-            font-weight: bold;
-            display: none;
+            cursor: pointer;
         }
 
-        .status-banner a {
-            color: #ffffff;
-            text-decoration: underline;
-            margin-left: 8px;
+        /* MAINTENANCE OVERLAY */
+        #maintenance-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #060913;
+            z-index: 99999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .maint-card {
+            background: rgba(12, 18, 32, 0.96);
+            border: 2px solid var(--db-red);
+            box-shadow: 0 0 25px rgba(255, 51, 51, 0.4);
+            width: 420px;
+            padding: 30px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
 
+<!-- MAINTENANCE LOCKOUT OVERLAY -->
+<div id="maintenance-overlay">
+    <div class="maint-card">
+        <div style="color:var(--db-red); font-weight:bold; margin-bottom:10px;">⚠️ BUILDER ACCESS RESTRICTED</div>
+        <div style="color:#8a9ba8; font-size:0.8rem; margin-bottom:15px;">ENTER DEVELOPER PASSKEY TO CONSTRUCT DOSSIERS</div>
+        <form onsubmit="unlockMaintenance(event)" style="display:flex; gap:10px;">
+            <input type="password" id="maint-key-input" placeholder="PASSKEY..." required style="flex:1; background:#000; border:1px solid var(--db-red); color:#fff; padding:8px;">
+            <button type="submit" style="background:var(--db-gold); border:none; padding:8px 12px; font-weight:bold; cursor:pointer;">UNSEAL</button>
+        </form>
+        <div id="maint-error" style="color:var(--db-red); font-size:0.75rem; margin-top:10px;"></div>
+    </div>
+</div>
+
 <div class="container">
-    <!-- HEADER -->
-    <div class="top-bar">
-        <div class="sys-title">
-            <div class="pulse-orb"></div>
-            PANTHEON STUDIOS // HERO DOSSIER GENERATOR
-        </div>
-        <div class="nav-links">
-            <a href="index.html" class="nav-btn">[SHOWCASE_HUB]</a>
-            <a href="dossier.html" class="nav-btn" style="border-color: var(--db-gold); color: var(--db-gold);">[HERO_WIKI]</a>
-            <a href="profile.html" class="nav-btn">[MY_PROFILE]</a>
-            <a href="admin.html" class="nav-btn">[TIME_NEST_ADMIN]</a>
+    <!-- NAV HEADER -->
+    <div class="nav-header">
+        <div class="nav-brand">PANTHEON STUDIOS</div>
+        <div class="nav-menu">
+            <a href="index.html">HUB</a>
+            <a href="login.html">LOGIN</a>
+            <a href="dossier.html">ROSTER</a>
+            <a href="dossier.html">ARCHIVES</a>
+            <a href="builder.html" class="active">CHARACTER BUILDER</a>
+            <a href="profile.html">MEDIA</a>
+            <a href="admin.html">COMMUNITY</a>
         </div>
     </div>
 
-    <!-- MAIN CREATOR FORM -->
-    <form id="hero-builder-form" onsubmit="saveCharacter(event)">
-        <!-- LOAD EXISTING OR CREATE NEW -->
-        <div class="card">
-            <div class="card-header">
-                <span>SELECT ACTION OR HERO TO EDIT</span>
-                <span style="color: var(--db-ki); font-size: 0.75rem;">CAPSULE CORP GENERATOR</span>
-            </div>
-            <div class="form-row">
-                <label>Target Fighter Slot</label>
-                <select id="char-selector" onchange="loadSelectedHero()">
-                    <option value="NEW">[ CREATE NEW HERO ]</option>
-                    <!-- Saved heroes populates dynamically -->
-                </select>
-            </div>
-        </div>
-
-        <!-- IDENTITY & SPECS -->
-        <div class="card">
-            <div class="card-header">1. IDENTITY & PHYSICAL PROFILE</div>
-            <div class="grid-2">
-                <div class="form-row">
-                    <label>Hero Callsign / Name *</label>
-                    <input type="text" id="field-callsign" placeholder="e.g. KAIGE" required autocomplete="off">
+    <div class="builder-grid">
+        <!-- FORM INPUT PANEL -->
+        <div class="builder-card">
+            <div class="card-header">CHARACTER SPECIFICATIONS // CREATOR</div>
+            <form id="hero-builder-form" oninput="updatePreview()">
+                <div class="form-group">
+                    <label class="form-label">CHARACTER NAME / CALLSIGN</label>
+                    <input type="text" id="hero-name" class="form-input" value="KAIGE MK-II" required>
                 </div>
 
-                <div class="form-row">
-                    <label>Real Name</label>
-                    <input type="text" id="field-realName" placeholder="e.g. Restricted or Classified">
-                </div>
-
-                <div class="form-row">
-                    <label>Show Title / Saga Project *</label>
-                    <input type="text" id="field-showTitle" placeholder="e.g. Project: Phantom Frequency" required>
-                </div>
-
-                <div class="form-row">
-                    <label>Race / Species</label>
-                    <input type="text" id="field-race" placeholder="e.g. Frieza Race, Saiyan, Android">
-                </div>
-
-                <div class="form-row">
-                    <label>Physical Height</label>
-                    <input type="text" id="field-height" placeholder="e.g. Twice Frieza's Height, 6'5&quot;">
-                </div>
-
-                <div class="form-row">
-                    <label>Combat Class / Role</label>
-                    <input type="text" id="field-role" placeholder="e.g. Lead Heavy Strike / Spatial Titan">
-                </div>
-
-                <div class="form-row">
-                    <label>Roster Status</label>
-                    <select id="field-status">
-                        <option value="UNLEASHED / ACTIVE">UNLEASHED / ACTIVE</option>
-                        <option value="STANDBY / TRAINING">STANDBY / TRAINING</option>
-                        <option value="RESERVE / SEALED">RESERVE / SEALED</option>
+                <div class="form-group">
+                    <label class="form-label">RACE / SPECIES ORIGIN</label>
+                    <select id="hero-race" class="form-select">
+                        <option value="Frieza Race // Spatial Titan">Frieza Race</option>
+                        <option value="Saiyan // Elite Warrior">Saiyan</option>
+                        <option value="Earthling // Martial Specialist">Earthling</option>
+                        <option value="Majin // Arcane Combatant">Majin</option>
+                        <option value="Namekian // Regeneration Specialist">Namekian</option>
                     </select>
                 </div>
 
-                <div class="form-row">
-                    <label>Portrait Image URL (Optional)</label>
-                    <input type="text" id="field-avatarUrl" placeholder="https://example.com/character_art.png">
+                <div class="form-group">
+                    <label class="form-label">COMBAT ROLE / CLASS</label>
+                    <select id="hero-role" class="form-select">
+                        <option value="Lead Heavy Strike">Lead Heavy Strike</option>
+                        <option value="Tactical Ki Specialist">Tactical Ki Specialist</option>
+                        <option value="Support Noise & Defense">Support Noise & Defense</option>
+                        <option value="Balanced Combat Operative">Balanced Combat Operative</option>
+                    </select>
                 </div>
-            </div>
+
+                <div class="form-group">
+                    <label class="form-label">RECORDED POWER LEVEL</label>
+                    <input type="text" id="hero-power" class="form-input" value="9,500,000">
+                </div>
+
+                <div class="card-header" style="margin-top:20px;">ATTRIBUTES & COMBAT STATS</div>
+
+                <div class="slider-row">
+                    <label>MAX HEALTH</label>
+                    <input type="range" id="stat-hp" min="10" max="100" value="90" oninput="updatePreview()">
+                    <span class="slider-val" id="val-hp">90</span>
+                </div>
+
+                <div class="slider-row">
+                    <label>MAX KI</label>
+                    <input type="range" id="stat-ki" min="10" max="100" value="75" oninput="updatePreview()">
+                    <span class="slider-val" id="val-ki">75</span>
+                </div>
+
+                <div class="slider-row">
+                    <label>MAX STAMINA</label>
+                    <input type="range" id="stat-stm" min="10" max="100" value="85" oninput="updatePreview()">
+                    <span class="slider-val" id="val-stm">85</span>
+                </div>
+
+                <div class="slider-row">
+                    <label>STRIKE SUPER</label>
+                    <input type="range" id="stat-str" min="10" max="100" value="95" oninput="updatePreview()">
+                    <span class="slider-val" id="val-str">95</span>
+                </div>
+
+                <div class="slider-row">
+                    <label>KI BLAST SUPER</label>
+                    <input type="range" id="stat-kib" min="10" max="100" value="60" oninput="updatePreview()">
+                    <span class="slider-val" id="val-kib">60</span>
+                </div>
+
+                <div class="form-group" style="margin-top:15px;">
+                    <label class="form-label">PRIMARY SKILL LOADOUT (COMMA SEPARATED)</label>
+                    <input type="text" id="hero-skills" class="form-input" value="Shadow Crusher, Sledgehammer, Meteor Burst">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">TACTICAL LORE NOTES</label>
+                    <textarea id="hero-lore" class="form-textarea" rows="3">Enhanced spatial strike capabilities designed for tight corner pressuring and burst counters.</textarea>
+                </div>
+
+                <div class="btn-action-group">
+                    <button type="button" class="btn-save" onclick="saveCustomCharacter()">SAVE HERO DOSSIER</button>
+                    <button type="reset" class="btn-reset" onclick="setTimeout(updatePreview, 50)">RESET</button>
+                </div>
+            </form>
         </div>
 
-        <!-- LORE & NARRATIVE -->
-        <div class="card">
-            <div class="card-header">2. DEEP LORE & NARRATIVE ARCS</div>
-            <div class="form-row">
-                <label>Origin & Backstory</label>
-                <textarea id="field-bio" rows="4" placeholder="Enter history, character origins, and background story..." required></textarea>
-            </div>
-
-            <div class="form-row">
-                <label>Show Saga & Narrative Arc Trajectory</label>
-                <textarea id="field-narrative" rows="3" placeholder="Describe their role in current show episodes, rivalries, and plot arcs..."></textarea>
-            </div>
-
-            <div class="form-row">
-                <label>Combat Style & Special Capabilities</label>
-                <textarea id="field-capabilities" rows="3" placeholder="Describe spatial awareness techniques, fighting stance, and transformation modes..."></textarea>
-            </div>
-
-            <div class="form-row">
-                <label>Community Lore & Atmosphere</label>
-                <textarea id="field-communityLore" rows="3" placeholder="Describe community standing, blackbasilisk42 origin, and presence in group chats..."></textarea>
-            </div>
-        </div>
-
-        <!-- XENOVERSE ATTRIBUTES & MOVES -->
-        <div class="card">
-            <div class="card-header">3. XENOVERSE ATTRIBUTES & SIGNATURE MOVES</div>
+        <!-- REAL-TIME LIVE PREVIEW PANEL -->
+        <div class="builder-card">
+            <div class="card-header">LIVE DOSSIER PREVIEW // TELEMETRY</div>
             
-            <div class="grid-2">
-                <!-- ATTRIBUTE SLIDERS -->
-                <div class="slider-group">
-                    <div style="font-size:0.75rem; color:var(--db-gold); font-weight:bold; margin-bottom:8px;">POWER GRID METERS</div>
-                    
-                    <div class="slider-row">
-                        <label>Max Health</label>
-                        <input type="range" id="stat-health" min="0" max="100" value="85" oninput="updateVal('val-health', this.value)">
-                        <span class="slider-val" id="val-health">85</span>
+            <div class="preview-box">
+                <div class="preview-top">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <div class="preview-avatar" id="prev-avatar">KG</div>
+                        <div>
+                            <div style="font-size:1.1rem; font-weight:bold; color:#fff;" id="prev-name">KAIGE MK-II</div>
+                            <div style="font-size:0.75rem; color:var(--db-ki);" id="prev-spec">Frieza Race // Spatial Titan</div>
+                        </div>
                     </div>
-
-                    <div class="slider-row">
-                        <label>Max Ki</label>
-                        <input type="range" id="stat-ki" min="0" max="100" value="80" oninput="updateVal('val-ki', this.value)">
-                        <span class="slider-val" id="val-ki">80</span>
-                    </div>
-
-                    <div class="slider-row">
-                        <label>Max Stamina</label>
-                        <input type="range" id="stat-stamina" min="0" max="100" value="90" oninput="updateVal('val-stamina', this.value)">
-                        <span class="slider-val" id="val-stamina">90</span>
-                    </div>
-
-                    <div class="slider-row">
-                        <label>Basic Attack</label>
-                        <input type="range" id="stat-basic" min="0" max="100" value="88" oninput="updateVal('val-basic', this.value)">
-                        <span class="slider-val" id="val-basic">88</span>
-                    </div>
-
-                    <div class="slider-row">
-                        <label>Strike Super</label>
-                        <input type="range" id="stat-strike" min="0" max="100" value="95" oninput="updateVal('val-strike', this.value)">
-                        <span class="slider-val" id="val-strike">95</span>
-                    </div>
-
-                    <div class="slider-row">
-                        <label>Ki Blast Super</label>
-                        <input type="range" id="stat-kiblast" min="0" max="100" value="75" oninput="updateVal('val-kiblast', this.value)">
-                        <span class="slider-val" id="val-kiblast">75</span>
+                    <div style="text-align:right;">
+                        <div style="font-size:0.6rem; color:var(--db-gold);">POWER LEVEL</div>
+                        <div style="font-size:1rem; font-weight:bold; color:#fff;" id="prev-power">9,500,000</div>
                     </div>
                 </div>
 
-                <!-- SIGNATURE MOVES & EQUIPMENT -->
-                <div>
-                    <div style="font-size:0.75rem; color:var(--db-gold); font-weight:bold; margin-bottom:8px;">SIGNATURE SKILLS & GEAR</div>
-                    <div class="form-row">
-                        <label>Skills & Modules (Comma-Separated)</label>
-                        <textarea id="field-equipment" rows="6" placeholder="Dark Inscription, Center of Gravity System, Gigantic Nova, Strike Boost Super Soul"></textarea>
-                    </div>
+                <div class="attr-bar-container">
+                    <div class="attr-bar-item"><span class="attr-label">HEALTH</span><div class="attr-bar-bg"><div class="attr-bar-fill" id="bar-hp" style="width:90%;"></div></div></div>
+                    <div class="attr-bar-item"><span class="attr-label">KI SPECS</span><div class="attr-bar-bg"><div class="attr-bar-fill" id="bar-ki" style="width:75%;"></div></div></div>
+                    <div class="attr-bar-item"><span class="attr-label">STAMINA</span><div class="attr-bar-bg"><div class="attr-bar-fill" id="bar-stm" style="width:85%;"></div></div></div>
+                    <div class="attr-bar-item"><span class="attr-label">STRIKE SUPER</span><div class="attr-bar-bg"><div class="attr-bar-fill" id="bar-str" style="width:95%;"></div></div></div>
+                    <div class="attr-bar-item"><span class="attr-label">KI BLAST SUPER</span><div class="attr-bar-bg"><div class="attr-bar-fill" id="bar-kib" style="width:60%;"></div></div></div>
+                </div>
+
+                <div style="margin-top:15px; border-top:1px dashed rgba(0,229,255,0.2); padding-top:10px;">
+                    <div style="font-size:0.7rem; color:var(--db-gold); margin-bottom:6px;">EQUIPPED SKILLS</div>
+                    <div id="prev-skills" style="font-size:0.75rem; color:#d0e0f0;">Shadow Crusher, Sledgehammer, Meteor Burst</div>
+                </div>
+
+                <div style="margin-top:12px; border-top:1px dashed rgba(0,229,255,0.2); padding-top:10px;">
+                    <div style="font-size:0.7rem; color:var(--db-gold); margin-bottom:6px;">TACTICAL LORE</div>
+                    <div id="prev-lore" style="font-size:0.75rem; color:#8a9ba8; line-height:1.5;">Enhanced spatial strike capabilities designed for tight corner pressuring and burst counters.</div>
                 </div>
             </div>
 
-            <button type="submit" class="btn-submit">GENERATE & PUBLISH DOSSIER PAGE</button>
-            <div id="status-banner" class="status-banner"></div>
+            <div id="save-status" style="margin-top:15px; font-size:0.75rem; color:var(--db-ki); text-align:center; display:none; font-weight:bold;">
+                ✓ CHARACTER DOSSIER SAVED TO LOCAL REPOSITORY
+            </div>
         </div>
-    </form>
+    </div>
 </div>
 
 <script>
-    // UPDATE SLIDER NUMBER DISPLAY
-    function updateVal(id, value) {
-        document.getElementById(id).innerText = value;
+    const DEV_PASSCODE = '@jimbo21';
+
+    function checkMaintenanceGate() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const passParam = urlParams.get('pass');
+        const overlay = document.getElementById('maintenance-overlay');
+
+        if (passParam === DEV_PASSCODE || localStorage.getItem('pantheon_maint_unlocked') === 'true') {
+            localStorage.setItem('pantheon_maint_unlocked', 'true');
+            if (overlay) overlay.style.display = 'none';
+        } else {
+            if (overlay) overlay.style.display = 'flex';
+        }
     }
 
-    // LOAD ALL SAVED HEROES INTO SELECTOR DROPDOWN
-    function populateSelector() {
-        const selector = document.getElementById('char-selector');
-        const saved = JSON.parse(localStorage.getItem('pantheon_characters') || '{}');
-        
-        // Keep "NEW" as first option
-        selector.innerHTML = '<option value="NEW">[ CREATE NEW HERO ]</option>';
-
-        // Default Kaige if not in saved
-        if (!saved['kaige']) {
-            const opt = document.createElement('option');
-            opt.value = 'kaige';
-            opt.innerText = 'KAIGE (Default Lead)';
-            selector.appendChild(opt);
-        }
-
-        Object.keys(saved).forEach(id => {
-            const opt = document.createElement('option');
-            opt.value = id;
-            opt.innerText = `${saved[id].callsign.toUpperCase()} (${saved[id].showTitle || 'Show Fighter'})`;
-            selector.appendChild(opt);
-        });
-    }
-
-    // LOAD SELECTED HERO INTO FORM FOR EDITING
-    function loadSelectedHero() {
-        const selectedId = document.getElementById('char-selector').value;
-        const saved = JSON.parse(localStorage.getItem('pantheon_characters') || '{}');
-
-        if (selectedId === 'NEW') {
-            document.getElementById('hero-builder-form').reset();
-            return;
-        }
-
-        const hero = saved[selectedId] || {
-            id: "kaige",
-            callsign: "KAIGE",
-            realName: "RESTRICTED",
-            showTitle: "Project: Phantom Frequency",
-            role: "Lead Heavy Strike / Spatial Titan",
-            race: "Frieza Race",
-            status: "UNLEASHED / ACTIVE",
-            height: "Twice Frieza's Height",
-            avatarUrl: "",
-            bio: "Kaige is a Frieza Race character standing nearly twice the height of a standard model. He runs a dark aura with a green core and black undertones, and rarely uses Golden Form—saving it for specific high-stakes moments rather than relying on it every match.",
-            narrative: "He serves as the primary background antagonist and main character driving events behind the scenes in Dragonball Legacy Reborn (DBLR). Rather than being front-and-center constantly, he operates from the shadows, stepping in directly only when it matters to test other characters.",
-            capabilities: "Built around spatial control with a primary focus on Ki blasts. Uses the Center of Gravity (COG) system to track opponent movement, heavy Ki blasts to break defense meters, and timed counters like Dark Inscription or Shadow Crusher to intercept aggressive rushes.",
-            communityLore: "A long-time veteran in the 160+ member DBLR community operating under blackbasilisk42. The character persona pre-dates official Black Frieza media. He keeps a low profile in public chats, so when he shows up in lobbies or group calls, people take notice.",
-            skills: [
-                { label: "MAX HEALTH", value: 95 },
-                { label: "MAX KI", value: 85 },
-                { label: "MAX STAMINA", value: 90 },
-                { label: "BASIC ATTACK", value: 88 },
-                { label: "STRIKE SUPER", value: 98 },
-                { label: "KI BLAST SUPER", value: 75 }
-            ],
-            equipment: ["Dark Inscription", "Center of Gravity System", "Gigantic Nova", "Strike Boost Super Soul"]
-        };
-
-        // Populate Text Fields
-        document.getElementById('field-callsign').value = hero.callsign || '';
-        document.getElementById('field-realName').value = hero.realName || '';
-        document.getElementById('field-showTitle').value = hero.showTitle || '';
-        document.getElementById('field-race').value = hero.race || '';
-        document.getElementById('field-height').value = hero.height || '';
-        document.getElementById('field-role').value = hero.role || '';
-        document.getElementById('field-status').value = hero.status || 'UNLEASHED / ACTIVE';
-        document.getElementById('field-avatarUrl').value = hero.avatarUrl || '';
-        document.getElementById('field-bio').value = hero.bio || '';
-        document.getElementById('field-narrative').value = hero.narrative || hero.showRole || '';
-        document.getElementById('field-capabilities').value = hero.capabilities || '';
-        document.getElementById('field-communityLore').value = hero.communityLore || '';
-
-        // Populate Attributes Sliders
-        const skillMap = {};
-        if (hero.skills) {
-            hero.skills.forEach(s => skillMap[s.label] = s.value);
-        }
-
-        document.getElementById('stat-health').value = skillMap['MAX HEALTH'] || 85;
-        document.getElementById('val-health').innerText = skillMap['MAX HEALTH'] || 85;
-
-        document.getElementById('stat-ki').value = skillMap['MAX KI'] || 80;
-        document.getElementById('val-ki').innerText = skillMap['MAX KI'] || 80;
-
-        document.getElementById('stat-stamina').value = skillMap['MAX STAMINA'] || 90;
-        document.getElementById('val-stamina').innerText = skillMap['MAX STAMINA'] || 90;
-
-        document.getElementById('stat-basic').value = skillMap['BASIC ATTACK'] || 88;
-        document.getElementById('val-basic').innerText = skillMap['BASIC ATTACK'] || 88;
-
-        document.getElementById('stat-strike').value = skillMap['STRIKE SUPER'] || 95;
-        document.getElementById('val-strike').innerText = skillMap['STRIKE SUPER'] || 95;
-
-        document.getElementById('stat-kiblast').value = skillMap['KI BLAST SUPER'] || 75;
-        document.getElementById('val-kiblast').innerText = skillMap['KI BLAST SUPER'] || 75;
-
-        // Populate Equipment Tag Cloud
-        document.getElementById('field-equipment').value = hero.equipment ? hero.equipment.join(', ') : '';
-    }
-
-    // SAVE / UPDATE CHARACTER IN LOCALSTORAGE
-    function saveCharacter(e) {
+    function unlockMaintenance(e) {
         e.preventDefault();
+        const inputVal = document.getElementById('maint-key-input').value.trim();
+        if (inputVal === DEV_PASSCODE) {
+            localStorage.setItem('pantheon_maint_unlocked', 'true');
+            document.getElementById('maintenance-overlay').style.display = 'none';
+        } else {
+            document.getElementById('maint-error').innerText = 'INVALID KEY';
+        }
+    }
 
-        const callsign = document.getElementById('field-callsign').value.trim();
-        const heroId = callsign.toLowerCase().replace(/[^a-z0-9]/g, '_');
+    function updatePreview() {
+        const name = document.getElementById('hero-name').value || 'CUSTOM HERO';
+        const race = document.getElementById('hero-race').value;
+        const role = document.getElementById('hero-role').value;
+        const power = document.getElementById('hero-power').value || '0';
+        
+        const hp = document.getElementById('stat-hp').value;
+        const ki = document.getElementById('stat-ki').value;
+        const stm = document.getElementById('stat-stm').value;
+        const str = document.getElementById('stat-str').value;
+        const kib = document.getElementById('stat-kib').value;
 
-        const equipmentRaw = document.getElementById('field-equipment').value;
-        const equipmentArray = equipmentRaw.split(',').map(s => s.trim()).filter(s => s.length > 0);
+        const skills = document.getElementById('hero-skills').value;
+        const lore = document.getElementById('hero-lore').value;
 
-        const heroObj = {
-            id: heroId,
-            callsign: callsign,
-            realName: document.getElementById('field-realName').value.trim() || 'Restricted',
-            showTitle: document.getElementById('field-showTitle').value.trim(),
-            race: document.getElementById('field-race').value.trim() || 'Unspecified Race',
-            height: document.getElementById('field-height').value.trim() || 'N/A',
-            role: document.getElementById('field-role').value.trim() || 'Hero Fighter',
-            status: document.getElementById('field-status').value,
-            avatarUrl: document.getElementById('field-avatarUrl').value.trim(),
-            bio: document.getElementById('field-bio').value.trim(),
-            narrative: document.getElementById('field-narrative').value.trim(),
-            capabilities: document.getElementById('field-capabilities').value.trim(),
-            communityLore: document.getElementById('field-communityLore').value.trim(),
-            skills: [
-                { label: "MAX HEALTH", value: parseInt(document.getElementById('stat-health').value) },
-                { label: "MAX KI", value: parseInt(document.getElementById('stat-ki').value) },
-                { label: "MAX STAMINA", value: parseInt(document.getElementById('stat-stamina').value) },
-                { label: "BASIC ATTACK", value: parseInt(document.getElementById('stat-basic').value) },
-                { label: "STRIKE SUPER", value: parseInt(document.getElementById('stat-strike').value) },
-                { label: "KI BLAST SUPER", value: parseInt(document.getElementById('stat-kiblast').value) }
-            ],
-            equipment: equipmentArray.length > 0 ? equipmentArray : ["Standard Issue Ki Modules"]
+        // Update slider number displays
+        document.getElementById('val-hp').innerText = hp;
+        document.getElementById('val-ki').innerText = ki;
+        document.getElementById('val-stm').innerText = stm;
+        document.getElementById('val-str').innerText = str;
+        document.getElementById('val-kib').innerText = kib;
+
+        // Update preview elements
+        document.getElementById('prev-name').innerText = name.toUpperCase();
+        document.getElementById('prev-spec').innerText = `${race} // ${role}`;
+        document.getElementById('prev-power').innerText = power;
+        document.getElementById('prev-avatar').innerText = name.substring(0, 2).toUpperCase();
+
+        document.getElementById('bar-hp').style.width = hp + '%';
+        document.getElementById('bar-ki').style.width = ki + '%';
+        document.getElementById('bar-stm').style.width = stm + '%';
+        document.getElementById('bar-str').style.width = str + '%';
+        document.getElementById('bar-kib').style.width = kib + '%';
+
+        document.getElementById('prev-skills').innerText = skills || 'No skills equipped.';
+        document.getElementById('prev-lore').innerText = lore || 'No tactical notes provided.';
+    }
+
+    function saveCustomCharacter() {
+        const heroData = {
+            id: 'custom_' + Date.now(),
+            name: document.getElementById('hero-name').value,
+            race: document.getElementById('hero-race').value,
+            role: document.getElementById('hero-role').value,
+            power: document.getElementById('hero-power').value,
+            stats: {
+                hp: document.getElementById('stat-hp').value,
+                ki: document.getElementById('stat-ki').value,
+                stm: document.getElementById('stat-stm').value,
+                str: document.getElementById('stat-str').value,
+                kib: document.getElementById('stat-kib').value
+            },
+            skills: document.getElementById('hero-skills').value,
+            lore: document.getElementById('hero-lore').value,
+            timestamp: new Date().toISOString()
         };
 
-        const saved = JSON.parse(localStorage.getItem('pantheon_characters') || '{}');
-        saved[heroId] = heroObj;
-        localStorage.setItem('pantheon_characters', JSON.stringify(saved));
+        const existingHeroes = JSON.parse(localStorage.getItem('pantheon_custom_heroes') || '[]');
+        existingHeroes.push(heroData);
+        localStorage.setItem('pantheon_custom_heroes', JSON.stringify(existingHeroes));
 
-        // Show Success Banner
-        const banner = document.getElementById('status-banner');
-        banner.style.display = 'block';
-        banner.innerHTML = `
-            HERO DOSSIER [${callsign}] PUBLISHED SUCCESSFULLY! 
-            <a href="dossier.html?id=${heroId}" target="_blank">[OPEN HERO WIKI PAGE ↗]</a>
-        `;
-
-        populateSelector();
-        document.getElementById('char-selector').value = heroId;
+        const status = document.getElementById('save-status');
+        status.style.display = 'block';
+        setTimeout(() => { status.style.display = 'none'; }, 3000);
     }
 
-    // INITIALIZATION
-    populateSelector();
-    const requestedHeroId = new URLSearchParams(window.location.search).get('id');
-    if (requestedHeroId && document.querySelector(`#char-selector option[value="${requestedHeroId}"]`)) {
-        document.getElementById('char-selector').value = requestedHeroId;
-        loadSelectedHero();
-    }
+    checkMaintenanceGate();
+    updatePreview();
 </script>
 
 </body>
