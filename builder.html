@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PANTHEON STUDIOS // CHARACTER BUILDER</title>
+    <title>PANTHEON STUDIOS // OFFICIAL SHOW ROSTER MANAGER</title>
     <style>
         :root {
             --bg-void: #060913;
@@ -73,7 +73,21 @@
             color: var(--db-gold);
         }
 
-        /* BUILDER GRID LAYOUT */
+        .admin-banner {
+            background: rgba(255, 183, 0, 0.1);
+            border: 1px solid var(--db-gold);
+            color: var(--db-gold);
+            padding: 12px 18px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* BUILDER GRID */
         .builder-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -99,7 +113,6 @@
             font-weight: bold;
         }
 
-        /* FORM ELEMENTS */
         .form-group {
             margin-bottom: 15px;
         }
@@ -130,7 +143,6 @@
             box-shadow: 0 0 8px rgba(255, 183, 0, 0.3);
         }
 
-        /* SLIDER CONTROL */
         .slider-row {
             display: flex;
             align-items: center;
@@ -157,7 +169,6 @@
             text-align: right;
         }
 
-        /* PREVIEW CARD STYLING */
         .preview-box {
             background: rgba(6, 9, 19, 0.95);
             border: 1px solid var(--db-cyan);
@@ -210,8 +221,6 @@
             height: 10px;
             background: rgba(0, 229, 255, 0.1);
             border: 1px solid rgba(0, 229, 255, 0.3);
-            position: relative;
-            overflow: hidden;
         }
 
         .attr-bar-fill {
@@ -242,19 +251,8 @@
             clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
         }
 
-        .btn-reset {
-            background: rgba(255, 51, 51, 0.15);
-            border: 1px solid var(--db-red);
-            color: var(--db-red);
-            padding: 12px 18px;
-            font-family: var(--font-mono);
-            font-weight: bold;
-            font-size: 0.8rem;
-            cursor: pointer;
-        }
-
-        /* MAINTENANCE OVERLAY */
-        #maintenance-overlay {
+        /* DIRECTOR AUTH OVERLAY */
+        #director-auth-overlay {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
             background-color: #060913;
@@ -264,11 +262,11 @@
             align-items: center;
         }
 
-        .maint-card {
+        .auth-card {
             background: rgba(12, 18, 32, 0.96);
-            border: 2px solid var(--db-red);
-            box-shadow: 0 0 25px rgba(255, 51, 51, 0.4);
-            width: 420px;
+            border: 2px solid var(--db-gold);
+            box-shadow: 0 0 25px rgba(255, 183, 0, 0.4);
+            width: 440px;
             padding: 30px;
             text-align: center;
         }
@@ -276,193 +274,166 @@
 </head>
 <body>
 
-<!-- MAINTENANCE LOCKOUT OVERLAY -->
-<div id="maintenance-overlay">
-    <div class="maint-card">
-        <div style="color:var(--db-red); font-weight:bold; margin-bottom:10px;">⚠️ BUILDER ACCESS RESTRICTED</div>
-        <div style="color:#8a9ba8; font-size:0.8rem; margin-bottom:15px;">ENTER DEVELOPER PASSKEY TO CONSTRUCT DOSSIERS</div>
-        <form onsubmit="unlockMaintenance(event)" style="display:flex; gap:10px;">
-            <input type="password" id="maint-key-input" placeholder="PASSKEY..." required style="flex:1; background:#000; border:1px solid var(--db-red); color:#fff; padding:8px;">
-            <button type="submit" style="background:var(--db-gold); border:none; padding:8px 12px; font-weight:bold; cursor:pointer;">UNSEAL</button>
+<!-- DIRECTOR AUTHENTICATION GATE OVERLAY -->
+<div id="director-auth-overlay">
+    <div class="auth-card">
+        <div style="color:var(--db-gold); font-size:1.1rem; font-weight:bold; letter-spacing:2px; margin-bottom:8px;">🔒 DIRECTOR ACCESS LOCK</div>
+        <div style="color:var(--db-ki); font-size:0.75rem; margin-bottom:20px; letter-spacing:1px;">OFFICIAL CANON ROSTER BUILDER</div>
+        <form onsubmit="authenticateDirector(event)">
+            <input type="password" id="director-key-input" placeholder="ENTER DIRECTOR PASSKEY..." required style="width:100%; background:#000; border:1px solid var(--db-gold); color:#fff; padding:10px; font-family:var(--font-mono); font-size:0.8rem; box-sizing:border-box; margin-bottom:15px; outline:none;">
+            <button type="submit" style="background:var(--db-gold); color:#000; border:none; padding:10px 18px; font-family:var(--font-mono); font-weight:bold; cursor:pointer; width:100%;">AUTHENTICATE DIRECTOR</button>
         </form>
-        <div id="maint-error" style="color:var(--db-red); font-size:0.75rem; margin-top:10px;"></div>
+        <div id="auth-error" style="color:var(--db-red); font-size:0.75rem; margin-top:12px; font-weight:bold;"></div>
     </div>
 </div>
 
 <div class="container">
     <!-- NAV HEADER -->
     <div class="nav-header">
-        <div class="nav-brand">PANTHEON STUDIOS</div>
+        <div class="nav-brand">PANTHEON STUDIOS // SHOW BUILDER</div>
         <div class="nav-menu">
             <a href="index.html">HUB</a>
             <a href="login.html">LOGIN</a>
             <a href="dossier.html">ROSTER</a>
             <a href="dossier.html">ARCHIVES</a>
-            <a href="builder.html" class="active">CHARACTER BUILDER</a>
+            <a href="builder.html" class="active">SHOW BUILDER</a>
             <a href="profile.html">MEDIA</a>
             <a href="admin.html">COMMUNITY</a>
         </div>
     </div>
 
+    <div class="admin-banner">
+        <span>🎬 CANON SHOW ROSTER MANAGER // DRAGONBALL LEGACY REBORN</span>
+        <span style="color:var(--db-ki);">DIRECTOR ACCESS GRANTED</span>
+    </div>
+
     <div class="builder-grid">
-        <!-- FORM INPUT PANEL -->
+        <!-- FORM PANEL -->
         <div class="builder-card">
-            <div class="card-header">CHARACTER SPECIFICATIONS // CREATOR</div>
+            <div class="card-header">CANON CAST SPECIFICATIONS</div>
             <form id="hero-builder-form" oninput="updatePreview()">
                 <div class="form-group">
                     <label class="form-label">CHARACTER NAME / CALLSIGN</label>
-                    <input type="text" id="hero-name" class="form-input" value="KAIGE MK-II" required>
+                    <input type="text" id="hero-name" class="form-input" value="KAIGE" required>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">RACE / SPECIES ORIGIN</label>
-                    <select id="hero-race" class="form-select">
-                        <option value="Frieza Race // Spatial Titan">Frieza Race</option>
-                        <option value="Saiyan // Elite Warrior">Saiyan</option>
-                        <option value="Earthling // Martial Specialist">Earthling</option>
-                        <option value="Majin // Arcane Combatant">Majin</option>
-                        <option value="Namekian // Regeneration Specialist">Namekian</option>
-                    </select>
+                    <input type="text" id="hero-race" class="form-input" value="Frieza Race // Spatial Titan">
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">COMBAT ROLE / CLASS</label>
-                    <select id="hero-role" class="form-select">
-                        <option value="Lead Heavy Strike">Lead Heavy Strike</option>
-                        <option value="Tactical Ki Specialist">Tactical Ki Specialist</option>
-                        <option value="Support Noise & Defense">Support Noise & Defense</option>
-                        <option value="Balanced Combat Operative">Balanced Combat Operative</option>
-                    </select>
+                    <input type="text" id="hero-role" class="form-input" value="Lead Heavy Strike / Spatial Titan">
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">RECORDED POWER LEVEL</label>
-                    <input type="text" id="hero-power" class="form-input" value="9,500,000">
-                </div>
-
-                <div class="card-header" style="margin-top:20px;">ATTRIBUTES & COMBAT STATS</div>
-
-                <div class="slider-row">
-                    <label>MAX HEALTH</label>
-                    <input type="range" id="stat-hp" min="10" max="100" value="90" oninput="updatePreview()">
-                    <span class="slider-val" id="val-hp">90</span>
-                </div>
-
-                <div class="slider-row">
-                    <label>MAX KI</label>
-                    <input type="range" id="stat-ki" min="10" max="100" value="75" oninput="updatePreview()">
-                    <span class="slider-val" id="val-ki">75</span>
-                </div>
-
-                <div class="slider-row">
-                    <label>MAX STAMINA</label>
-                    <input type="range" id="stat-stm" min="10" max="100" value="85" oninput="updatePreview()">
-                    <span class="slider-val" id="val-stm">85</span>
-                </div>
-
-                <div class="slider-row">
-                    <label>STRIKE SUPER</label>
-                    <input type="range" id="stat-str" min="10" max="100" value="95" oninput="updatePreview()">
-                    <span class="slider-val" id="val-str">95</span>
-                </div>
-
-                <div class="slider-row">
-                    <label>KI BLAST SUPER</label>
-                    <input type="range" id="stat-kib" min="10" max="100" value="60" oninput="updatePreview()">
-                    <span class="slider-val" id="val-kib">60</span>
-                </div>
-
-                <div class="form-group" style="margin-top:15px;">
-                    <label class="form-label">PRIMARY SKILL LOADOUT (COMMA SEPARATED)</label>
-                    <input type="text" id="hero-skills" class="form-input" value="Shadow Crusher, Sledgehammer, Meteor Burst">
+                    <input type="text" id="hero-power" class="form-input" value="9,240,000">
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">TACTICAL LORE NOTES</label>
-                    <textarea id="hero-lore" class="form-textarea" rows="3">Enhanced spatial strike capabilities designed for tight corner pressuring and burst counters.</textarea>
+                    <label class="form-label">DEPLOYMENT STATUS TAG</label>
+                    <select id="hero-status" class="form-select">
+                        <option value="UNLEASHED">UNLEASHED</option>
+                        <option value="ACTIVE">ACTIVE</option>
+                        <option value="STANDBY">STANDBY</option>
+                    </select>
+                </div>
+
+                <div class="card-header" style="margin-top:20px;">XENOVERSE ATTRIBUTES</div>
+
+                <div class="slider-row"><label>MAX HEALTH</label><input type="range" id="stat-hp" min="10" max="100" value="95"><span class="slider-val" id="val-hp">95</span></div>
+                <div class="slider-row"><label>MAX KI</label><input type="range" id="stat-ki" min="10" max="100" value="70"><span class="slider-val" id="val-ki">70</span></div>
+                <div class="slider-row"><label>MAX STAMINA</label><input type="range" id="stat-stm" min="10" max="100" value="85"><span class="slider-val" id="val-stm">85</span></div>
+                <div class="slider-row"><label>STRIKE SUPER</label><input type="range" id="stat-str" min="10" max="100" value="100"><span class="slider-val" id="val-str">100</span></div>
+                <div class="slider-row"><label>KI BLAST SUPER</label><input type="range" id="stat-kib" min="10" max="100" value="60"><span class="slider-val" id="val-kib">60</span></div>
+
+                <div class="form-group" style="margin-top:15px;">
+                    <label class="form-label">EQUIPPED SKILLS (COMMA SEPARATED)</label>
+                    <input type="text" id="hero-skills" class="form-input" value="Shadow Crusher, Sledgehammer, Meteor Burst, Evasive Teleport">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">TACTICAL LORE & SHOW NOTES</label>
+                    <textarea id="hero-lore" class="form-textarea" rows="3">Primary front-line spatial combat lead. Specialized in heavy strike counters, pressure locking, and absolute battlefield control during high-intensity engagements.</textarea>
                 </div>
 
                 <div class="btn-action-group">
-                    <button type="button" class="btn-save" onclick="saveCustomCharacter()">SAVE HERO DOSSIER</button>
-                    <button type="reset" class="btn-reset" onclick="setTimeout(updatePreview, 50)">RESET</button>
+                    <button type="button" class="btn-save" onclick="saveOfficialCharacter()">PUBLISH TO CANON ROSTER</button>
                 </div>
             </form>
         </div>
 
-        <!-- REAL-TIME LIVE PREVIEW PANEL -->
+        <!-- PREVIEW PANEL -->
         <div class="builder-card">
-            <div class="card-header">LIVE DOSSIER PREVIEW // TELEMETRY</div>
+            <div class="card-header">CANON TELEMETRY PREVIEW</div>
             
             <div class="preview-box">
                 <div class="preview-top">
                     <div style="display:flex; align-items:center; gap:12px;">
                         <div class="preview-avatar" id="prev-avatar">KG</div>
                         <div>
-                            <div style="font-size:1.1rem; font-weight:bold; color:#fff;" id="prev-name">KAIGE MK-II</div>
-                            <div style="font-size:0.75rem; color:var(--db-ki);" id="prev-spec">Frieza Race // Spatial Titan</div>
+                            <div style="font-size:1.1rem; font-weight:bold; color:#fff;" id="prev-name">KAIGE</div>
+                            <div style="font-size:0.75rem; color:var(--db-ki);" id="prev-spec">Frieza Race // Lead Heavy Strike</div>
                         </div>
                     </div>
                     <div style="text-align:right;">
                         <div style="font-size:0.6rem; color:var(--db-gold);">POWER LEVEL</div>
-                        <div style="font-size:1rem; font-weight:bold; color:#fff;" id="prev-power">9,500,000</div>
+                        <div style="font-size:1rem; font-weight:bold; color:#fff;" id="prev-power">9,240,000</div>
                     </div>
                 </div>
 
                 <div class="attr-bar-container">
-                    <div class="attr-bar-item"><span class="attr-label">HEALTH</span><div class="attr-bar-bg"><div class="attr-bar-fill" id="bar-hp" style="width:90%;"></div></div></div>
-                    <div class="attr-bar-item"><span class="attr-label">KI SPECS</span><div class="attr-bar-bg"><div class="attr-bar-fill" id="bar-ki" style="width:75%;"></div></div></div>
+                    <div class="attr-bar-item"><span class="attr-label">HEALTH</span><div class="attr-bar-bg"><div class="attr-bar-fill" id="bar-hp" style="width:95%;"></div></div></div>
+                    <div class="attr-bar-item"><span class="attr-label">KI SPECS</span><div class="attr-bar-bg"><div class="attr-bar-fill" id="bar-ki" style="width:70%;"></div></div></div>
                     <div class="attr-bar-item"><span class="attr-label">STAMINA</span><div class="attr-bar-bg"><div class="attr-bar-fill" id="bar-stm" style="width:85%;"></div></div></div>
-                    <div class="attr-bar-item"><span class="attr-label">STRIKE SUPER</span><div class="attr-bar-bg"><div class="attr-bar-fill" id="bar-str" style="width:95%;"></div></div></div>
+                    <div class="attr-bar-item"><span class="attr-label">STRIKE SUPER</span><div class="attr-bar-bg"><div class="attr-bar-fill" id="bar-str" style="width:100%;"></div></div></div>
                     <div class="attr-bar-item"><span class="attr-label">KI BLAST SUPER</span><div class="attr-bar-bg"><div class="attr-bar-fill" id="bar-kib" style="width:60%;"></div></div></div>
                 </div>
 
                 <div style="margin-top:15px; border-top:1px dashed rgba(0,229,255,0.2); padding-top:10px;">
                     <div style="font-size:0.7rem; color:var(--db-gold); margin-bottom:6px;">EQUIPPED SKILLS</div>
-                    <div id="prev-skills" style="font-size:0.75rem; color:#d0e0f0;">Shadow Crusher, Sledgehammer, Meteor Burst</div>
+                    <div id="prev-skills" style="font-size:0.75rem; color:#d0e0f0;">Shadow Crusher, Sledgehammer, Meteor Burst, Evasive Teleport</div>
                 </div>
 
                 <div style="margin-top:12px; border-top:1px dashed rgba(0,229,255,0.2); padding-top:10px;">
                     <div style="font-size:0.7rem; color:var(--db-gold); margin-bottom:6px;">TACTICAL LORE</div>
-                    <div id="prev-lore" style="font-size:0.75rem; color:#8a9ba8; line-height:1.5;">Enhanced spatial strike capabilities designed for tight corner pressuring and burst counters.</div>
+                    <div id="prev-lore" style="font-size:0.75rem; color:#8a9ba8; line-height:1.5;">Primary front-line spatial combat lead. Specialized in heavy strike counters, pressure locking, and absolute battlefield control.</div>
                 </div>
             </div>
 
             <div id="save-status" style="margin-top:15px; font-size:0.75rem; color:var(--db-ki); text-align:center; display:none; font-weight:bold;">
-                ✓ CHARACTER DOSSIER SAVED TO LOCAL REPOSITORY
+                ✓ CANON CHARACTER PUBLISHED TO OFFICIAL SHOW DATABASE
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    const DEV_PASSCODE = '@jimbo21';
+    const DIRECTOR_PASSCODE = '@Sammyzzz3Jimbo21';
 
-    function checkMaintenanceGate() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const passParam = urlParams.get('pass');
-        const overlay = document.getElementById('maintenance-overlay');
-
-        if (passParam === DEV_PASSCODE || localStorage.getItem('pantheon_maint_unlocked') === 'true') {
-            localStorage.setItem('pantheon_maint_unlocked', 'true');
-            if (overlay) overlay.style.display = 'none';
+    function checkDirectorAuth() {
+        if (localStorage.getItem('pantheon_director_authenticated') === 'true') {
+            document.getElementById('director-auth-overlay').style.display = 'none';
         } else {
-            if (overlay) overlay.style.display = 'flex';
+            document.getElementById('director-auth-overlay').style.display = 'flex';
         }
     }
 
-    function unlockMaintenance(e) {
+    function authenticateDirector(e) {
         e.preventDefault();
-        const inputVal = document.getElementById('maint-key-input').value.trim();
-        if (inputVal === DEV_PASSCODE) {
-            localStorage.setItem('pantheon_maint_unlocked', 'true');
-            document.getElementById('maintenance-overlay').style.display = 'none';
+        const inputKey = document.getElementById('director-key-input').value.trim();
+        if (inputKey === DIRECTOR_PASSCODE) {
+            localStorage.setItem('pantheon_director_authenticated', 'true');
+            document.getElementById('director-auth-overlay').style.display = 'none';
         } else {
-            document.getElementById('maint-error').innerText = 'INVALID KEY';
+            document.getElementById('auth-error').innerText = 'ACCESS DENIED: INVALID DIRECTOR PASSKEY';
         }
     }
 
     function updatePreview() {
-        const name = document.getElementById('hero-name').value || 'CUSTOM HERO';
+        const name = document.getElementById('hero-name').value || 'CANON HERO';
         const race = document.getElementById('hero-race').value;
         const role = document.getElementById('hero-role').value;
         const power = document.getElementById('hero-power').value || '0';
@@ -476,14 +447,12 @@
         const skills = document.getElementById('hero-skills').value;
         const lore = document.getElementById('hero-lore').value;
 
-        // Update slider number displays
         document.getElementById('val-hp').innerText = hp;
         document.getElementById('val-ki').innerText = ki;
         document.getElementById('val-stm').innerText = stm;
         document.getElementById('val-str').innerText = str;
         document.getElementById('val-kib').innerText = kib;
 
-        // Update preview elements
         document.getElementById('prev-name').innerText = name.toUpperCase();
         document.getElementById('prev-spec').innerText = `${race} // ${role}`;
         document.getElementById('prev-power').innerText = power;
@@ -499,35 +468,34 @@
         document.getElementById('prev-lore').innerText = lore || 'No tactical notes provided.';
     }
 
-    function saveCustomCharacter() {
+    function saveOfficialCharacter() {
+        const key = document.getElementById('hero-name').value.toLowerCase().replace(/[^a-z0-0]/g, '');
         const heroData = {
-            id: 'custom_' + Date.now(),
-            name: document.getElementById('hero-name').value,
-            race: document.getElementById('hero-race').value,
-            role: document.getElementById('hero-role').value,
+            id: key || 'hero_' + Date.now(),
+            initials: document.getElementById('hero-name').value.substring(0, 2).toUpperCase(),
+            name: document.getElementById('hero-name').value.toUpperCase(),
+            spec: `${document.getElementById('hero-race').value} // ${document.getElementById('hero-role').value}`,
             power: document.getElementById('hero-power').value,
-            stats: {
-                hp: document.getElementById('stat-hp').value,
-                ki: document.getElementById('stat-ki').value,
-                stm: document.getElementById('stat-stm').value,
-                str: document.getElementById('stat-str').value,
-                kib: document.getElementById('stat-kib').value
-            },
-            skills: document.getElementById('hero-skills').value,
-            lore: document.getElementById('hero-lore').value,
-            timestamp: new Date().toISOString()
+            status: document.getElementById('hero-status').value,
+            health: `${document.getElementById('stat-hp').value} / 100`,
+            ki: `${document.getElementById('stat-ki').value} / 100`,
+            stamina: `${document.getElementById('stat-stm').value} / 100`,
+            strikeSuper: `${document.getElementById('stat-str').value} / 100`,
+            kiSuper: `${document.getElementById('stat-kib').value} / 100`,
+            skills: document.getElementById('hero-skills').value.split(',').map(s => ({ name: s.trim(), type: 'strike' })),
+            lore: document.getElementById('hero-lore').value
         };
 
-        const existingHeroes = JSON.parse(localStorage.getItem('pantheon_custom_heroes') || '[]');
-        existingHeroes.push(heroData);
-        localStorage.setItem('pantheon_custom_heroes', JSON.stringify(existingHeroes));
+        const officialRoster = JSON.parse(localStorage.getItem('pantheon_official_roster') || '{}');
+        officialRoster[heroData.id] = heroData;
+        localStorage.setItem('pantheon_official_roster', JSON.stringify(officialRoster));
 
         const status = document.getElementById('save-status');
         status.style.display = 'block';
         setTimeout(() => { status.style.display = 'none'; }, 3000);
     }
 
-    checkMaintenanceGate();
+    checkDirectorAuth();
     updatePreview();
 </script>
 
