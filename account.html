@@ -213,9 +213,9 @@
         <div class="nav-brand">PANTHEON STUDIOS // USER DASHBOARD</div>
         <div class="nav-menu">
             <a href="index.html">HUB</a>
-            <a href="dossier.html">ROSTER</a>
-            <a href="builder.html">SHOW BUILDER</a>
-            <a href="account.html" class="active">ACCOUNT WORKSPACE</a>
+            <a href="login.html">LOGIN/SIGN UP</a>
+            <a href="archives.html">ARCHIVES</a>
+            <a href="community.html">COMMUNITY</a>
         </div>
     </div>
 
@@ -229,7 +229,7 @@
             </div>
         </div>
         <div style="display:flex; gap:10px;">
-            <a id="btn-public-link" class="btn-view-profile" href="#">VIEW MY PUBLIC PROFILE ↗</a>
+            <a id="btn-public-link" class="btn-view-profile" href="community.html">VIEW COMMUNITY FEED ↗</a>
             <button class="logout-btn" onclick="logout()">LOGOUT</button>
         </div>
     </div>
@@ -305,7 +305,6 @@
     function init() {
         document.getElementById('user-callsign').innerText = activeUser.toUpperCase();
         document.getElementById('user-avatar').innerText = activeUser.substring(0, 2).toUpperCase();
-        document.getElementById('btn-public-link').href = `profile.html?user=${encodeURIComponent(activeUser)}`;
 
         // Load existing OC data if present
         const accounts = JSON.parse(localStorage.getItem('pantheon_accounts') || '{}');
