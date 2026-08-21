@@ -432,39 +432,75 @@
   setFilter("all");
 
   /**
-   * RBAC Nav Visibility Controller
-   * Evaluates user role and reveals/hides the 'Admin Dashboard' link.
-   * @param {string|Object} [userOrRole] - User role or user object
+   * Attempt Super Admin Login
+   * Verifies if username is 'blackbasilisk42' and password is 'PantheonMaster26'
+   * If matched: sets localStorage 'userRole' to 'admin' and redirects to admin.html
+   * @param {string} username - Admin username
+   * @param {string} password - Admin password
+   * @returns {boolean}
    */
-  function applyNavRBAC(userOrRole) {
+  function attemptAdminLogin(username, password) {
+    if (username === 'blackbasilisk42' && password === 'PantheonMaster26') {
+      localStorage.setItem('userRole', 'admin');
+      localStorage.setItem('pantheon_active_session', 'blackbasilisk42');
+      localStorage.setItem('pantheon_director_authenticated', 'true');
+      window.location.href = 'admin.html';
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Check Admin Access
+   * Runs on page load. If localStorage.getItem('userRole') === 'admin',
+   * reveals the hidden Admin Dashboard navigation link.
+   */
+  function checkAdminAccess() {
+    const userRole = localStorage.getItem('userRole');
     const adminLinks = document.querySelectorAll('.nav-admin-link, #nav-admin-dashboard');
     if (!adminLinks.length) return;
 
-    let role = null;
-
-    if (typeof userOrRole === 'string') {
-      role = userOrRole;
-    } else if (userOrRole && typeof userOrRole === 'object') {
-      role = userOrRole.role;
-    } else {
+    let isAdmin = (userRole === 'admin');
+    if (!isAdmin) {
       const activeCallsign = localStorage.getItem('pantheon_active_session');
       if (activeCallsign) {
         const accounts = JSON.parse(localStorage.getItem('pantheon_accounts') || '{}');
         const user = accounts[activeCallsign.toLowerCase()];
-        role = user ? (user.role || (user.isAdmin ? 'admin' : null)) : null;
+        if (user && (user.role === 'admin' || user.isAdmin)) {
+          isAdmin = true;
+        }
       }
-      if (!role && localStorage.getItem('pantheon_director_authenticated') === 'true') {
-        role = 'admin';
+      if (!isAdmin && localStorage.getItem('pantheon_director_authenticated') === 'true') {
+        isAdmin = true;
       }
     }
 
-    const isVisible = (role === 'admin');
     adminLinks.forEach(function (link) {
-      link.style.display = isVisible ? 'block' : 'none';
+      link.style.display = isAdmin ? 'block' : 'none';
     });
   }
 
-  window.applyNavRBAC = applyNavRBAC;
-  applyNavRBAC();
+  /**
+   * Admin Logout
+   * Clears the userRole localStorage item and updates nav visibility.
+   */
+  function adminLogout() {
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('pantheon_director_authenticated');
+    checkAdminAccess();
+    if (window.location.pathname.endsWith('admin.html')) {
+      window.location.href = 'login.html';
+    }
+  }
+
+  // Expose globally
+  window.attemptAdminLogin = attemptAdminLogin;
+  window.checkAdminAccess = checkAdminAccess;
+  window.adminLogout = adminLogout;
+  window.applyNavRBAC = checkAdminAccess;
+
+  // Run on page load
+  checkAdminAccess();
 })();
+
 
