@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PANTHEON STUDIOS // DOSSIER MANAGER</title>
+    <style>
+        :root {
+            --bg-color: #0b0e14;
+            --panel-bg: #141923;
+            --accent-green: #00ff88;
+            --db-gold: #ffb700;
+            --text-main: #e0e6ed;
+            --text-dim: #8b9bb4;
+            --border-color: #232d3f;
+            --font-mono: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-mono);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 50% 30%, rgba(0, 255, 136, 0.05) 0%, transparent 70%),
+                linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 4px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* NAV HEADER */
+        .nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0 25px 0;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .nav-brand {
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: var(--accent-green);
+            letter-spacing: 2px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 18px;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            color: #c0daf0;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: bold;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            transition: color 0.2s ease;
+        }
+
+        .nav-menu a:hover, .nav-menu a.active {
+            color: var(--db-gold);
+        }
+
+        .controls-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: var(--panel-bg);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        button {
+            background: var(--accent-green);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            font-family: var(--font-mono);
+        }
+
+        button:hover { opacity: 0.85; }
+        button.secondary { background: #3b485d; color: #fff; }
+
+        .editor-panel {
+            background: var(--panel-bg);
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            display: grid;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        label {
+            color: var(--accent-green);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        input, textarea {
+            background: #080a0f;
+            border: 1px solid var(--border-color);
+            color: #fff;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        textarea { height: 100px; resize: vertical; }
+
+        /* Rendered Page Styling */
+        .dossier-rendered {
+            background: var(--panel-bg);
+            padding: 30px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            display: none;
+        }
+
+        .dossier-rendered h1 {
+            color: var(--accent-green);
+            margin-top: 0;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .dossier-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            background: #080a0f;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+        }
+
+        .dossier-photo {
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+            border: 1px solid var(--accent-green);
+            margin-bottom: 25px;
+        }
+
+        .dossier-section {
+            margin-bottom: 25px;
+        }
+
+        .dossier-section h2 {
+            color: var(--accent-green);
+            font-size: 1.2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 5px;
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- NAV HEADER -->
+    <div class="nav-header">
+        <div class="nav-brand">PANTHEON STUDIOS // DOSSIER BUILDER</div>
+        <div class="nav-menu">
+            <a href="index.html">HUB</a>
+            <a href="login.html">LOGIN/SIGN UP</a>
+            <a href="archives.html" class="active">ARCHIVES</a>
+            <a href="community.html">COMMUNITY</a>
+        </div>
+    </div>
+
+    <!-- Top Action Bar -->
+    <div class="controls-bar">
+        <button id="btn-save" onclick="saveAndPublish()">Save & Publish</button>
+        <button id="btn-edit" class="secondary hidden" onclick="switchToEdit()">Edit Dossier</button>
+    </div>
+
+    <!-- Form View (Fill-in-the-blanks) -->
+    <div id="editor" class="editor-panel">
+        <h2>Dossier Builder</h2>
+        
+        <div class="form-group">
+            <label>Title / Header</label>
+            <input type="text" id="in-title" value="DOSSIER: KAIGE // THE MULTIVERSE TITAN">
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Classification</label>
+                <input type="text" id="in-class" value="Primary Background Antagonist / Main Character">
+            </div>
+            <div class="form-group">
+                <label>Race</label>
+                <input type="text" id="in-race" value="Frieza Race (Titan Anomaly)">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Height Profile</label>
+                <input type="text" id="in-height" value="~2x Standard Frieza Scale">
+            </div>
+            <div class="form-group">
+                <label>Primary Gamertag</label>
+                <input type="text" id="in-tag" value="blackbasilisk42">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Affiliation</label>
+            <input type="text" id="in-affil" value="Pantheon Core // Dragonball Legacy Reborn (DBLR)">
+        </div>
+
+        <div class="form-group">
+            <label>Photo URL or Path</label>
+            <input type="text" id="in-photo" value="images/kaige-portrait.jpg" placeholder="e.g. images/kaige.jpg or http://...">
+        </div>
+
+        <div class="form-group">
+            <label>Section I: Overview & Anatomy</label>
+            <textarea id="in-sec1">Standing at nearly twice the height of a conventional Frieza Race warrior, Kaige’s sheer physical scale transforms standard arena geometry. He isn't just another custom character in Conton City; his massive physical frame makes even basic neutral stances look imposing.
+
+• Signature Aura: Manifests a distinct dark energy signature featuring a piercing emerald-green core framed by obsidian black undertones.
+• The Golden Override: Rarely accesses the Frieza Race Golden Form, treating it not as a standard transformation crutch, but as an extraordinarily rare power override reserved for narrative-altering threats.</textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Section II: Community Standing & Origin Debates</label>
+            <textarea id="in-sec2">Across competitive gaming circles and large creative networks like the 160+ member Dragonball Legacy Reborn (DBLR) writer and voice-actor ecosystem, Kaige is established as a true community pillar.
+
+• The Precursor Fact: The gamertag blackbasilisk42 and the Kaige persona directly pre-date the official reveal of Black Frieza in the Dragon Ball Super manga saga. He didn't copy official media—he established the community benchmark for the dark Frieza Race aesthetic long before official channels caught up.
+• The Modding Community Debate: Because Kaige operates with high-tier efficiency, players frequently debate whether he is a standard player character or a custom "lobby boss" engineered by modders to test the limits of what a Frieza Race character can do.
+• OG Standing: Within group chats and creative leadership hubs, Kaige functions as a respected veteran voice, focusing on talent development, team structure, and group cohesion over personal clout.</textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Section III: Combat Methodology & Playstyle</label>
+            <textarea id="in-sec3">Kaige’s playstyle relies on aggressive territorial dominance, precise timing, and spatial calculations rather than passive zoning.
+
+• Center of Gravity System: A specialized spatial awareness approach that calculates tracking arcs, opponent vanish frames, and deadzones in real time to shut down movement before it happens.
+• Heavy Ki-Blast Compression: Employs high-impact, max-optimized ki bursts designed to shatter defense meters and punish opponents during extended vanish trades.
+• Manual Counter-Casting: Relies on strict manual timing to intercept aggressive rushes mid-animation (using skills like Dark Inscription), instantly turning an opponent's momentum back against them.</textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Section IV: The "Entity" Atmosphere & Voldemort Effect</label>
+            <textarea id="in-sec4">To an outsider looking at text on a screen, the "Voldemort Effect" can sound like an exaggeration—until they witness how high-ranking group leaders and veteran players actually speak to him in private channels.
+
+• Calculated Presence: Kaige doesn't spam public lobbies or constantly speak in group chats. His interactions are rare, deliberate, and measured, giving his sudden appearance in a room immediate weight.
+• Elevated Manner of Speech: Speaking with formal, composed authority rather than casual slang, his presence commands natural quiet and respect. When he drops a message in a 20-person room, high-level leaders instantly step up, align with his points, and offer full backing.
+• The "Dark Lord" Archetype: Much like a high-tier entity whose name alone shifts the room's energy, his rare appearances create an atmosphere where players either show immediate deferential respect or actively avoid entering his match queue altogether.</textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Section V: Show Role & Multiverse Narrative Arc</label>
+            <textarea id="in-sec5">(PENDING PRODUCTION TEAM DISPATCHES // STRUCTURE PREPARED FOR FULL SCRIPT INPUT)</textarea>
+        </div>
+    </div>
+
+    <!-- Rendered View (The Live Wiki Page) -->
+    <div id="view-dossier" class="dossier-rendered">
+        <h1 id="out-title"></h1>
+        
+        <div class="dossier-meta">
+            <div><strong>Classification:</strong> <span id="out-class"></span></div>
+            <div><strong>Race:</strong> <span id="out-race"></span></div>
+            <div><strong>Height:</strong> <span id="out-height"></span></div>
+            <div><strong>Gamertag:</strong> <span id="out-tag"></span></div>
+            <div><strong>Affiliation:</strong> <span id="out-affil"></span></div>
+        </div>
+
+        <img id="out-photo" class="dossier-photo" src="" alt="Character Photo" onerror="this.style.display='none'" onload="this.style.display='block'">
+
+        <div class="dossier-section">
+            <h2>I. OVERVIEW & PHYSICAL ANATOMY</h2>
+            <div id="out-sec1"></div>
+        </div>
+
+        <div class="dossier-section">
+            <h2>II. COMMUNITY STANDING & ORIGIN DEBATES</h2>
+            <div id="out-sec2"></div>
+        </div>
+
+        <div class="dossier-section">
+            <h2>III. COMBAT METHODOLOGY & PLAYSTYLE</h2>
+            <div id="out-sec3"></div>
+        </div>
+
+        <div class="dossier-section">
+            <h2>IV. THE "ENTITY" ATMOSPHERE & THE VOLDEMORT EFFECT</h2>
+            <div id="out-sec4"></div>
+        </div>
+
+        <div class="dossier-section">
+            <h2>V. SHOW ROLE & MULTIVERSE NARRATIVE ARC</h2>
+            <div id="out-sec5"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const STORAGE_KEY = 'pantheon_dossier_kaige';
+
+    // Format plain text into styled HTML paragraphs and bullet points
+    function formatText(text) {
+        if (!text) return '';
+        let lines = text.split('\n');
+        let html = '';
+        let inList = false;
+
+        lines.forEach(line => {
+            let trimmed = line.trim();
+            if (trimmed.startsWith('•') || trimmed.startsWith('-')) {
+                if (!inList) { html += '<ul>'; inList = true; }
+                html += `<li>${trimmed.substring(1).trim()}</li>`;
+            } else {
+                if (inList) { html += '</ul>'; inList = false; }
+                if (trimmed.length > 0) {
+                    html += `<p>${trimmed}</p>`;
+                }
+            }
+        });
+        if (inList) html += '</ul>';
+        return html;
+    }
+
+    function saveAndPublish() {
+        const data = {
+            title: document.getElementById('in-title').value,
+            classification: document.getElementById('in-class').value,
+            race: document.getElementById('in-race').value,
+            height: document.getElementById('in-height').value,
+            tag: document.getElementById('in-tag').value,
+            affil: document.getElementById('in-affil').value,
+            photo: document.getElementById('in-photo').value,
+            sec1: document.getElementById('in-sec1').value,
+            sec2: document.getElementById('in-sec2').value,
+            sec3: document.getElementById('in-sec3').value,
+            sec4: document.getElementById('in-sec4').value,
+            sec5: document.getElementById('in-sec5').value
+        };
+
+        // Save to Browser Storage
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        
+        render(data);
+        switchToView();
+    }
+
+    function render(data) {
+        document.getElementById('out-title').innerText = data.title;
+        document.getElementById('out-class').innerText = data.classification;
+        document.getElementById('out-race').innerText = data.race;
+        document.getElementById('out-height').innerText = data.height;
+        document.getElementById('out-tag').innerText = data.tag;
+        document.getElementById('out-affil').innerText = data.affil;
+        
+        const photoElem = document.getElementById('out-photo');
+        if (data.photo) {
+            photoElem.src = data.photo;
+        } else {
+            photoElem.style.display = 'none';
+        }
+
+        document.getElementById('out-sec1').innerHTML = formatText(data.sec1);
+        document.getElementById('out-sec2').innerHTML = formatText(data.sec2);
+        document.getElementById('out-sec3').innerHTML = formatText(data.sec3);
+        document.getElementById('out-sec4').innerHTML = formatText(data.sec4);
+        document.getElementById('out-sec5').innerHTML = formatText(data.sec5);
+    }
+
+    function loadSavedData() {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+            const data = JSON.parse(saved);
+            document.getElementById('in-title').value = data.title || '';
+            document.getElementById('in-class').value = data.classification || '';
+            document.getElementById('in-race').value = data.race || '';
+            document.getElementById('in-height').value = data.height || '';
+            document.getElementById('in-tag').value = data.tag || '';
+            document.getElementById('in-affil').value = data.affil || '';
+            document.getElementById('in-photo').value = data.photo || '';
+            document.getElementById('in-sec1').value = data.sec1 || '';
+            document.getElementById('in-sec2').value = data.sec2 || '';
+            document.getElementById('in-sec3').value = data.sec3 || '';
+            document.getElementById('in-sec4').value = data.sec4 || '';
+            document.getElementById('in-sec5').value = data.sec5 || '';
+            
+            render(data);
+            switchToView();
+        }
+    }
+
+    function switchToView() {
+        document.getElementById('editor').classList.add('hidden');
+        document.getElementById('view-dossier').style.display = 'block';
+        document.getElementById('btn-save').classList.add('hidden');
+        document.getElementById('btn-edit').classList.remove('hidden');
+    }
+
+    function switchToEdit() {
+        document.getElementById('editor').classList.remove('hidden');
+        document.getElementById('view-dossier').style.display = 'none';
+        document.getElementById('btn-save').classList.remove('hidden');
+        document.getElementById('btn-edit').classList.add('hidden');
+    }
+
+    // Auto load on open
+    window.onload = loadSavedData;
+</script>
+
+</body>
+</html>

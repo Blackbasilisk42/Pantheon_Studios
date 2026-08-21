@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PANTHEON STUDIOS // OFFICIAL SHOW ROSTER MANAGER</title>
+    <style>
+        :root {
+            --bg-void: #060913;
+            --db-gold: #ffb700;
+            --db-orange: #ff5500;
+            --db-cyan: #00e5ff;
+            --db-ki: #00ff88;
+            --db-purple: #a100ff;
+            --db-red: #ff3333;
+            --panel-bg: rgba(12, 18, 32, 0.92);
+            --scouter-glow: 0 0 12px rgba(255, 183, 0, 0.35);
+            --font-mono: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            background-color: var(--bg-void);
+            color: var(--db-cyan);
+            font-family: var(--font-mono);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 50% 30%, rgba(255, 183, 0, 0.08) 0%, transparent 70%),
+                linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 4px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* NAV HEADER */
+        .nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0 25px 0;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .nav-brand {
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: #00ff88;
+            letter-spacing: 2px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 18px;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            color: #c0daf0;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: bold;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            transition: color 0.2s ease;
+        }
+
+        .nav-menu a:hover, .nav-menu a.active {
+            color: var(--db-gold);
+        }
+
+        .admin-banner {
+            background: rgba(255, 183, 0, 0.1);
+            border: 1px solid var(--db-gold);
+            color: var(--db-gold);
+            padding: 12px 18px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* BUILDER GRID */
+        .builder-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .builder-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--db-gold);
+            box-shadow: var(--scouter-glow);
+            padding: 22px;
+            clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
+        }
+
+        .card-header {
+            font-size: 0.9rem;
+            color: var(--db-gold);
+            border-bottom: 1px dashed rgba(255, 183, 0, 0.4);
+            padding-bottom: 8px;
+            margin-bottom: 18px;
+            letter-spacing: 1.5px;
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.75rem;
+            color: #8a9ba8;
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            background: rgba(6, 9, 19, 0.9);
+            border: 1px solid rgba(0, 229, 255, 0.4);
+            color: #ffffff;
+            padding: 9px 12px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            border-color: var(--db-gold);
+            box-shadow: 0 0 8px rgba(255, 183, 0, 0.3);
+        }
+
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .slider-row label {
+            width: 120px;
+            font-size: 0.7rem;
+            color: #8a9ba8;
+        }
+
+        .slider-row input[type="range"] {
+            flex: 1;
+            accent-color: var(--db-ki);
+        }
+
+        .slider-val {
+            width: 35px;
+            font-size: 0.75rem;
+            color: var(--db-ki);
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .preview-box {
+            background: rgba(6, 9, 19, 0.95);
+            border: 1px solid var(--db-cyan);
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.15);
+        }
+
+        .preview-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .preview-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid var(--db-gold);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #ffffff;
+            background: #000;
+            box-shadow: 0 0 10px rgba(255, 183, 0, 0.4);
+        }
+
+        .attr-bar-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 15px 0;
+        }
+
+        .attr-bar-item {
+            display: flex;
+            align-items: center;
+            font-size: 0.7rem;
+        }
+
+        .attr-label {
+            width: 110px;
+            color: #8a9ba8;
+        }
+
+        .attr-bar-bg {
+            flex: 1;
+            height: 10px;
+            background: rgba(0, 229, 255, 0.1);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+        }
+
+        .attr-bar-fill {
+            height: 100%;
+            background: var(--db-ki);
+            box-shadow: 0 0 6px var(--db-ki);
+            width: 50%;
+            transition: width 0.2s ease;
+        }
+
+        .btn-action-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn-save {
+            flex: 1;
+            background: #00ff88;
+            color: #000;
+            border: none;
+            padding: 12px;
+            font-family: var(--font-mono);
+            font-weight: 900;
+            font-size: 0.8rem;
+            cursor: pointer;
+            letter-spacing: 1.5px;
+            clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+        }
+
+        /* DIRECTOR AUTH OVERLAY */
+        #director-auth-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #060913;
+            z-index: 99999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .auth-card {
+            background: rgba(12, 18, 32, 0.96);
+            border: 2px solid var(--db-gold);
+            box-shadow: 0 0 25px rgba(255, 183, 0, 0.4);
+            width: 440px;
+            padding: 30px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<!-- DIRECTOR AUTHENTICATION GATE OVERLAY -->
+<div id="director-auth-overlay">
+    <div class="auth-card">
+        <div style="color:var(--db-gold); font-size:1.1rem; font-weight:bold; letter-spacing:2px; margin-bottom:8px;">🔒 DIRECTOR ACCESS LOCK</div>
+        <div style="color:var(--db-ki); font-size:0.75rem; margin-bottom:20px; letter-spacing:1px;">OFFICIAL CANON ROSTER BUILDER</div>
+        <form onsubmit="authenticateDirector(event)">
+            <input type="password" id="director-key-input" placeholder="ENTER DIRECTOR PASSKEY..." required style="width:100%; background:#000; border:1px solid var(--db-gold); color:#fff; padding:10px; font-family:var(--font-mono); font-size:0.8rem; box-sizing:border-box; margin-bottom:15px; outline:none;">
+            <button type="submit" style="background:var(--db-gold); color:#000; border:none; padding:10px 18px; font-family:var(--font-mono); font-weight:bold; cursor:pointer; width:100%;">AUTHENTICATE DIRECTOR</button>
+        </form>
+        <div id="auth-error" style="color:var(--db-red); font-size:0.75rem; margin-top:12px; font-weight:bold;"></div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- NAV HEADER -->
+    <div class="nav-header">
+        <div class="nav-brand">PANTHEON STUDIOS // SHOW BUILDER</div>
+        <div class="nav-menu">
+            <a href="index.html">HUB</a>
+            <a href="login.html">LOGIN/SIGN UP</a>
+            <a href="archives.html">ARCHIVES</a>
+            <a href="community.html">COMMUNITY</a>
+        </div>
+    </div>
+
+    <div class="admin-banner">
+        <span>🎬 CANON SHOW ROSTER MANAGER // DRAGONBALL LEGACY REBORN</span>
+        <span style="color:var(--db-ki);">DIRECTOR ACCESS GRANTED</span>
+    </div>
+
+    <div class="builder-grid">
+        <!-- FORM PANEL -->
+        <div class="builder-card">
+            <div class="card-header">CANON CAST SPECIFICATIONS</div>
+            <form id="hero-builder-form" oninput="updatePreview()">
+                <div class="form-group">
+                    <label class="form-label">CHARACTER NAME / CALLSIGN</label>
+                    <input type="text" id="hero-name" class="form-input" value="KAIGE" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">RACE / SPECIES ORIGIN</label>
+                    <input type="text" id="hero-race" class="form-input" value="Frieza Race // Spatial Titan">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">COMBAT ROLE / CLASS</label>
+                    <input type="text" id="hero-role" class="form-input" value="Lead Heavy Strike / Spatial Titan">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">RECORDED POWER LEVEL</label>
+                    <input type="text" id="hero-power" class="form-input" value="9,240,000">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">DEPLOYMENT STATUS TAG</label>
+                    <select id="hero-status" class="form-select">
+                        <option value="UNLEASHED">UNLEASHED</option>
+                        <option value="ACTIVE">ACTIVE</option>
+                        <option value="STANDBY">STANDBY</option>
+                    </select>
+                </div>
+
+                <div class="card-header" style="margin-top:20px;">XENOVERSE ATTRIBUTES</div>
+
+                <div class="slider-row"><label>MAX HEALTH</label><input type="range" id="stat-hp" min="10" max="100" value="95"><span class="slider-val" id="val-hp">95</span></div>
+                <div class="slider-row"><label>MAX KI</label><input type="range" id="stat-ki" min="10" max="100" value="70"><span class="slider-val" id="val-ki">70</span></div>
+                <div class="slider-row"><label>MAX STAMINA</label><input type="range" id="stat-stm" min="10" max="100" value="85"><span class="slider-val" id="val-stm">85</span></div>
+                <div class="slider-row"><label>STRIKE SUPER</label><input type="range" id="stat-str" min="10" max="100" value="100"><span class="slider-val" id="val-str">100</span></div>
+                <div class="slider-row"><label>KI BLAST SUPER</label><input type="range" id="stat-kib" min="10" max="100" value="60"><span class="slider-val" id="val-kib">60</span></div>
+
+                <div class="form-group" style="margin-top:15px;">
+                    <label class="form-label">EQUIPPED SKILLS (COMMA SEPARATED)</label>
+                    <input type="text" id="hero-skills" class="form-input" value="Shadow Crusher, Sledgehammer, Meteor Burst, Evasive Teleport">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">TACTICAL LORE & SHOW NOTES</label>
+                    <textarea id="hero-lore" class="form-textarea" rows="3">Primary front-line spatial combat lead. Specialized in heavy strike counters, pressure locking, and absolute battlefield control during high-intensity engagements.</textarea>
+                </div>
+
+                <div class="btn-action-group">
+                    <button type="button" class="btn-save" onclick="saveOfficialCharacter()">PUBLISH TO CANON ROSTER</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- PREVIEW PANEL -->
+        <div class="builder-card">
+            <div class="card-header">CANON TELEMETRY PREVIEW</div>
+            
+            <div class="preview-box">
+                <div class="preview-top">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <div class="preview-avatar" id="prev-avatar">KG</div>
+                        <div>
+                            <div style="font-size:1.1rem; font-weight:bold; color:#fff;" id="prev-name">KAIGE</div>
+                            <div style="font-size:0.75rem; color:var(--db-ki);" id="prev-spec">Frieza Race // Lead Heavy Strike</div>
+                        </div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-size:0.6rem; color:var(--db-gold);">POWER LEVEL</div>
+                        <div style="font-size:1rem; font-weight:bold; color:#fff;" id="prev-power">9,240,000</div>
+                    </div>
+                </div>
+
+                <div class="attr-bar-container">
+                    <div class="attr-bar-item"><span class="attr-label">HEALTH</span><div class="attr-bar-bg"><div class="attr-bar-fill" id="bar-hp" style="width:95%;"></div></div></div>
+                    <div class="attr-bar-item"><span class="attr-label">KI SPECS</span><div class="attr-bar-bg"><div class="attr-bar-fill" id="bar-ki" style="width:70%;"></div></div></div>
+                    <div class="attr-bar-item"><span class="attr-label">STAMINA</span><div class="attr-bar-bg"><div class="attr-bar-fill" id="bar-stm" style="width:85%;"></div></div></div>
+                    <div class="attr-bar-item"><span class="attr-label">STRIKE SUPER</span><div class="attr-bar-bg"><div class="attr-bar-fill" id="bar-str" style="width:100%;"></div></div></div>
+                    <div class="attr-bar-item"><span class="attr-label">KI BLAST SUPER</span><div class="attr-bar-bg"><div class="attr-bar-fill" id="bar-kib" style="width:60%;"></div></div></div>
+                </div>
+
+                <div style="margin-top:15px; border-top:1px dashed rgba(0,229,255,0.2); padding-top:10px;">
+                    <div style="font-size:0.7rem; color:var(--db-gold); margin-bottom:6px;">EQUIPPED SKILLS</div>
+                    <div id="prev-skills" style="font-size:0.75rem; color:#d0e0f0;">Shadow Crusher, Sledgehammer, Meteor Burst, Evasive Teleport</div>
+                </div>
+
+                <div style="margin-top:12px; border-top:1px dashed rgba(0,229,255,0.2); padding-top:10px;">
+                    <div style="font-size:0.7rem; color:var(--db-gold); margin-bottom:6px;">TACTICAL LORE</div>
+                    <div id="prev-lore" style="font-size:0.75rem; color:#8a9ba8; line-height:1.5;">Primary front-line spatial combat lead. Specialized in heavy strike counters, pressure locking, and absolute battlefield control.</div>
+                </div>
+            </div>
+
+            <div id="save-status" style="margin-top:15px; font-size:0.75rem; color:var(--db-ki); text-align:center; display:none; font-weight:bold;">
+                ✓ CANON CHARACTER PUBLISHED TO OFFICIAL SHOW DATABASE
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const DIRECTOR_PASSCODE = '@Sammyzzz3Jimbo21';
+
+    function checkDirectorAuth() {
+        if (localStorage.getItem('pantheon_director_authenticated') === 'true') {
+            document.getElementById('director-auth-overlay').style.display = 'none';
+        } else {
+            document.getElementById('director-auth-overlay').style.display = 'flex';
+        }
+    }
+
+    function authenticateDirector(e) {
+        e.preventDefault();
+        const inputKey = document.getElementById('director-key-input').value.trim();
+        if (inputKey === DIRECTOR_PASSCODE) {
+            localStorage.setItem('pantheon_director_authenticated', 'true');
+            document.getElementById('director-auth-overlay').style.display = 'none';
+        } else {
+            document.getElementById('auth-error').innerText = 'ACCESS DENIED: INVALID DIRECTOR PASSKEY';
+        }
+    }
+
+    function updatePreview() {
+        const name = document.getElementById('hero-name').value || 'CANON HERO';
+        const race = document.getElementById('hero-race').value;
+        const role = document.getElementById('hero-role').value;
+        const power = document.getElementById('hero-power').value || '0';
+        
+        const hp = document.getElementById('stat-hp').value;
+        const ki = document.getElementById('stat-ki').value;
+        const stm = document.getElementById('stat-stm').value;
+        const str = document.getElementById('stat-str').value;
+        const kib = document.getElementById('stat-kib').value;
+
+        const skills = document.getElementById('hero-skills').value;
+        const lore = document.getElementById('hero-lore').value;
+
+        document.getElementById('val-hp').innerText = hp;
+        document.getElementById('val-ki').innerText = ki;
+        document.getElementById('val-stm').innerText = stm;
+        document.getElementById('val-str').innerText = str;
+        document.getElementById('val-kib').innerText = kib;
+
+        document.getElementById('prev-name').innerText = name.toUpperCase();
+        document.getElementById('prev-spec').innerText = `${race} // ${role}`;
+        document.getElementById('prev-power').innerText = power;
+        document.getElementById('prev-avatar').innerText = name.substring(0, 2).toUpperCase();
+
+        document.getElementById('bar-hp').style.width = hp + '%';
+        document.getElementById('bar-ki').style.width = ki + '%';
+        document.getElementById('bar-stm').style.width = stm + '%';
+        document.getElementById('bar-str').style.width = str + '%';
+        document.getElementById('bar-kib').style.width = kib + '%';
+
+        document.getElementById('prev-skills').innerText = skills || 'No skills equipped.';
+        document.getElementById('prev-lore').innerText = lore || 'No tactical notes provided.';
+    }
+
+    function saveOfficialCharacter() {
+        const key = document.getElementById('hero-name').value.toLowerCase().replace(/[^a-z0-9]/g, '');
+        const heroData = {
+            id: key || 'hero_' + Date.now(),
+            initials: document.getElementById('hero-name').value.substring(0, 2).toUpperCase(),
+            name: document.getElementById('hero-name').value.toUpperCase(),
+            spec: `${document.getElementById('hero-race').value} // ${document.getElementById('hero-role').value}`,
+            power: document.getElementById('hero-power').value,
+            status: document.getElementById('hero-status').value,
+            health: `${document.getElementById('stat-hp').value} / 100`,
+            ki: `${document.getElementById('stat-ki').value} / 100`,
+            stamina: `${document.getElementById('stat-stm').value} / 100`,
+            strikeSuper: `${document.getElementById('stat-str').value} / 100`,
+            kiSuper: `${document.getElementById('stat-kib').value} / 100`,
+            skills: document.getElementById('hero-skills').value.split(',').map(s => ({ name: s.trim(), type: 'strike' })),
+            lore: document.getElementById('hero-lore').value
+        };
+
+        const officialRoster = JSON.parse(localStorage.getItem('pantheon_official_roster') || '{}');
+        officialRoster[heroData.id] = heroData;
+        localStorage.setItem('pantheon_official_roster', JSON.stringify(officialRoster));
+
+        const status = document.getElementById('save-status');
+        status.style.display = 'block';
+        setTimeout(() => { status.style.display = 'none'; }, 3000);
+    }
+
+    checkDirectorAuth();
+    updatePreview();
+</script>
+
+</body>
+</html>
