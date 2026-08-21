@@ -433,22 +433,26 @@
 
   /**
    * Attempt Super Admin Login
-   * Verifies if username is 'blackbasilisk42' and password is 'PantheonMaster26'
+   * Verifies if username is 'blackbasilisk42' and password is '@croatoan'
    * If matched: sets localStorage 'userRole' to 'admin' and redirects to admin.html
+   * If wrong: throws a browser alert
    * @param {string} username - Admin username
    * @param {string} password - Admin password
    * @returns {boolean}
    */
   function attemptAdminLogin(username, password) {
-    if (username === 'blackbasilisk42' && password === 'PantheonMaster26') {
+    if (username === 'blackbasilisk42' && password === '@croatoan') {
       localStorage.setItem('userRole', 'admin');
       localStorage.setItem('pantheon_active_session', 'blackbasilisk42');
       localStorage.setItem('pantheon_director_authenticated', 'true');
       window.location.href = 'admin.html';
       return true;
+    } else {
+      alert('Invalid username or password. Access Denied.');
+      return false;
     }
-    return false;
   }
+
 
   /**
    * Check Admin Access
