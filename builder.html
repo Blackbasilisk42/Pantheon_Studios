@@ -422,12 +422,15 @@
     const DIRECTOR_PASSCODE = '@Sammyzzz3Jimbo21';
 
     function checkDirectorAuth() {
-        if (localStorage.getItem('pantheon_director_authenticated') === 'true') {
+        if (localStorage.getItem('userRole') === 'admin' || localStorage.getItem('pantheon_director_authenticated') === 'true') {
+            localStorage.setItem('userRole', 'admin');
+            localStorage.setItem('pantheon_director_authenticated', 'true');
             document.getElementById('director-auth-overlay').style.display = 'none';
         } else {
             document.getElementById('director-auth-overlay').style.display = 'flex';
         }
     }
+
 
     function authenticateDirector(e) {
         e.preventDefault();
