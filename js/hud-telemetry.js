@@ -430,4 +430,41 @@
   updateClock();
   setInterval(updateClock, 1);
   setFilter("all");
+
+  /**
+   * RBAC Nav Visibility Controller
+   * Evaluates user role and reveals/hides the 'Admin Dashboard' link.
+   * @param {string|Object} [userOrRole] - User role or user object
+   */
+  function applyNavRBAC(userOrRole) {
+    const adminLinks = document.querySelectorAll('.nav-admin-link, #nav-admin-dashboard');
+    if (!adminLinks.length) return;
+
+    let role = null;
+
+    if (typeof userOrRole === 'string') {
+      role = userOrRole;
+    } else if (userOrRole && typeof userOrRole === 'object') {
+      role = userOrRole.role;
+    } else {
+      const activeCallsign = localStorage.getItem('pantheon_active_session');
+      if (activeCallsign) {
+        const accounts = JSON.parse(localStorage.getItem('pantheon_accounts') || '{}');
+        const user = accounts[activeCallsign.toLowerCase()];
+        role = user ? (user.role || (user.isAdmin ? 'admin' : null)) : null;
+      }
+      if (!role && localStorage.getItem('pantheon_director_authenticated') === 'true') {
+        role = 'admin';
+      }
+    }
+
+    const isVisible = (role === 'admin');
+    adminLinks.forEach(function (link) {
+      link.style.display = isVisible ? 'block' : 'none';
+    });
+  }
+
+  window.applyNavRBAC = applyNavRBAC;
+  applyNavRBAC();
 })();
+

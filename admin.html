@@ -73,6 +73,16 @@
             color: var(--db-gold);
         }
 
+        .nav-menu a.nav-admin-link {
+            display: none;
+            color: var(--db-red);
+        }
+
+        .nav-menu a.nav-admin-link:hover, .nav-menu a.nav-admin-link.active {
+            color: var(--db-gold);
+        }
+
+
         /* ADMIN GRID LAYOUT */
         .admin-grid {
             display: grid;
@@ -281,6 +291,7 @@
             <a href="login.html">LOGIN/SIGN UP</a>
             <a href="archives.html">ARCHIVES</a>
             <a href="community.html">COMMUNITY</a>
+            <a href="admin.html" class="nav-admin-link active" id="nav-admin-dashboard">ADMIN DASHBOARD</a>
         </div>
     </div>
 
@@ -473,7 +484,29 @@
         }
     }
 
+    function applyNavRBAC() {
+        const adminLinks = document.querySelectorAll('.nav-admin-link, #nav-admin-dashboard');
+        if (!adminLinks.length) return;
+
+        let role = null;
+        const activeCallsign = localStorage.getItem('pantheon_active_session');
+        if (activeCallsign) {
+            const accounts = JSON.parse(localStorage.getItem('pantheon_accounts') || '{}');
+            const user = accounts[activeCallsign.toLowerCase()];
+            role = user ? (user.role || (user.isAdmin ? 'admin' : null)) : null;
+        }
+        if (!role && localStorage.getItem('pantheon_director_authenticated') === 'true') {
+            role = 'admin';
+        }
+
+        const isVisible = (role === 'admin');
+        adminLinks.forEach(link => {
+            link.style.display = isVisible ? 'block' : 'none';
+        });
+    }
+
     checkDirectorAuth();
+    applyNavRBAC();
 </script>
 
 </body>

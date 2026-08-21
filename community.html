@@ -41,6 +41,8 @@
             font-weight: bold; letter-spacing: 1.5px; text-transform: uppercase;
         }
         .nav-menu a:hover, .nav-menu a.active { color: var(--db-gold); }
+        .nav-menu a.nav-admin-link { display: none; color: #ff3333; }
+        .nav-menu a.nav-admin-link:hover, .nav-menu a.nav-admin-link.active { color: var(--db-gold); }
 
         /* COMMUNITY LAYOUT */
         .page-title { font-size: 1.5rem; color: var(--db-orange); border-bottom: 1px dashed rgba(255,85,0,0.4); padding-bottom: 10px; margin-bottom: 20px; font-weight: bold; }
@@ -61,6 +63,7 @@
             <a href="login.html">LOGIN/SIGN UP</a>
             <a href="archives.html">ARCHIVES</a>
             <a href="community.html" class="active">COMMUNITY</a>
+            <a href="admin.html" class="nav-admin-link" id="nav-admin-dashboard">ADMIN DASHBOARD</a>
         </div>
     </div>
 
@@ -80,6 +83,27 @@
 </div>
 
 <script>
+    function applyNavRBAC() {
+        const adminLinks = document.querySelectorAll('.nav-admin-link, #nav-admin-dashboard');
+        if (!adminLinks.length) return;
+
+        let role = null;
+        const activeCallsign = localStorage.getItem('pantheon_active_session');
+        if (activeCallsign) {
+            const accounts = JSON.parse(localStorage.getItem('pantheon_accounts') || '{}');
+            const user = accounts[activeCallsign.toLowerCase()];
+            role = user ? (user.role || (user.isAdmin ? 'admin' : null)) : null;
+        }
+        if (!role && localStorage.getItem('pantheon_director_authenticated') === 'true') {
+            role = 'admin';
+        }
+
+        const isVisible = (role === 'admin');
+        adminLinks.forEach(link => {
+            link.style.display = isVisible ? 'block' : 'none';
+        });
+    }
+
     function execTerminal(e) {
         e.preventDefault();
         const input = document.getElementById('term-input');
@@ -94,6 +118,8 @@
         box.scrollTop = box.scrollHeight;
         input.value = '';
     }
+
+    applyNavRBAC();
 </script>
 </body>
 </html>

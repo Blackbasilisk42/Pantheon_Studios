@@ -806,3 +806,16 @@ body {
     opacity: 1;
   }
 }
+
+/* RBAC NAVIGATION CONTROLS */
+.nav-admin-link {
+  display: none;
+  color: var(--neon-pink, #ff3333);
+}
+
+.nav-admin-link:hover,
+.nav-admin-link.active {
+  color: var(--neon-cyan, #00e5ff);
+  filter: drop-shadow(0 0 8px var(--neon-cyan, #00e5ff));
+}
+
