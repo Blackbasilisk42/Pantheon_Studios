@@ -197,13 +197,13 @@
         <form id="form-login" onsubmit="handleLogin(event)">
             <div class="form-group">
                 <label class="form-label">CALLSIGN / USERNAME</label>
-                <input type="text" id="login-callsign" class="form-input" required placeholder="e.g., BLACK_BASILISK">
+                <input type="text" id="login-callsign" class="form-input" required placeholder="e.g., blackbasilisk42">
             </div>
             <div class="form-group">
                 <label class="form-label">SECURITY PASSKEY</label>
                 <input type="password" id="login-password" class="form-input" required placeholder="••••••••">
             </div>
-            <button type="submit" class="btn-submit">AUTHENTICATE SESSION</button>
+            <button type="submit" class="btn-submit" id="btn-login-submit">AUTHENTICATE SESSION</button>
         </form>
 
         <!-- SIGNUP FORM -->
@@ -224,37 +224,55 @@
 </div>
 
 <script>
-    // Check if user is already logged in
-    if (localStorage.getItem('pantheon_active_session')) {
+    // Check if user is already logged in as admin or standard member
+    if (localStorage.getItem('userRole') === 'admin') {
+        window.location.href = 'admin.html';
+    } else if (localStorage.getItem('pantheon_active_session')) {
         window.location.href = 'account.html';
     }
 
-    function applyNavRBAC(userOrRole) {
+    /**
+     * Attempt Super Admin Login
+     * @param {string} username
+     * @param {string} password
+     * @returns {boolean}
+     */
+    function attemptAdminLogin(username, password) {
+        if (username === 'blackbasilisk42' && password === 'PantheonMaster26') {
+            localStorage.setItem('userRole', 'admin');
+            localStorage.setItem('pantheon_active_session', 'blackbasilisk42');
+            localStorage.setItem('pantheon_director_authenticated', 'true');
+            window.location.href = 'admin.html';
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Check Admin Access and reveal nav link
+     */
+    function checkAdminAccess() {
+        const userRole = localStorage.getItem('userRole');
         const adminLinks = document.querySelectorAll('.nav-admin-link, #nav-admin-dashboard');
         if (!adminLinks.length) return;
 
-        let role = null;
+        const isAdmin = (userRole === 'admin') || 
+                        (localStorage.getItem('pantheon_director_authenticated') === 'true');
 
-        if (typeof userOrRole === 'string') {
-            role = userOrRole;
-        } else if (userOrRole && typeof userOrRole === 'object') {
-            role = userOrRole.role;
-        } else {
-            const activeCallsign = localStorage.getItem('pantheon_active_session');
-            if (activeCallsign) {
-                const accounts = JSON.parse(localStorage.getItem('pantheon_accounts') || '{}');
-                const user = accounts[activeCallsign.toLowerCase()];
-                role = user ? (user.role || (user.isAdmin ? 'admin' : null)) : null;
-            }
-            if (!role && localStorage.getItem('pantheon_director_authenticated') === 'true') {
-                role = 'admin';
-            }
-        }
-
-        const isVisible = (role === 'admin');
         adminLinks.forEach(link => {
-            link.style.display = isVisible ? 'block' : 'none';
+            link.style.display = isAdmin ? 'block' : 'none';
         });
+    }
+
+    /**
+     * Admin Logout
+     */
+    function adminLogout() {
+        localStorage.removeItem('userRole');
+        localStorage.removeItem('pantheon_director_authenticated');
+        localStorage.removeItem('pantheon_active_session');
+        checkAdminAccess();
+        window.location.href = 'login.html';
     }
 
     function switchTab(mode) {
@@ -294,22 +312,19 @@
             return;
         }
 
-        // Determine initial role (admin for director usernames or standard user)
-        const isAdminCallsign = ['black_basilisk', 'director', 'admin', 'jimbo21', 'zetsu', 'princeabu'].includes(callsign.toLowerCase());
-        const role = isAdminCallsign ? 'admin' : 'user';
-
         // Register new user
         accounts[callsign.toLowerCase()] = {
             callsign: callsign,
             password: password,
-            role: role,
+            role: 'user',
             joined: new Date().toISOString()
         };
 
         localStorage.setItem('pantheon_accounts', JSON.stringify(accounts));
         localStorage.setItem('pantheon_active_session', callsign);
+        localStorage.setItem('userRole', 'user');
 
-        applyNavRBAC(role);
+        checkAdminAccess();
 
         msg.style.color = 'var(--db-ki)';
         msg.innerText = 'ACCOUNT CREATED. REDIRECTING TO ACCOUNT WORKSPACE...';
@@ -325,6 +340,14 @@
         const password = document.getElementById('login-password').value;
         const msg = document.getElementById('auth-msg');
 
+        // 1. Attempt Super Admin Login
+        if (attemptAdminLogin(callsign, password)) {
+            msg.style.color = 'var(--db-ki)';
+            msg.innerText = 'SUPER ADMIN AUTHENTICATED. REDIRECTING TO ADMIN DASHBOARD...';
+            return;
+        }
+
+        // 2. Standard user account login
         let accounts = JSON.parse(localStorage.getItem('pantheon_accounts') || '{}');
         const user = accounts[callsign.toLowerCase()];
 
@@ -336,10 +359,10 @@
 
         // Set active session
         localStorage.setItem('pantheon_active_session', user.callsign);
+        const role = user.role || 'user';
+        localStorage.setItem('userRole', role);
 
-        // RBAC CHECK
-        const role = user.role || (['black_basilisk', 'director', 'admin', 'jimbo21', 'zetsu', 'princeabu'].includes(user.callsign.toLowerCase()) ? 'admin' : 'user');
-        applyNavRBAC(role);
+        checkAdminAccess();
 
         msg.style.color = 'var(--db-ki)';
         msg.innerText = 'AUTHENTICATED. ACCESSING WORKSPACE...';
@@ -349,7 +372,7 @@
         }, 1000);
     }
 
-    applyNavRBAC();
+    checkAdminAccess();
 </script>
 
 </body>
