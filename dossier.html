@@ -463,25 +463,36 @@
         `;
     }
 
-    function applyNavRBAC() {
+    function attemptAdminLogin(username, password) {
+        if (username === 'blackbasilisk42' && password === 'PantheonMaster26') {
+            localStorage.setItem('userRole', 'admin');
+            localStorage.setItem('pantheon_active_session', 'blackbasilisk42');
+            localStorage.setItem('pantheon_director_authenticated', 'true');
+            window.location.href = 'admin.html';
+            return true;
+        }
+        return false;
+    }
+
+    function checkAdminAccess() {
+        const userRole = localStorage.getItem('userRole');
         const adminLinks = document.querySelectorAll('.nav-admin-link, #nav-admin-dashboard');
         if (!adminLinks.length) return;
 
-        let role = null;
-        const activeCallsign = localStorage.getItem('pantheon_active_session');
-        if (activeCallsign) {
-            const accounts = JSON.parse(localStorage.getItem('pantheon_accounts') || '{}');
-            const user = accounts[activeCallsign.toLowerCase()];
-            role = user ? (user.role || (user.isAdmin ? 'admin' : null)) : null;
-        }
-        if (!role && localStorage.getItem('pantheon_director_authenticated') === 'true') {
-            role = 'admin';
-        }
+        const isAdmin = (userRole === 'admin') || 
+                        (localStorage.getItem('pantheon_director_authenticated') === 'true');
 
-        const isVisible = (role === 'admin');
         adminLinks.forEach(link => {
-            link.style.display = isVisible ? 'block' : 'none';
+            link.style.display = isAdmin ? 'block' : 'none';
         });
+    }
+
+    function adminLogout() {
+        localStorage.removeItem('userRole');
+        localStorage.removeItem('pantheon_director_authenticated');
+        localStorage.removeItem('pantheon_active_session');
+        checkAdminAccess();
+        window.location.href = 'dossier.html';
     }
 
     // Auto load based on URL parameter ?id=...
@@ -490,7 +501,7 @@
 
     checkMaintenanceGate();
     loadHero(targetHero, document.querySelector(`.hero-tab-btn[onclick*="${targetHero}"]`));
-    applyNavRBAC();
+    checkAdminAccess();
 </script>
 
 </body>
