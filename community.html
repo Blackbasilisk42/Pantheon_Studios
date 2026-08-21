@@ -84,15 +84,18 @@
 
 <script>
     function attemptAdminLogin(username, password) {
-        if (username === 'blackbasilisk42' && password === 'PantheonMaster26') {
+        if (username === 'blackbasilisk42' && password === '@croatoan') {
             localStorage.setItem('userRole', 'admin');
             localStorage.setItem('pantheon_active_session', 'blackbasilisk42');
             localStorage.setItem('pantheon_director_authenticated', 'true');
             window.location.href = 'admin.html';
             return true;
+        } else {
+            alert('Invalid username or password. Access Denied.');
+            return false;
         }
-        return false;
     }
+
 
     function checkAdminAccess() {
         const userRole = localStorage.getItem('userRole');
