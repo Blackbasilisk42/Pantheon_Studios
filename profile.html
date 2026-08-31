@@ -225,6 +225,38 @@
             font-weight: bold;
         }
 
+        /* SOCIAL LINKS BUTTONS */
+        .social-btn {
+            display: inline-block;
+            background: rgba(0, 229, 255, 0.1);
+            border: 1px solid var(--db-cyan);
+            color: var(--db-cyan);
+            padding: 8px 14px;
+            font-size: 0.75rem;
+            text-decoration: none;
+            font-weight: bold;
+            margin-right: 12px;
+            margin-top: 10px;
+            transition: 0.2s;
+            clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+        }
+
+        .social-btn.yt-btn {
+            border-color: var(--db-gold);
+            color: var(--db-gold);
+            background: rgba(255, 183, 0, 0.1);
+        }
+        
+        .social-btn:hover {
+            background: var(--db-cyan);
+            color: #000;
+        }
+        
+        .social-btn.yt-btn:hover {
+            background: var(--db-gold);
+            color: #000;
+        }
+
         /* GRID LAYOUT */
         .profile-grid {
             display: grid;
@@ -350,16 +382,6 @@
             padding: 12px;
         }
 
-        /* Framing specifically designed to anchor tall character builds and prevent head crops */
-        .asset-box img {
-            width: 100%;
-            max-height: 200px;
-            object-fit: cover;
-            object-position: top center; 
-            border: 1px solid rgba(255, 183, 0, 0.2);
-            margin-bottom: 8px;
-        }
-
         .asset-title {
             color: #fff;
             font-weight: bold;
@@ -463,22 +485,22 @@
 
     <div class="profile-grid" id="profile-editor-grid">
 
-        <!-- PROFILE VISUALS & DYNAMIC BACKGROUND UPLOADER -->
+        <!-- PROFILE VISUALS BYPASS -->
         <div class="profile-card" style="grid-column: span 2;">
-            <div class="card-header" style="color:var(--db-cyan); border-bottom-color: rgba(0, 229, 255, 0.4);">PROFILE VISUALS // AVATAR & BACKGROUND</div>
+            <div class="card-header" style="color:var(--db-cyan); border-bottom-color: rgba(0, 229, 255, 0.4);">PROFILE VISUALS // EXTERNAL MEDIA LINKING</div>
             <form onsubmit="updateProfileVisuals(event)" style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
                 <div class="form-group">
-                    <label class="form-label">CUSTOM AVATAR (IMAGE ONLY)</label>
-                    <input type="file" id="avatar-file" accept="image/*" class="form-input" style="padding:6px;">
+                    <label class="form-label">CUSTOM AVATAR (EXTERNAL IMAGE URL)</label>
+                    <input type="url" id="avatar-url" class="form-input" placeholder="https://i.imgur.com/...png">
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">DYNAMIC BACKGROUND (IMAGE OR MP4 VIDEO)</label>
-                    <input type="file" id="bg-file" accept="image/*,video/mp4" class="form-input" style="padding:6px;">
+                    <label class="form-label">DYNAMIC BACKGROUND (EXTERNAL IMAGE OR MP4 URL)</label>
+                    <input type="url" id="bg-url" class="form-input" placeholder="https://...">
                 </div>
 
                 <div style="grid-column: span 2;">
-                    <button type="submit" class="btn-action" style="background:var(--db-cyan);" id="btn-update-visuals">UPDATE VISUALS</button>
+                    <button type="submit" class="btn-action" style="background:var(--db-cyan);" id="btn-update-visuals">LINK VISUALS TO PROFILE</button>
                 </div>
             </form>
             <div id="visuals-status" style="margin-top:10px; font-size:0.75rem; color:var(--db-ki); display:none; text-align:center; font-weight:bold;"></div>
@@ -486,9 +508,10 @@
 
 
         <!-- PERSONAL OC BUILDER (COMMUNITY OC) -->
-        <div class="profile-card">
-            <div class="card-header">PERSONAL OC CREATOR // COMMUNITY AVATAR</div>
-            <form id="oc-builder-form" oninput="updateOcPreview()">
+        <div class="profile-card" style="grid-column: span 2;">
+            <div class="card-header">PERSONAL OC CREATOR & SOCIAL ROUTING</div>
+            <form id="oc-builder-form" oninput="updateOcPreview()" style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                
                 <div class="form-group">
                     <label class="form-label">AVATAR CALLSIGN / OC NAME</label>
                     <input type="text" id="oc-name" class="form-input" value="SHADOW_STRIKER" required>
@@ -510,61 +533,47 @@
                     <input type="text" id="oc-power" class="form-input" value="5,400,000">
                 </div>
 
-                <div class="slider-row"><label>HEALTH</label><input type="range" id="oc-hp" min="10" max="100" value="80"><span class="slider-val" id="v-hp">80</span></div>
-                <div class="slider-row"><label>KI SPECS</label><input type="range" id="oc-ki" min="10" max="100" value="85"><span class="slider-val" id="v-ki">85</span></div>
-                <div class="slider-row"><label>STAMINA</label><input type="range" id="oc-stm" min="10" max="100" value="75"><span class="slider-val" id="v-stm">75</span></div>
-                <div class="slider-row"><label>STRIKE SUPER</label><input type="range" id="oc-str" min="10" max="100" value="90"><span class="slider-val" id="v-str">90</span></div>
-
-                <div class="form-group" style="margin-top:10px;">
+                <div class="form-group">
                     <label class="form-label">PRIMARY SKILL LOADOUT</label>
                     <input type="text" id="oc-skills" class="form-input" value="Shadow Crusher, Sledgehammer">
                 </div>
 
-                <button type="button" class="btn-action" onclick="savePersonalOC()">SAVE PERSONAL OC</button>
+                <!-- Attributes Box -->
+                <div class="form-group" style="grid-column: span 2; border:1px solid rgba(255,183,0,0.2); padding:15px; background:rgba(0,0,0,0.3);">
+                    <div style="font-size:0.75rem; color:var(--db-gold); margin-bottom:12px; font-weight:bold;">XENOVERSE ATTRIBUTES</div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                        <div class="slider-row"><label>HEALTH</label><input type="range" id="oc-hp" min="10" max="100" value="80"><span class="slider-val" id="v-hp">80</span></div>
+                        <div class="slider-row"><label>KI SPECS</label><input type="range" id="oc-ki" min="10" max="100" value="85"><span class="slider-val" id="v-ki">85</span></div>
+                        <div class="slider-row"><label>STAMINA</label><input type="range" id="oc-stm" min="10" max="100" value="75"><span class="slider-val" id="v-stm">75</span></div>
+                        <div class="slider-row"><label>STRIKE SUPER</label><input type="range" id="oc-str" min="10" max="100" value="90"><span class="slider-val" id="v-str">90</span></div>
+                    </div>
+                </div>
+
+                <!-- Social Media Routing -->
+                <div class="form-group" style="grid-column: span 1;">
+                    <label class="form-label" style="color:var(--db-gold);">EXTERNAL CONTENT (YOUTUBE LINK)</label>
+                    <input type="url" id="oc-youtube" class="form-input" placeholder="https://youtube.com/...">
+                </div>
+
+                <div class="form-group" style="grid-column: span 1;">
+                    <label class="form-label" style="color:var(--db-cyan);">EXTERNAL CONTENT (X / TWITTER LINK)</label>
+                    <input type="url" id="oc-x" class="form-input" placeholder="https://x.com/...">
+                </div>
+
+                <div style="grid-column: span 2;">
+                    <button type="button" class="btn-action" onclick="savePersonalOC()">SAVE & PUBLISH PERSONAL OC</button>
+                </div>
             </form>
-            <div id="oc-status" style="margin-top:10px; font-size:0.75rem; color:var(--db-ki); display:none; text-align:center; font-weight:bold;">✓ PERSONAL OC SAVED TO PROFILE</div>
+            <div id="oc-status" style="margin-top:10px; font-size:0.75rem; color:var(--db-ki); display:none; text-align:center; font-weight:bold;">✓ PERSONAL OC PUBLISHED TO PROFILE</div>
         </div>
 
-        <!-- MEDIA UPLOAD CENTER -->
-        <div class="profile-card">
-            <div class="card-header">MEDIA DISPATCH // PUBLIC FEED UPLOADER</div>
-            <form onsubmit="uploadMediaAsset(event)">
-                <div class="form-group">
-                    <label class="form-label">DISPATCH TITLE / SHOW EPISODE FEEDBACK</label>
-                    <input type="text" id="media-title" class="form-input" placeholder="e.g., Episode 07 Reaction Art" required>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">SELECT IMAGE ASSET (FILE)</label>
-                    <input type="file" id="media-file" accept="image/*" class="form-input" required style="padding:6px;">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">DISPATCH PRIVACY</label>
-                    <select id="media-privacy" class="form-select">
-                        <option value="public">PUBLIC_HQ // DISPATCH TO HUB FEED</option>
-                        <option value="private">PRIVATE_ARCHIVE // USER PROFILE ONLY</option>
-                    </select>
-                </div>
-
-                <button type="submit" id="btn-transmit-media" class="btn-action" style="background:var(--db-gold);">TRANSMIT MEDIA ASSET</button>
-            </form>
-            <div id="media-status" style="margin-top:10px; font-size:0.75rem; color:var(--db-ki); display:none; text-align:center; font-weight:bold;"></div>
-        </div>
     </div>
 
     <!-- SAVED ASSETS & PERSONAL OCs -->
     <div class="assets-card">
-        <div class="card-header" style="margin-bottom:10px;">YOUR SAVED COMMUNITY OCs & UPLOADED MEDIA</div>
-        
-        <div style="color:var(--db-gold); font-size:0.8rem; font-weight:bold; margin-top:15px;">SAVED PERSONAL OCs</div>
+        <div class="card-header" style="margin-bottom:10px;">YOUR SAVED COMMUNITY OCs</div>
         <div class="asset-list" id="user-oc-list">
             <!-- User OCs render here -->
-        </div>
-
-        <div style="color:var(--db-gold); font-size:0.8rem; font-weight:bold; margin-top:25px;">YOUR DISPATCHED MEDIA ASSETS</div>
-        <div class="asset-list" id="user-media-list">
-            <!-- User Media renders here -->
         </div>
     </div>
 </div>
@@ -572,8 +581,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
-
+    
     const firebaseConfig = {
         apiKey: "AIzaSyD8k_5c_4mxpJCtKIYxiko8i1mY1vxg2dQ",
         authDomain: "pantheon-ba229.firebaseapp.com",
@@ -585,12 +593,10 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const storage = getStorage(app);
     window.db = db;
 
     const DEV_PASSCODES = ['@jimbo21', '@zetsu', '@princeabu'];
     
-    // Parse target user from ?user= parameter or fallback to active logged-in session
     const urlParams = new URLSearchParams(window.location.search);
     let viewTargetUser = urlParams.get('user');
     let activeSessionUser = localStorage.getItem('pantheon_active_session') || 'GUEST_FAN';
@@ -625,11 +631,10 @@
         
         if (viewTargetUser && viewTargetUser.toLowerCase() !== activeSessionUser.toLowerCase()) {
             document.getElementById('display-badge').innerText = `PUBLIC MEMBER PROFILE SHOWCASE`;
-            // Hide the edit grids if viewing someone else
             document.getElementById('profile-editor-grid').style.display = 'none';
         }
 
-        // Fetch User specific visual data (Avatar & BG)
+        // Fetch User specific visual data (Linked Avatar & BG)
         try {
             const userRef = doc(db, "users", currentCallsign.toLowerCase());
             const userSnap = await getDoc(userRef);
@@ -659,45 +664,35 @@
         e.preventDefault();
         const btn = document.getElementById('btn-update-visuals');
         const status = document.getElementById('visuals-status');
-        const avatarFile = document.getElementById('avatar-file').files[0];
-        const bgFile = document.getElementById('bg-file').files[0];
+        const avatarUrl = document.getElementById('avatar-url').value.trim();
+        const bgUrl = document.getElementById('bg-url').value.trim();
 
-        if (!avatarFile && !bgFile) return;
+        if (!avatarUrl && !bgUrl) return;
 
         btn.disabled = true;
-        btn.innerText = "UPLOADING TO STORAGE...";
+        btn.innerText = "LINKING ASSETS...";
         status.style.display = 'none';
 
         try {
             const updateData = {};
-
-            if (avatarFile) {
-                const avatarRef = ref(storage, `users/${currentCallsign.toLowerCase()}/avatar_${Date.now()}_${avatarFile.name}`);
-                await uploadBytes(avatarRef, avatarFile);
-                updateData.avatarUrl = await getDownloadURL(avatarRef);
-            }
-
-            if (bgFile) {
-                const bgRef = ref(storage, `users/${currentCallsign.toLowerCase()}/bg_${Date.now()}_${bgFile.name}`);
-                await uploadBytes(bgRef, bgFile);
-                updateData.bgUrl = await getDownloadURL(bgRef);
-            }
+            if (avatarUrl) updateData.avatarUrl = avatarUrl;
+            if (bgUrl) updateData.bgUrl = bgUrl;
 
             const userRef = doc(db, "users", currentCallsign.toLowerCase());
             await setDoc(userRef, updateData, { merge: true });
 
             status.style.display = 'block';
             status.style.color = "var(--db-ki)";
-            status.innerText = "✓ VISUALS UPDATED SUCCESSFULLY. RELOADING...";
+            status.innerText = "✓ VISUALS LINKED SUCCESSFULLY. RELOADING...";
             setTimeout(() => window.location.reload(), 1500);
 
         } catch (error) {
-            console.error("Visual upload failed:", error);
+            console.error("Visual linking failed:", error);
             status.style.display = 'block';
             status.style.color = "var(--db-red)";
-            status.innerText = "ERROR: FAILED TO UPLOAD ASSETS.";
+            status.innerText = "ERROR: FAILED TO LINK ASSETS.";
             btn.disabled = false;
-            btn.innerText = "UPDATE VISUALS";
+            btn.innerText = "LINK VISUALS TO PROFILE";
         }
     }
 
@@ -733,15 +728,28 @@
             const latestOc = myOcs[myOcs.length - 1];
             const stats = latestOc.stats || { hp: 80, ki: 85, stm: 75, str: 90 };
 
+            let socialLinksHTML = '';
+            if (latestOc.socialYoutube || latestOc.socialX) {
+                socialLinksHTML += `<div style="margin-top:20px; border-top:1px dashed rgba(255,183,0,0.3); padding-top:15px;">
+                    <div style="font-size:0.75rem; color:var(--db-gold); margin-bottom:8px; font-weight:bold;">EXTERNAL MEDIA & LOADOUT TRANSMISSIONS</div>`;
+                if (latestOc.socialYoutube) {
+                    socialLinksHTML += `<a href="${latestOc.socialYoutube}" target="_blank" class="social-btn yt-btn">YOUTUBE TRANSMISSION ↗</a>`;
+                }
+                if (latestOc.socialX) {
+                    socialLinksHTML += `<a href="${latestOc.socialX}" target="_blank" class="social-btn">X / TWITTER FEED ↗</a>`;
+                }
+                socialLinksHTML += `</div>`;
+            }
+
             showcaseBox.innerHTML = `
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
                     <div>
-                        <div style="font-size:1.3rem; font-weight:900; color:#fff;">${latestOc.name.toUpperCase()}</div>
-                        <div style="font-size:0.75rem; color:var(--db-ki); margin-top:2px;">SPECIES: ${latestOc.race}</div>
+                        <div style="font-size:1.4rem; font-weight:900; color:#fff; letter-spacing:1px;">${latestOc.name.toUpperCase()}</div>
+                        <div style="font-size:0.75rem; color:var(--db-ki); margin-top:4px;">SPECIES: ${latestOc.race}</div>
                     </div>
                     <div style="text-align:right;">
                         <div style="font-size:0.65rem; color:var(--db-gold);">POWER RATING</div>
-                        <div style="font-size:1.2rem; font-weight:bold; color:#fff;">${latestOc.power}</div>
+                        <div style="font-size:1.3rem; font-weight:bold; color:#fff;">${latestOc.power}</div>
                     </div>
                 </div>
 
@@ -753,9 +761,11 @@
                 </div>
 
                 <div style="margin-top:15px; border-top:1px dashed rgba(0,229,255,0.2); padding-top:10px;">
-                    <div style="font-size:0.7rem; color:var(--db-gold); margin-bottom:4px;">EQUIPPED SKILL LOADOUT</div>
-                    <div style="font-size:0.78rem; color:#ffffff;">${latestOc.skills || 'None equipped.'}</div>
+                    <div style="font-size:0.7rem; color:var(--db-cyan); margin-bottom:4px; font-weight:bold;">EQUIPPED SKILL LOADOUT</div>
+                    <div style="font-size:0.8rem; color:#ffffff;">${latestOc.skills || 'None equipped.'}</div>
                 </div>
+                
+                ${socialLinksHTML}
             `;
         } catch (error) {
             console.error("Error fetching OCs:", error);
@@ -787,6 +797,8 @@
                 str: document.getElementById('oc-str').value
             },
             skills: document.getElementById('oc-skills').value,
+            socialYoutube: document.getElementById('oc-youtube').value.trim(),
+            socialX: document.getElementById('oc-x').value.trim(),
             timestamp: new Date().toISOString()
         };
 
@@ -801,61 +813,6 @@
             await renderUserAssets();
         } catch (error) {
             console.error("Error saving OC:", error);
-        }
-    }
-
-    async function uploadMediaAsset(e) {
-        e.preventDefault();
-        const btn = document.getElementById('btn-transmit-media');
-        const status = document.getElementById('media-status');
-        const title = document.getElementById('media-title').value;
-        const privacy = document.getElementById('media-privacy').value;
-        const fileInput = document.getElementById('media-file');
-
-        if (!fileInput.files || !fileInput.files[0]) return;
-        const file = fileInput.files[0];
-
-        btn.disabled = true;
-        btn.innerText = "TRANSMITTING TO CLOUD...";
-        status.style.display = 'none';
-
-        try {
-            // Push to Firebase Storage
-            const storageRef = ref(storage, `media/${currentCallsign.toLowerCase()}/${Date.now()}_${file.name}`);
-            await uploadBytes(storageRef, file);
-            
-            // Get Public Cloud URL
-            const downloadURL = await getDownloadURL(storageRef);
-
-            // Save Reference to Firestore
-            const mediaData = {
-                owner: currentCallsign,
-                title: title,
-                privacy: privacy,
-                data: downloadURL, 
-                timestamp: new Date().toISOString()
-            };
-
-            await addDoc(collection(db, "media"), mediaData);
-
-            status.style.display = 'block';
-            status.style.color = "var(--db-ki)";
-            status.innerText = "✓ MEDIA TRANSMITTED TO FEED";
-            setTimeout(() => { status.style.display = 'none'; }, 2500);
-
-            document.getElementById('media-title').value = '';
-            fileInput.value = '';
-            btn.disabled = false;
-            btn.innerText = "TRANSMIT MEDIA ASSET";
-            
-            await renderUserAssets();
-        } catch (error) {
-            console.error("Error uploading media:", error);
-            status.style.display = 'block';
-            status.style.color = "var(--db-red)";
-            status.innerText = "ERROR: TRANSMISSION FAILED.";
-            btn.disabled = false;
-            btn.innerText = "TRANSMIT MEDIA ASSET";
         }
     }
 
@@ -883,33 +840,6 @@
                     </div>
                 `).join('');
             }
-
-            const mediaBox = document.getElementById('user-media-list');
-            const mediaSnapshot = await getDocs(collection(db, "media"));
-            const allMedia = [];
-            mediaSnapshot.forEach((doc) => allMedia.push({ id: doc.id, ...doc.data() }));
-
-            let myMedia = allMedia.filter(m => m.owner.toLowerCase() === currentCallsign.toLowerCase());
-            
-            // Hide private assets if viewing someone else's profile
-            if (currentCallsign.toLowerCase() !== activeSessionUser.toLowerCase()) {
-                myMedia = myMedia.filter(m => m.privacy === 'public');
-            }
-
-            if (myMedia.length === 0) {
-                mediaBox.innerHTML = '<div style="color:#607080; font-size:0.75rem;">No media assets transmitted yet.</div>';
-            } else {
-                mediaBox.innerHTML = myMedia.map(m => `
-                    <div class="asset-box">
-                        <img src="${m.data}" alt="${m.title}">
-                        <div class="asset-title">${m.title}</div>
-                        <div class="asset-meta">
-                            <span style="color:${m.privacy === 'public' ? 'var(--db-ki)' : 'var(--db-gold)'};">[${m.privacy.toUpperCase()}]</span>
-                            ${currentCallsign.toLowerCase() === activeSessionUser.toLowerCase() ? `<button class="btn-del" onclick="deleteMedia('${m.id}')">[DELETE]</button>` : ''}
-                        </div>
-                    </div>
-                `).join('');
-            }
         } catch (error) {
             console.error("Error rendering user assets:", error);
         }
@@ -922,15 +852,6 @@
             await renderUserAssets();
         } catch (error) {
             console.error("Error deleting OC:", error);
-        }
-    }
-
-    async function deleteMedia(id) {
-        try {
-            await deleteDoc(doc(db, "media", id));
-            await renderUserAssets();
-        } catch (error) {
-            console.error("Error deleting media:", error);
         }
     }
 
@@ -952,10 +873,8 @@
     window.logoutUser = logoutUser;
     window.updateOcPreview = updateOcPreview;
     window.savePersonalOC = savePersonalOC;
-    window.uploadMediaAsset = uploadMediaAsset;
     window.updateProfileVisuals = updateProfileVisuals;
     window.deleteOc = deleteOc;
-    window.deleteMedia = deleteMedia;
 
     checkMaintenanceGate();
     loadUserProfile();
