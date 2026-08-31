@@ -1,6 +1,4 @@
-<!-- Test connection -->
 <!DOCTYPE html>
-<!-- OpenCode Connection Established -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -83,7 +81,6 @@
         .nav-menu a.nav-admin-link:hover, .nav-menu a.nav-admin-link.active {
             color: var(--db-gold);
         }
-
 
         /* ADMIN GRID LAYOUT */
         .admin-grid {
@@ -368,15 +365,15 @@
             </div>
         </div>
 
-        <!-- LOCALSTORAGE DATA MANAGEMENT -->
+        <!-- DATABASE MANAGEMENT -->
         <div class="admin-card full-width">
-            <div class="card-header">LOCAL REPOSITORY DATA MANAGEMENT</div>
+            <div class="card-header">GLOBAL DATABASE MANAGEMENT</div>
             
             <div style="display:flex; gap:15px; flex-wrap:wrap;">
                 <button class="btn-danger" onclick="clearCustomHeroes()">CLEAR CUSTOM HEROES</button>
                 <button class="btn-danger" onclick="clearMediaUploads()">CLEAR MEDIA UPLOADS</button>
-                <button class="btn-danger" onclick="clearComments()">CLEAR COMMUNITY COMMENTS</button>
-                <button class="btn-danger" onclick="resetAllConfig()" style="background:var(--db-red); color:#000;">PURGE ENTIRE LOCAL STORAGE</button>
+                <button class="btn-danger" onclick="clearComments()">CLEAR COMMUNITY CHAT</button>
+                <button class="btn-danger" onclick="resetAllConfig()" style="background:var(--db-red); color:#000;">PURGE ENTIRE NETWORK DATABASE</button>
             </div>
         </div>
 
@@ -385,14 +382,27 @@
             <div class="card-header">SYSTEM DIAGNOSTICS & TELEMETRY LOGS</div>
             <div class="sys-console" id="sys-log">
                 [SYSTEM]: Admin telemetry online.<br>
-                [STORAGE]: Pantheon local repository synchronized.<br>
-                [AUTHENTICATION]: Director session validated via passkey.
+                [STORAGE]: Pantheon database synchronization standby.<br>
             </div>
         </div>
     </div>
 </div>
 
-<script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyD8k_5c_4mxpJCtKIYxiko8i1mY1vxg2dQ",
+        authDomain: "pantheon-ba229.firebaseapp.com",
+        projectId: "pantheon-ba229",
+        storageBucket: "pantheon-ba229.firebasestorage.app",
+        messagingSenderId: "578947122045",
+        appId: "1:578947122045:web:5343b13612fab74ea64214"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
     const DIRECTOR_PASSCODE = '@Sammyzzz3Jimbo21';
 
     function checkDirectorAuth() {
@@ -400,20 +410,22 @@
             localStorage.setItem('userRole', 'admin');
             localStorage.setItem('pantheon_director_authenticated', 'true');
             document.getElementById('admin-auth-overlay').style.display = 'none';
+            logConsole("[AUTHENTICATION]: Director session validated via active token.");
             loadConfig();
         } else {
             document.getElementById('admin-auth-overlay').style.display = 'flex';
         }
     }
 
-
     function authenticateDirector(e) {
         e.preventDefault();
         const inputKey = document.getElementById('director-key-input').value.trim();
         if (inputKey === DIRECTOR_PASSCODE) {
             localStorage.setItem('pantheon_director_authenticated', 'true');
+            localStorage.setItem('userRole', 'admin');
             document.getElementById('admin-auth-overlay').style.display = 'none';
-            logConsole("Director authorization granted.");
+            logConsole("[AUTHENTICATION]: Director authorization granted.");
+            checkAdminAccess();
             loadConfig();
         } else {
             document.getElementById('auth-error').innerText = 'ACCESS DENIED: INVALID DIRECTOR PASSKEY';
@@ -427,23 +439,35 @@
         consoleBox.scrollTop = consoleBox.scrollHeight;
     }
 
-    function loadConfig() {
-        const cfg = JSON.parse(localStorage.getItem('pantheon_site_config') || '{}');
+    async function loadConfig() {
+        try {
+            const docRef = doc(db, "system", "config");
+            const docSnap = await getDoc(docRef);
 
-        if (cfg.primaryColor) document.getElementById('cfg-primary').value = cfg.primaryColor;
-        if (cfg.accentColor) document.getElementById('cfg-accent').value = cfg.accentColor;
-        if (cfg.bgColor) document.getElementById('cfg-bg').value = cfg.bgColor;
-        if (cfg.customCss) document.getElementById('cfg-custom-css').value = cfg.customCss;
+            if (docSnap.exists()) {
+                const cfg = docSnap.data();
+                if (cfg.primaryColor) document.getElementById('cfg-primary').value = cfg.primaryColor;
+                if (cfg.accentColor) document.getElementById('cfg-accent').value = cfg.accentColor;
+                if (cfg.bgColor) document.getElementById('cfg-bg').value = cfg.bgColor;
+                if (cfg.customCss) document.getElementById('cfg-custom-css').value = cfg.customCss;
 
-        if (cfg.modules) {
-            document.getElementById('mod-radar').checked = cfg.modules.radar !== false;
-            document.getElementById('mod-lattice').checked = cfg.modules.lattice !== false;
-            document.getElementById('mod-showcase').checked = cfg.modules.showcase !== false;
-            document.getElementById('mod-logs').checked = cfg.modules.logs !== false;
+                if (cfg.modules) {
+                    document.getElementById('mod-radar').checked = cfg.modules.radar !== false;
+                    document.getElementById('mod-lattice').checked = cfg.modules.lattice !== false;
+                    document.getElementById('mod-showcase').checked = cfg.modules.showcase !== false;
+                    document.getElementById('mod-logs').checked = cfg.modules.logs !== false;
+                }
+                logConsole("Site configuration loaded from global database.");
+            } else {
+                logConsole("No global configuration found. Using default schema.");
+            }
+        } catch (error) {
+            console.error("Error loading config:", error);
+            logConsole("ERROR: Failed to retrieve configuration from database.");
         }
     }
 
-    function saveConfig() {
+    async function saveConfig() {
         const cfg = {
             primaryColor: document.getElementById('cfg-primary').value,
             accentColor: document.getElementById('cfg-accent').value,
@@ -454,55 +478,71 @@
                 lattice: document.getElementById('mod-lattice').checked,
                 showcase: document.getElementById('mod-showcase').checked,
                 logs: document.getElementById('mod-logs').checked
-            }
+            },
+            updatedAt: new Date().toISOString()
         };
 
-        localStorage.setItem('pantheon_site_config', JSON.stringify(cfg));
-        logConsole("Site configuration saved to LocalStorage.");
-    }
-
-    function clearCustomHeroes() {
-        if (confirm("Purge all custom created hero dossiers?")) {
-            localStorage.removeItem('pantheon_custom_heroes');
-            logConsole("Cleared custom hero repository.");
+        try {
+            await setDoc(doc(db, "system", "config"), cfg);
+            logConsole("Site configuration synchronized to global database.");
+        } catch (error) {
+            console.error("Error saving config:", error);
+            logConsole("ERROR: Failed to push configuration to database.");
         }
     }
 
-    function clearMediaUploads() {
+    async function clearCollection(collectionName, successLog) {
+        logConsole(`Initiating purge sequence for: ${collectionName}...`);
+        try {
+            const querySnapshot = await getDocs(collection(db, collectionName));
+            const deletePromises = [];
+            querySnapshot.forEach((document) => {
+                deletePromises.push(deleteDoc(doc(db, collectionName, document.id)));
+            });
+            await Promise.all(deletePromises);
+            logConsole(successLog);
+        } catch (error) {
+            console.error(`Error clearing ${collectionName}:`, error);
+            logConsole(`ERROR: Purge failed for ${collectionName}.`);
+        }
+    }
+
+    async function clearCustomHeroes() {
+        if (confirm("Purge all custom created hero OCs from the database?")) {
+            await clearCollection("user_ocs", "Cleared custom hero repository.");
+        }
+    }
+
+    async function clearMediaUploads() {
         if (confirm("Purge all public and private uploaded media files?")) {
-            localStorage.removeItem('pantheon_media');
-            logConsole("Cleared media upload cache.");
+            await clearCollection("media", "Cleared media upload cache.");
         }
     }
 
-    function clearComments() {
-        if (confirm("Purge all community comments?")) {
-            localStorage.removeItem('pantheon_comments');
-            logConsole("Cleared community comment database.");
+    async function clearComments() {
+        if (confirm("Purge all community terminal chat messages?")) {
+            await clearCollection("community_messages", "Cleared community chat database.");
         }
     }
 
-    function resetAllConfig() {
-        if (confirm("CRITICAL WARNING: Purge ALL Pantheon LocalStorage data and lock director session?")) {
-            localStorage.clear();
-            alert("LocalStorage purged. Reloading...");
+    async function resetAllConfig() {
+        if (confirm("CRITICAL WARNING: Purge ALL Pantheon database records (OCs, Media, Chat, Config)?")) {
+            logConsole("CRITICAL PURGE INITIATED.");
+            await clearCollection("user_ocs", "User OCs wiped.");
+            await clearCollection("media", "Media wiped.");
+            await clearCollection("community_messages", "Chat wiped.");
+            
+            try {
+                await deleteDoc(doc(db, "system", "config"));
+                logConsole("System config wiped.");
+            } catch (e) {
+                console.error(e);
+            }
+
+            alert("Database purged. Reloading interface...");
             window.location.reload();
         }
     }
-
-    function attemptAdminLogin(username, password) {
-        if (username === 'blackbasilisk42' && password === '@croatoan') {
-            localStorage.setItem('userRole', 'admin');
-            localStorage.setItem('pantheon_active_session', 'blackbasilisk42');
-            localStorage.setItem('pantheon_director_authenticated', 'true');
-            window.location.href = 'admin.html';
-            return true;
-        } else {
-            alert('Invalid username or password. Access Denied.');
-            return false;
-        }
-    }
-
 
     function checkAdminAccess() {
         const userRole = localStorage.getItem('userRole');
@@ -524,6 +564,15 @@
         checkAdminAccess();
         window.location.href = 'login.html';
     }
+
+    // Expose functions to window
+    window.authenticateDirector = authenticateDirector;
+    window.saveConfig = saveConfig;
+    window.clearCustomHeroes = clearCustomHeroes;
+    window.clearMediaUploads = clearMediaUploads;
+    window.clearComments = clearComments;
+    window.resetAllConfig = resetAllConfig;
+    window.adminLogout = adminLogout;
 
     checkDirectorAuth();
     checkAdminAccess();
