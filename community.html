@@ -1,9 +1,10 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PANTHEON STUDIOS // COMMUNITY</title>
+    <title>PANTHEON STUDIOS // COMMUNITY & COMMS</title>
     <style>
         :root {
             --bg-void: #060913;
@@ -11,6 +12,7 @@
             --db-orange: #ff5500;
             --db-cyan: #00e5ff;
             --db-ki: #00ff88;
+            --db-red: #ff3333;
             --panel-bg: rgba(12, 18, 32, 0.92);
             --font-mono: 'Courier New', Courier, monospace;
         }
@@ -26,7 +28,7 @@
                 linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px);
             background-size: 100% 100%, 100% 4px;
         }
-        .container { max-width: 1100px; margin: 0 auto; }
+        .container { max-width: 1200px; margin: 0 auto; }
         
         /* NAV */
         .nav-header {
@@ -45,13 +47,76 @@
         .nav-menu a.nav-admin-link:hover, .nav-menu a.nav-admin-link.active { color: var(--db-gold); }
 
         /* COMMUNITY LAYOUT */
-        .page-title { font-size: 1.5rem; color: var(--db-orange); border-bottom: 1px dashed rgba(255,85,0,0.4); padding-bottom: 10px; margin-bottom: 20px; font-weight: bold; }
-        .terminal-card { background: var(--panel-bg); border: 1px solid var(--db-cyan); padding: 20px; margin-bottom: 25px; }
-        .terminal-logs { height: 200px; overflow-y: auto; background: rgba(6, 9, 19, 0.95); border: 1px solid rgba(0, 229, 255, 0.3); padding: 12px; font-size: 0.8rem; line-height: 1.6; margin-bottom: 12px; }
-        .sys-line { color: var(--db-cyan); }
+        .page-title { 
+            font-size: 1.5rem; color: var(--db-orange); border-bottom: 1px dashed rgba(255,85,0,0.4); 
+            padding-bottom: 10px; margin-bottom: 20px; font-weight: bold; 
+        }
+        
+        .community-grid {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 25px;
+        }
+
+        /* TERMINAL (LEFT COLUMN) */
+        .terminal-card { 
+            background: var(--panel-bg); border: 1px solid var(--db-cyan); 
+            padding: 20px; height: 100%; display: flex; flex-direction: column;
+            clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
+        }
+        .terminal-logs { 
+            flex-grow: 1; min-height: 400px; max-height: 500px; overflow-y: auto; 
+            background: rgba(6, 9, 19, 0.95); border: 1px solid rgba(0, 229, 255, 0.3); 
+            padding: 12px; font-size: 0.8rem; line-height: 1.6; margin-bottom: 15px; 
+            display: flex; flex-direction: column; gap: 8px;
+        }
+        
+        .msg-row { display: flex; flex-direction: column; border-bottom: 1px dotted rgba(0, 229, 255, 0.1); padding-bottom: 5px; }
+        .msg-meta { font-size: 0.65rem; color: var(--db-gold); margin-bottom: 2px; }
+        .msg-text { color: #ffffff; }
+        .msg-text.admin-text { color: var(--db-ki); font-weight: bold; }
+        .msg-text.system-text { color: var(--db-orange); font-style: italic; }
+
         .input-bar { display: flex; gap: 10px; }
-        .input-bar input { flex: 1; background: rgba(6, 9, 19, 0.9); border: 1px solid rgba(0, 229, 255, 0.4); color: #fff; padding: 10px; font-family: var(--font-mono); }
-        .input-bar button { background: var(--db-gold); color: #000; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; }
+        .input-bar input { 
+            flex: 1; background: rgba(6, 9, 19, 0.9); border: 1px solid rgba(0, 229, 255, 0.4); 
+            color: #fff; padding: 12px; font-family: var(--font-mono); outline: none;
+        }
+        .input-bar input:focus { border-color: var(--db-gold); }
+        .input-bar button { 
+            background: var(--db-gold); color: #000; border: none; 
+            padding: 10px 20px; font-weight: bold; cursor: pointer; font-family: var(--font-mono);
+        }
+
+        /* SIDEBAR (RIGHT COLUMN) */
+        .sidebar-panel { display: flex; flex-direction: column; gap: 20px; }
+        
+        .side-card {
+            background: var(--panel-bg); border: 1px solid var(--db-gold); padding: 18px;
+            clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+        }
+        
+        .side-header { 
+            color: var(--db-gold); font-size: 0.85rem; font-weight: bold; 
+            border-bottom: 1px solid rgba(255, 183, 0, 0.3); padding-bottom: 8px; margin-bottom: 15px; letter-spacing: 1px;
+        }
+
+        /* OC REGISTRY LIST */
+        .roster-list { display: flex; flex-direction: column; gap: 10px; max-height: 250px; overflow-y: auto; }
+        .roster-item {
+            background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(0, 255, 136, 0.2); 
+            padding: 8px 10px; font-size: 0.75rem; display: flex; justify-content: space-between; align-items: center;
+        }
+        .roster-item:hover { border-color: var(--db-ki); background: rgba(0, 255, 136, 0.05); }
+        .roster-name { color: #fff; font-weight: bold; }
+        .roster-creator { color: #8a9ba8; font-size: 0.65rem; }
+
+        /* MISSION BOARD */
+        .mission-item {
+            border-left: 2px solid var(--db-orange); padding-left: 10px; margin-bottom: 15px; font-size: 0.75rem;
+        }
+        .mission-title { color: var(--db-orange); font-weight: bold; margin-bottom: 4px; }
+        .mission-desc { color: #c0daf0; line-height: 1.4; }
     </style>
 </head>
 <body>
@@ -69,40 +134,177 @@
 
     <div class="page-title">COMMUNITY // PUBLIC TRANSMISSION RELAY</div>
 
-    <div class="terminal-card">
-        <div style="color:var(--db-gold); margin-bottom:10px; font-weight:bold;">LIVE COMM LINK</div>
-        <div class="terminal-logs" id="terminal-box">
-            <div class="sys-line">LOG: STUDIO: Time Nest broadcast node synchronized.</div>
-            <div class="sys-line">LOG: Kaige: Initializing combat deployment protocols.</div>
+    <div class="community-grid">
+        <!-- CHAT TERMINAL -->
+        <div class="terminal-card">
+            <div style="color:var(--db-gold); margin-bottom:10px; font-weight:bold; letter-spacing: 1px;">LIVE COMM LINK // GLOBAL NETWORK</div>
+            <div class="terminal-logs" id="terminal-box">
+                <div class="msg-row">
+                    <div class="msg-meta">SYSTEM // [SERVER ROOT]</div>
+                    <div class="msg-text system-text">Time Nest broadcast node synchronized. Establishing secure connection...</div>
+                </div>
+                <!-- Dynamic messages injected here -->
+            </div>
+            <form class="input-bar" onsubmit="transmitMessage(event)">
+                <input type="text" id="term-input" placeholder="Broadcast to the network..." required autocomplete="off">
+                <button type="submit">TRANSMIT</button>
+            </form>
         </div>
-        <form class="input-bar" onsubmit="execTerminal(event)">
-            <input type="text" id="term-input" placeholder="Broadcast to the network..." required autocomplete="off">
-            <button type="submit">TRANSMIT</button>
-        </form>
+
+        <!-- SIDEBAR WIDGETS -->
+        <div class="sidebar-panel">
+            <!-- ACTIVE REGISTRY -->
+            <div class="side-card">
+                <div class="side-header">ACTIVE SCOUTER REGISTRY</div>
+                <div class="roster-list" id="community-roster">
+                    <div style="color:#8a9ba8; font-size:0.75rem; font-style:italic;">Scanning sector for public OCs...</div>
+                </div>
+            </div>
+
+            <!-- DISPATCH BOARD -->
+            <div class="side-card">
+                <div class="side-header">PANTHEON DISPATCH BOARD</div>
+                
+                <div class="mission-item">
+                    <div class="mission-title">OPERATION: CENTER OF GRAVITY</div>
+                    <div class="mission-desc">Testing spatial tracking arcs and vanish frame intercepts. Looking for heavy Strike-build spar partners to calibrate timing.</div>
+                </div>
+
+                <div class="mission-item">
+                    <div class="mission-title">CO-OP: FESTIVAL CIRCUIT</div>
+                    <div class="mission-desc">KJade and Talia forming up for multi-node operations. Need one more ranged ki specialist to cover flanking routes.</div>
+                </div>
+
+                <div class="mission-item" style="border-left-color: var(--db-ki);">
+                    <div class="mission-title" style="color: var(--db-ki);">STUDIO UPDATE</div>
+                    <div class="mission-desc">AI capture stream testing begins next cycle. Ensure macro scripts are compiled and hardware limits are set.</div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
-<script>
-    function attemptAdminLogin(username, password) {
-        if (username === 'blackbasilisk42' && password === '@croatoan') {
-            localStorage.setItem('userRole', 'admin');
-            localStorage.setItem('pantheon_active_session', 'blackbasilisk42');
-            localStorage.setItem('pantheon_director_authenticated', 'true');
-            window.location.href = 'admin.html';
-            return true;
-        } else {
-            alert('Invalid username or password. Access Denied.');
-            return false;
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyD8k_5c_4mxpJCtKIYxiko8i1mY1vxg2dQ",
+        authDomain: "pantheon-ba229.firebaseapp.com",
+        projectId: "pantheon-ba229",
+        storageBucket: "pantheon-ba229.firebasestorage.app",
+        messagingSenderId: "578947122045",
+        appId: "1:578947122045:web:5343b13612fab74ea64214"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const currentUser = localStorage.getItem('pantheon_active_session') || 'GUEST_USER';
+    const currentRole = localStorage.getItem('userRole') || 'guest';
+
+    // 1. REAL-TIME TERMINAL CHAT
+    function setupChatListener() {
+        const q = query(collection(db, "community_messages"), orderBy("timestamp", "desc"), limit(50));
+        
+        onSnapshot(q, (snapshot) => {
+            const terminalBox = document.getElementById('terminal-box');
+            // Keep the initial system message, clear the rest
+            terminalBox.innerHTML = `
+                <div class="msg-row">
+                    <div class="msg-meta">SYSTEM // [SERVER ROOT]</div>
+                    <div class="msg-text system-text">Time Nest broadcast node synchronized. Connection stable.</div>
+                </div>
+            `;
+
+            const messages = [];
+            snapshot.forEach((doc) => messages.push(doc.data()));
+            
+            // Reverse to display oldest to newest at the bottom
+            messages.reverse().forEach((msg) => {
+                const row = document.createElement('div');
+                row.className = 'msg-row';
+                
+                const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const isAdmin = msg.role === 'admin';
+                const textClass = isAdmin ? 'msg-text admin-text' : 'msg-text';
+                const userTag = isAdmin ? `[DIRECTOR] ${msg.user.toUpperCase()}` : `[${msg.user.toUpperCase()}]`;
+
+                row.innerHTML = `
+                    <div class="msg-meta">${time} // ${userTag}</div>
+                    <div class="${textClass}">${msg.text}</div>
+                `;
+                terminalBox.appendChild(row);
+            });
+
+            terminalBox.scrollTop = terminalBox.scrollHeight;
+        });
+    }
+
+    async function transmitMessage(e) {
+        e.preventDefault();
+        const input = document.getElementById('term-input');
+        const text = input.value.trim();
+        if (!text) return;
+
+        input.value = '';
+        input.disabled = true;
+
+        try {
+            await addDoc(collection(db, "community_messages"), {
+                user: currentUser,
+                role: currentRole,
+                text: text,
+                timestamp: new Date().toISOString()
+            });
+        } catch (error) {
+            console.error("Error transmitting message:", error);
+            const box = document.getElementById('terminal-box');
+            box.innerHTML += `<div class="msg-row"><div class="msg-text system-text" style="color:var(--db-red);">ERROR: Transmission failed.</div></div>`;
+        } finally {
+            input.disabled = false;
+            input.focus();
         }
     }
 
+    // 2. FETCH PUBLIC OCs
+    async function fetchPublicRoster() {
+        try {
+            const q = query(collection(db, "user_ocs"), orderBy("timestamp", "desc"), limit(10));
+            const snapshot = await getDocs(q);
+            const rosterBox = document.getElementById('community-roster');
+            
+            if (snapshot.empty) {
+                rosterBox.innerHTML = '<div style="color:#8a9ba8; font-size:0.75rem;">No registered operatives found in sector.</div>';
+                return;
+            }
+
+            rosterBox.innerHTML = '';
+            snapshot.forEach((doc) => {
+                const oc = doc.data();
+                rosterBox.innerHTML += `
+                    <div class="roster-item">
+                        <div>
+                            <div class="roster-name">${oc.name.toUpperCase()}</div>
+                            <div class="roster-creator">PWR: ${oc.power || 'UNKNOWN'}</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div class="roster-creator" style="color:var(--db-gold);">@${oc.owner.toUpperCase()}</div>
+                            <div class="roster-creator">${oc.race}</div>
+                        </div>
+                    </div>
+                `;
+            });
+        } catch (error) {
+            console.error("Error fetching roster:", error);
+        }
+    }
 
     function checkAdminAccess() {
-        const userRole = localStorage.getItem('userRole');
         const adminLinks = document.querySelectorAll('.nav-admin-link, #nav-admin-dashboard');
         if (!adminLinks.length) return;
 
-        const isAdmin = (userRole === 'admin') || 
+        const isAdmin = (currentRole === 'admin') || 
                         (localStorage.getItem('pantheon_director_authenticated') === 'true');
 
         adminLinks.forEach(link => {
@@ -110,30 +312,15 @@
         });
     }
 
-    function adminLogout() {
-        localStorage.removeItem('userRole');
-        localStorage.removeItem('pantheon_director_authenticated');
-        localStorage.removeItem('pantheon_active_session');
-        checkAdminAccess();
-        window.location.href = 'community.html';
-    }
+    // Expose form submission to window
+    window.transmitMessage = transmitMessage;
 
-    function execTerminal(e) {
-        e.preventDefault();
-        const input = document.getElementById('term-input');
-        const cmd = input.value.trim();
-        if (!cmd) return;
-
-        const box = document.getElementById('terminal-box');
-        const line = document.createElement('div');
-        line.className = 'sys-line';
-        line.innerHTML = `CHAT: [GUEST_USER]: ${cmd}`;
-        box.appendChild(line);
-        box.scrollTop = box.scrollHeight;
-        input.value = '';
-    }
-
+    // Initialize
+    setupChatListener();
+    fetchPublicRoster();
     checkAdminAccess();
 </script>
 </body>
 </html>
+
+```
