@@ -46,12 +46,55 @@
         .nav-menu a.nav-admin-link:hover, .nav-menu a.nav-admin-link.active { color: var(--db-gold); }
 
         /* ARCHIVE CARDS */
-        .page-title { font-size: 1.5rem; color: var(--db-gold); border-bottom: 1px dashed rgba(255,183,0,0.4); padding-bottom: 10px; margin-bottom: 20px; font-weight: bold; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .card { background: var(--panel-bg); border: 1px solid var(--db-cyan); padding: 20px; box-shadow: 0 0 10px rgba(0,229,255,0.2); clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px)); }
-        .card h3 { color: var(--db-ki); margin-top: 0; }
-        .card p { color: #8a9ba8; font-size: 0.85rem; line-height: 1.5; }
-        .btn { display: inline-block; background: var(--db-cyan); color: #000; padding: 8px 15px; text-decoration: none; font-weight: bold; font-size: 0.8rem; margin-top: 10px; }
+        .page-title { 
+            font-size: 1.5rem; color: var(--db-gold); 
+            border-bottom: 1px dashed rgba(255,183,0,0.4); 
+            padding-bottom: 10px; margin-bottom: 20px; font-weight: bold; 
+        }
+        .grid { 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(48%, 1fr)); gap: 20px; margin-bottom: 40px; 
+        }
+        .card { 
+            background: var(--panel-bg); border: 1px solid var(--db-cyan); 
+            padding: 22px; box-shadow: 0 0 10px rgba(0,229,255,0.2); 
+            clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px)); 
+            display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .card h3 { color: var(--db-ki); margin-top: 0; letter-spacing: 1px; font-size: 1.1rem; }
+        .card p { color: #8a9ba8; font-size: 0.85rem; line-height: 1.5; margin-bottom: 20px; flex-grow: 1; }
+        .btn { 
+            display: inline-block; background: var(--db-cyan); color: #000; 
+            padding: 10px 15px; text-decoration: none; font-weight: bold; 
+            font-size: 0.8rem; text-align: center; border: none; cursor: pointer;
+        }
+        .btn:hover { filter: brightness(1.1); }
+
+        /* LIVE DATABANK FEED */
+        .databank-section {
+            background: rgba(12, 18, 32, 0.6);
+            border: 1px solid rgba(255, 183, 0, 0.3);
+            padding: 25px;
+        }
+        .databank-header {
+            color: var(--db-orange); font-size: 1.1rem; font-weight: bold;
+            margin-bottom: 15px; border-bottom: 1px solid rgba(255, 85, 0, 0.3); padding-bottom: 8px;
+        }
+        .data-row {
+            display: grid;
+            grid-template-columns: 120px 100px 1fr 150px;
+            gap: 15px;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px dotted rgba(0, 229, 255, 0.2);
+            font-size: 0.8rem;
+        }
+        .data-row:hover { background: rgba(0, 229, 255, 0.05); }
+        .data-date { color: #8a9ba8; }
+        .data-type { font-weight: bold; text-align: center; padding: 3px 8px; font-size: 0.7rem; }
+        .type-oc { background: rgba(0, 255, 136, 0.1); color: var(--db-ki); border: 1px solid var(--db-ki); }
+        .type-media { background: rgba(255, 183, 0, 0.1); color: var(--db-gold); border: 1px solid var(--db-gold); }
+        .data-title { color: #ffffff; font-weight: bold; }
+        .data-owner { color: var(--db-cyan); text-align: right; }
     </style>
 </head>
 <body>
@@ -66,35 +109,63 @@
             <a href="admin.html" class="nav-admin-link" id="nav-admin-dashboard">ADMIN DASHBOARD</a>
         </div>
     </div>
-    <div class="page-title">DATA ARCHIVES // ROSTERS & LORE</div>
+    
+    <div class="page-title">DATA ARCHIVES // MASTER INDEX</div>
+    
     <div class="grid">
+        <!-- Card 1: Official Dossiers -->
         <div class="card">
-            <h3>OFFICIAL CHARACTER DOSSIERS</h3>
+            <h3>[01] OFFICIAL DOSSIERS</h3>
             <p>Access the central database for all verified Pantheon Core members. Review physical attributes, combat metrics, and historical show data.</p>
-            <a href="dossier-builder.html" class="btn">ENTER RECORDS</a>
+            <a href="dossier.html" class="btn">ACCESS RECORDS</a>
         </div>
+        
+        <!-- Card 2: Community OCs -->
         <div class="card">
-            <h3>SAGA TIMELINES</h3>
-            <p>Review the historical dispatch logs and timeline matrix from past Dragonball Legacy Reborn arcs.</p>
-            <a href="#" class="btn" style="background:var(--db-gold);">VIEW TIMELINES</a>
+            <h3>[02] PUBLIC OC REGISTRY</h3>
+            <p>Browse custom operatives built and submitted by the Pantheon Studios community. View power levels, loadouts, and spatial combat metrics.</p>
+            <a href="profile.html" class="btn" style="background:var(--db-gold);">VIEW REGISTRY</a>
+        </div>
+
+        <!-- Card 3: Media & Art -->
+        <div class="card">
+            <h3>[03] MULTIVERSE MEDIA CAPTURES</h3>
+            <p>Public feed of transmitted images, episode reaction art, and captured combat footage from active network operators.</p>
+            <button class="btn" style="background:var(--db-orange); color:#fff;" onclick="alert('Media gallery filter routing pending connection to visual architecture.')">BROWSE MEDIA</button>
+        </div>
+
+        <!-- Card 4: Macro Scripts -->
+        <div class="card">
+            <h3>[04] TACTICAL MACRO SCRIPTS (GPC2)</h3>
+            <p>Restricted repository containing Titan Two automation scripts, including advanced timing sequences and Center of Gravity defensive macros.</p>
+            <button class="btn" style="background:#ff3333; color:#fff;" onclick="alert('ACCESS DENIED: Insufficient clearance for GPC2 tactical repository.')">DECRYPT SCRIPTS</button>
+        </div>
+    </div>
+
+    <!-- Live Database Feed -->
+    <div class="databank-section">
+        <div class="databank-header">LATEST DECLASSIFIED ASSETS // LIVE FEED</div>
+        <div id="live-feed-container">
+            <div style="color: #8a9ba8; font-size: 0.85rem; padding: 10px;">Querying sector databases...</div>
         </div>
     </div>
 </div>
 
-<script>
-    function attemptAdminLogin(username, password) {
-        if (username === 'blackbasilisk42' && password === '@croatoan') {
-            localStorage.setItem('userRole', 'admin');
-            localStorage.setItem('pantheon_active_session', 'blackbasilisk42');
-            localStorage.setItem('pantheon_director_authenticated', 'true');
-            window.location.href = 'admin.html';
-            return true;
-        } else {
-            alert('Invalid username or password. Access Denied.');
-            return false;
-        }
-    }
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getFirestore, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
+    const firebaseConfig = {
+        apiKey: "AIzaSyD8k_5c_4mxpJCtKIYxiko8i1mY1vxg2dQ",
+        authDomain: "pantheon-ba229.firebaseapp.com",
+        projectId: "pantheon-ba229",
+        storageBucket: "pantheon-ba229.firebasestorage.app",
+        messagingSenderId: "578947122045",
+        appId: "1:578947122045:web:5343b13612fab74ea64214"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
     function checkAdminAccess() {
         const userRole = localStorage.getItem('userRole');
@@ -109,6 +180,79 @@
         });
     }
 
+    async function fetchRecentArchives() {
+        const feedContainer = document.getElementById('live-feed-container');
+        let combinedData = [];
+
+        try {
+            // Fetch latest OCs
+            const ocQuery = query(collection(db, "user_ocs"), orderBy("timestamp", "desc"), limit(5));
+            const ocSnapshot = await getDocs(ocQuery);
+            ocSnapshot.forEach(doc => {
+                const data = doc.data();
+                combinedData.push({
+                    type: 'OC_RECORD',
+                    typeClass: 'type-oc',
+                    title: data.name,
+                    owner: data.owner,
+                    timestamp: data.timestamp
+                });
+            });
+
+            // Fetch latest Media
+            const mediaQuery = query(collection(db, "media"), orderBy("timestamp", "desc"), limit(5));
+            const mediaSnapshot = await getDocs(mediaQuery);
+            mediaSnapshot.forEach(doc => {
+                const data = doc.data();
+                if(data.privacy === 'public') {
+                    combinedData.push({
+                        type: 'MEDIA_ASSET',
+                        typeClass: 'type-media',
+                        title: data.title,
+                        owner: data.owner,
+                        timestamp: data.timestamp
+                    });
+                }
+            });
+
+            // Sort combined data by timestamp descending
+            combinedData.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            // Limit to top 8 items total
+            combinedData = combinedData.slice(0, 8);
+
+            if (combinedData.length === 0) {
+                feedContainer.innerHTML = '<div style="color: #8a9ba8; font-size: 0.85rem; padding: 10px;">No public records found in active memory banks.</div>';
+                return;
+            }
+
+            feedContainer.innerHTML = combinedData.map(item => `
+                <div class="data-row">
+                    <div class="data-date">${new Date(item.timestamp).toLocaleDateString()}</div>
+                    <div class="data-type ${item.typeClass}">${item.type}</div>
+                    <div class="data-title">${item.title.toUpperCase()}</div>
+                    <div class="data-owner">OP: @${item.owner.toUpperCase()}</div>
+                </div>
+            `).join('');
+
+        } catch (error) {
+            console.error("Error fetching archives:", error);
+            feedContainer.innerHTML = '<div style="color: var(--db-red); font-size: 0.85rem; padding: 10px;">ERROR: FAILED TO SYNCHRONIZE WITH CENTRAL DATABANKS.</div>';
+        }
+    }
+
+    function attemptAdminLogin(username, password) {
+        if (username === 'blackbasilisk42' && password === '@croatoan') {
+            localStorage.setItem('userRole', 'admin');
+            localStorage.setItem('pantheon_active_session', 'blackbasilisk42');
+            localStorage.setItem('pantheon_director_authenticated', 'true');
+            window.location.href = 'admin.html';
+            return true;
+        } else {
+            alert('Invalid username or password. Access Denied.');
+            return false;
+        }
+    }
+
     function adminLogout() {
         localStorage.removeItem('userRole');
         localStorage.removeItem('pantheon_director_authenticated');
@@ -117,7 +261,11 @@
         window.location.href = 'archives.html';
     }
 
+    window.attemptAdminLogin = attemptAdminLogin;
+    window.adminLogout = adminLogout;
+
     checkAdminAccess();
+    fetchRecentArchives();
 </script>
 </body>
 </html>
