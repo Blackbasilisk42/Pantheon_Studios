@@ -80,7 +80,6 @@
             color: var(--db-gold);
         }
 
-
         .controls-bar {
             display: flex;
             gap: 10px;
@@ -258,7 +257,7 @@
 
         <div class="form-group">
             <label>Section I: Overview & Anatomy</label>
-            <textarea id="in-sec1">Standing at nearly twice the height of a conventional Frieza Race warrior, Kaige’s sheer physical scale transforms standard arena geometry. He isn't just another custom character in Conton City; his massive physical frame makes even basic neutral stances look imposing.
+            <textarea id="in-sec1">Standing at nearly twice the height of a conventional Frieza Race warrior and lacking a nose entirely, Kaige’s sheer physical scale and unique facial structure transforms standard arena geometry. He isn't just another custom character in Conton City; his massive physical frame makes even basic neutral stances look imposing.
 
 • Signature Aura: Manifests a distinct dark energy signature featuring a piercing emerald-green core framed by obsidian black undertones.
 • The Golden Override: Rarely accesses the Frieza Race Golden Form, treating it not as a standard transformation crutch, but as an extraordinarily rare power override reserved for narrative-altering threats.</textarea>
@@ -338,8 +337,21 @@
     </div>
 </div>
 
-<script>
-    const STORAGE_KEY = 'pantheon_dossier_kaige';
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyD8k_5c_4mxpJCtKIYxiko8i1mY1vxg2dQ",
+        authDomain: "pantheon-ba229.firebaseapp.com",
+        projectId: "pantheon-ba229",
+        storageBucket: "pantheon-ba229.firebasestorage.app",
+        messagingSenderId: "578947122045",
+        appId: "1:578947122045:web:5343b13612fab74ea64214"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
     // Format plain text into styled HTML paragraphs and bullet points
     function formatText(text) {
@@ -364,7 +376,11 @@
         return html;
     }
 
-    function saveAndPublish() {
+    async function saveAndPublish() {
+        const btnSave = document.getElementById('btn-save');
+        btnSave.innerText = "SAVING...";
+        btnSave.disabled = true;
+
         const data = {
             title: document.getElementById('in-title').value,
             classification: document.getElementById('in-class').value,
@@ -377,14 +393,24 @@
             sec2: document.getElementById('in-sec2').value,
             sec3: document.getElementById('in-sec3').value,
             sec4: document.getElementById('in-sec4').value,
-            sec5: document.getElementById('in-sec5').value
+            sec5: document.getElementById('in-sec5').value,
+            updatedAt: new Date().toISOString()
         };
 
-        // Save to Browser Storage
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-        
-        render(data);
-        switchToView();
+        const docId = data.tag ? data.tag.toLowerCase() : "default_dossier";
+
+        try {
+            await setDoc(doc(db, "dossiers", docId), data);
+            
+            render(data);
+            switchToView();
+        } catch (error) {
+            console.error("Error saving dossier:", error);
+            alert("Failed to save dossier to database.");
+        } finally {
+            btnSave.innerText = "Save & Publish";
+            btnSave.disabled = false;
+        }
     }
 
     function render(data) {
@@ -398,6 +424,7 @@
         const photoElem = document.getElementById('out-photo');
         if (data.photo) {
             photoElem.src = data.photo;
+            photoElem.style.display = 'block';
         } else {
             photoElem.style.display = 'none';
         }
@@ -409,25 +436,34 @@
         document.getElementById('out-sec5').innerHTML = formatText(data.sec5);
     }
 
-    function loadSavedData() {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-            const data = JSON.parse(saved);
-            document.getElementById('in-title').value = data.title || '';
-            document.getElementById('in-class').value = data.classification || '';
-            document.getElementById('in-race').value = data.race || '';
-            document.getElementById('in-height').value = data.height || '';
-            document.getElementById('in-tag').value = data.tag || '';
-            document.getElementById('in-affil').value = data.affil || '';
-            document.getElementById('in-photo').value = data.photo || '';
-            document.getElementById('in-sec1').value = data.sec1 || '';
-            document.getElementById('in-sec2').value = data.sec2 || '';
-            document.getElementById('in-sec3').value = data.sec3 || '';
-            document.getElementById('in-sec4').value = data.sec4 || '';
-            document.getElementById('in-sec5').value = data.sec5 || '';
-            
-            render(data);
-            switchToView();
+    async function loadSavedData() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetId = urlParams.get('id') || 'blackbasilisk42';
+
+        try {
+            const docRef = doc(db, "dossiers", targetId);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                document.getElementById('in-title').value = data.title || '';
+                document.getElementById('in-class').value = data.classification || '';
+                document.getElementById('in-race').value = data.race || '';
+                document.getElementById('in-height').value = data.height || '';
+                document.getElementById('in-tag').value = data.tag || '';
+                document.getElementById('in-affil').value = data.affil || '';
+                document.getElementById('in-photo').value = data.photo || '';
+                document.getElementById('in-sec1').value = data.sec1 || '';
+                document.getElementById('in-sec2').value = data.sec2 || '';
+                document.getElementById('in-sec3').value = data.sec3 || '';
+                document.getElementById('in-sec4').value = data.sec4 || '';
+                document.getElementById('in-sec5').value = data.sec5 || '';
+                
+                render(data);
+                switchToView();
+            }
+        } catch (error) {
+            console.error("Error loading dossier:", error);
         }
     }
 
@@ -447,15 +483,19 @@
 
     function attemptAdminLogin(username, password) {
         if (username === 'blackbasilisk42' && password === '@croatoan') {
+            localStorage.setItem('userRole', 'admin');
             localStorage.setItem('pantheon_active_session', 'blackbasilisk42');
             localStorage.setItem('pantheon_director_authenticated', 'true');
             window.location.href = 'admin.html';
             return true;
         } else {
+            alert('Invalid credentials. Access Denied.');
+            return false;
+        }
     }
 
-
     function checkAdminAccess() {
+        const userRole = localStorage.getItem('userRole');
         const adminLinks = document.querySelectorAll('.nav-admin-link, #nav-admin-dashboard');
         if (!adminLinks.length) return;
 
@@ -472,8 +512,15 @@
         localStorage.removeItem('pantheon_director_authenticated');
         localStorage.removeItem('pantheon_active_session');
         checkAdminAccess();
-        window.location.href = 'dossier-builder.html';
+        window.location.href = 'login.html';
     }
+
+    // Expose functions to window
+    window.saveAndPublish = saveAndPublish;
+    window.switchToView = switchToView;
+    window.switchToEdit = switchToEdit;
+    window.attemptAdminLogin = attemptAdminLogin;
+    window.adminLogout = adminLogout;
 
     // Auto load on open
     window.onload = function() {
