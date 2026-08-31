@@ -19,14 +19,33 @@
         }
 
         body {
-            background-color: var(--bg-void);
             color: var(--db-cyan);
             font-family: var(--font-mono);
             margin: 0;
             padding: 20px;
             min-height: 100vh;
+        }
+
+        /* DYNAMIC BACKGROUND SYSTEM */
+        #dynamic-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -2;
+            background-color: var(--bg-void);
+            background-size: cover;
+            background-position: center;
+        }
+
+        #dynamic-bg video {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+
+        #bg-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1;
             background-image: 
-                radial-gradient(circle at 50% 30%, rgba(255, 183, 0, 0.08) 0%, transparent 70%),
+                radial-gradient(circle at 50% 30%, rgba(255, 183, 0, 0.08) 0%, rgba(6, 9, 19, 0.85) 80%),
                 linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px);
             background-size: 100% 100%, 100% 4px;
         }
@@ -82,7 +101,6 @@
             color: var(--db-gold);
         }
 
-
         /* USER SESSION CARD */
         .session-card {
             background: var(--panel-bg);
@@ -115,6 +133,7 @@
             font-weight: 900;
             color: #fff;
             box-shadow: 0 0 10px rgba(0, 255, 136, 0.4);
+            overflow: hidden;
         }
 
         .user-callsign {
@@ -302,6 +321,12 @@
             margin-top: 10px;
             clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
         }
+        
+        .btn-action:disabled {
+            background: #444;
+            color: #888;
+            cursor: not-allowed;
+        }
 
         /* ASSETS DISPLAY SECTION */
         .assets-card {
@@ -325,10 +350,12 @@
             padding: 12px;
         }
 
+        /* Framing specifically designed to anchor tall character builds and prevent head crops */
         .asset-box img {
             width: 100%;
-            max-height: 180px;
+            max-height: 200px;
             object-fit: cover;
+            object-position: top center; 
             border: 1px solid rgba(255, 183, 0, 0.2);
             margin-bottom: 8px;
         }
@@ -378,6 +405,9 @@
     </style>
 </head>
 <body>
+
+<div id="dynamic-bg"></div>
+<div id="bg-overlay"></div>
 
 <!-- MAINTENANCE LOCKOUT OVERLAY -->
 <div id="maintenance-overlay">
@@ -432,6 +462,29 @@
     </div>
 
     <div class="profile-grid" id="profile-editor-grid">
+
+        <!-- PROFILE VISUALS & DYNAMIC BACKGROUND UPLOADER -->
+        <div class="profile-card" style="grid-column: span 2;">
+            <div class="card-header" style="color:var(--db-cyan); border-bottom-color: rgba(0, 229, 255, 0.4);">PROFILE VISUALS // AVATAR & BACKGROUND</div>
+            <form onsubmit="updateProfileVisuals(event)" style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                <div class="form-group">
+                    <label class="form-label">CUSTOM AVATAR (IMAGE ONLY)</label>
+                    <input type="file" id="avatar-file" accept="image/*" class="form-input" style="padding:6px;">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">DYNAMIC BACKGROUND (IMAGE OR MP4 VIDEO)</label>
+                    <input type="file" id="bg-file" accept="image/*,video/mp4" class="form-input" style="padding:6px;">
+                </div>
+
+                <div style="grid-column: span 2;">
+                    <button type="submit" class="btn-action" style="background:var(--db-cyan);" id="btn-update-visuals">UPDATE VISUALS</button>
+                </div>
+            </form>
+            <div id="visuals-status" style="margin-top:10px; font-size:0.75rem; color:var(--db-ki); display:none; text-align:center; font-weight:bold;"></div>
+        </div>
+
+
         <!-- PERSONAL OC BUILDER (COMMUNITY OC) -->
         <div class="profile-card">
             <div class="card-header">PERSONAL OC CREATOR // COMMUNITY AVATAR</div>
@@ -494,9 +547,9 @@
                     </select>
                 </div>
 
-                <button type="submit" class="btn-action" style="background:var(--db-gold);">TRANSMIT MEDIA ASSET</button>
+                <button type="submit" id="btn-transmit-media" class="btn-action" style="background:var(--db-gold);">TRANSMIT MEDIA ASSET</button>
             </form>
-            <div id="media-status" style="margin-top:10px; font-size:0.75rem; color:var(--db-ki); display:none; text-align:center; font-weight:bold;">✓ MEDIA TRANSMITTED TO FEED</div>
+            <div id="media-status" style="margin-top:10px; font-size:0.75rem; color:var(--db-ki); display:none; text-align:center; font-weight:bold;"></div>
         </div>
     </div>
 
@@ -518,7 +571,8 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyD8k_5c_4mxpJCtKIYxiko8i1mY1vxg2dQ",
@@ -531,6 +585,7 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const storage = getStorage(app);
     window.db = db;
 
     const DEV_PASSCODES = ['@jimbo21', '@zetsu', '@princeabu'];
@@ -570,10 +625,80 @@
         
         if (viewTargetUser && viewTargetUser.toLowerCase() !== activeSessionUser.toLowerCase()) {
             document.getElementById('display-badge').innerText = `PUBLIC MEMBER PROFILE SHOWCASE`;
+            // Hide the edit grids if viewing someone else
+            document.getElementById('profile-editor-grid').style.display = 'none';
+        }
+
+        // Fetch User specific visual data (Avatar & BG)
+        try {
+            const userRef = doc(db, "users", currentCallsign.toLowerCase());
+            const userSnap = await getDoc(userRef);
+            if (userSnap.exists()) {
+                const userData = userSnap.data();
+                if (userData.avatarUrl) {
+                    document.getElementById('user-avatar-circle').innerHTML = `<img src="${userData.avatarUrl}" style="width:100%; height:100%; object-fit:cover; object-position:top center; border-radius:50%;">`;
+                }
+                if (userData.bgUrl) {
+                    const bgContainer = document.getElementById('dynamic-bg');
+                    if (userData.bgUrl.includes('.mp4')) {
+                        bgContainer.innerHTML = `<video autoplay loop muted playsinline><source src="${userData.bgUrl}" type="video/mp4"></video>`;
+                    } else {
+                        bgContainer.style.backgroundImage = `url('${userData.bgUrl}')`;
+                    }
+                }
+            }
+        } catch (error) {
+            console.error("Error loading user visuals:", error);
         }
 
         await renderPublicShowcaseCard();
         await renderUserAssets();
+    }
+
+    async function updateProfileVisuals(e) {
+        e.preventDefault();
+        const btn = document.getElementById('btn-update-visuals');
+        const status = document.getElementById('visuals-status');
+        const avatarFile = document.getElementById('avatar-file').files[0];
+        const bgFile = document.getElementById('bg-file').files[0];
+
+        if (!avatarFile && !bgFile) return;
+
+        btn.disabled = true;
+        btn.innerText = "UPLOADING TO STORAGE...";
+        status.style.display = 'none';
+
+        try {
+            const updateData = {};
+
+            if (avatarFile) {
+                const avatarRef = ref(storage, `users/${currentCallsign.toLowerCase()}/avatar_${Date.now()}_${avatarFile.name}`);
+                await uploadBytes(avatarRef, avatarFile);
+                updateData.avatarUrl = await getDownloadURL(avatarRef);
+            }
+
+            if (bgFile) {
+                const bgRef = ref(storage, `users/${currentCallsign.toLowerCase()}/bg_${Date.now()}_${bgFile.name}`);
+                await uploadBytes(bgRef, bgFile);
+                updateData.bgUrl = await getDownloadURL(bgRef);
+            }
+
+            const userRef = doc(db, "users", currentCallsign.toLowerCase());
+            await setDoc(userRef, updateData, { merge: true });
+
+            status.style.display = 'block';
+            status.style.color = "var(--db-ki)";
+            status.innerText = "✓ VISUALS UPDATED SUCCESSFULLY. RELOADING...";
+            setTimeout(() => window.location.reload(), 1500);
+
+        } catch (error) {
+            console.error("Visual upload failed:", error);
+            status.style.display = 'block';
+            status.style.color = "var(--db-red)";
+            status.innerText = "ERROR: FAILED TO UPLOAD ASSETS.";
+            btn.disabled = false;
+            btn.innerText = "UPDATE VISUALS";
+        }
     }
 
     function copyPublicProfileLink() {
@@ -604,7 +729,6 @@
                 return;
             }
 
-            // Sort by timestamp if available to get the actual latest
             myOcs.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
             const latestOc = myOcs[myOcs.length - 1];
             const stats = latestOc.stats || { hp: 80, ki: 85, stm: 75, str: 90 };
@@ -682,43 +806,61 @@
 
     async function uploadMediaAsset(e) {
         e.preventDefault();
+        const btn = document.getElementById('btn-transmit-media');
+        const status = document.getElementById('media-status');
         const title = document.getElementById('media-title').value;
         const privacy = document.getElementById('media-privacy').value;
         const fileInput = document.getElementById('media-file');
 
         if (!fileInput.files || !fileInput.files[0]) return;
+        const file = fileInput.files[0];
 
-        const reader = new FileReader();
-        reader.onload = async function(evt) {
+        btn.disabled = true;
+        btn.innerText = "TRANSMITTING TO CLOUD...";
+        status.style.display = 'none';
+
+        try {
+            // Push to Firebase Storage
+            const storageRef = ref(storage, `media/${currentCallsign.toLowerCase()}/${Date.now()}_${file.name}`);
+            await uploadBytes(storageRef, file);
+            
+            // Get Public Cloud URL
+            const downloadURL = await getDownloadURL(storageRef);
+
+            // Save Reference to Firestore
             const mediaData = {
                 owner: currentCallsign,
                 title: title,
                 privacy: privacy,
-                data: evt.target.result,
+                data: downloadURL, 
                 timestamp: new Date().toISOString()
             };
 
-            try {
-                await addDoc(collection(db, "media"), mediaData);
+            await addDoc(collection(db, "media"), mediaData);
 
-                const status = document.getElementById('media-status');
-                status.style.display = 'block';
-                setTimeout(() => { status.style.display = 'none'; }, 2500);
+            status.style.display = 'block';
+            status.style.color = "var(--db-ki)";
+            status.innerText = "✓ MEDIA TRANSMITTED TO FEED";
+            setTimeout(() => { status.style.display = 'none'; }, 2500);
 
-                document.getElementById('media-title').value = '';
-                fileInput.value = '';
-                await renderUserAssets();
-            } catch (error) {
-                console.error("Error uploading media:", error);
-            }
-        };
-
-        reader.readAsDataURL(fileInput.files[0]);
+            document.getElementById('media-title').value = '';
+            fileInput.value = '';
+            btn.disabled = false;
+            btn.innerText = "TRANSMIT MEDIA ASSET";
+            
+            await renderUserAssets();
+        } catch (error) {
+            console.error("Error uploading media:", error);
+            status.style.display = 'block';
+            status.style.color = "var(--db-red)";
+            status.innerText = "ERROR: TRANSMISSION FAILED.";
+            btn.disabled = false;
+            btn.innerText = "TRANSMIT MEDIA ASSET";
+        }
     }
 
     async function renderUserAssets() {
         try {
-            // Render Personal OCs
             const ocBox = document.getElementById('user-oc-list');
             const ocSnapshot = await getDocs(collection(db, "user_ocs"));
             const allOcs = [];
@@ -736,19 +878,23 @@
                         <div style="font-size:0.7rem; color:#8a9ba8; margin-top:4px;">Skills: ${oc.skills}</div>
                         <div class="asset-meta">
                             <span>Created: ${new Date(oc.timestamp).toLocaleDateString()}</span>
-                            <button class="btn-del" onclick="deleteOc('${oc.id}')">[DELETE]</button>
+                            ${currentCallsign.toLowerCase() === activeSessionUser.toLowerCase() ? `<button class="btn-del" onclick="deleteOc('${oc.id}')">[DELETE]</button>` : ''}
                         </div>
                     </div>
                 `).join('');
             }
 
-            // Render Uploaded Media
             const mediaBox = document.getElementById('user-media-list');
             const mediaSnapshot = await getDocs(collection(db, "media"));
             const allMedia = [];
             mediaSnapshot.forEach((doc) => allMedia.push({ id: doc.id, ...doc.data() }));
 
-            const myMedia = allMedia.filter(m => m.owner.toLowerCase() === currentCallsign.toLowerCase());
+            let myMedia = allMedia.filter(m => m.owner.toLowerCase() === currentCallsign.toLowerCase());
+            
+            // Hide private assets if viewing someone else's profile
+            if (currentCallsign.toLowerCase() !== activeSessionUser.toLowerCase()) {
+                myMedia = myMedia.filter(m => m.privacy === 'public');
+            }
 
             if (myMedia.length === 0) {
                 mediaBox.innerHTML = '<div style="color:#607080; font-size:0.75rem;">No media assets transmitted yet.</div>';
@@ -759,7 +905,7 @@
                         <div class="asset-title">${m.title}</div>
                         <div class="asset-meta">
                             <span style="color:${m.privacy === 'public' ? 'var(--db-ki)' : 'var(--db-gold)'};">[${m.privacy.toUpperCase()}]</span>
-                            <button class="btn-del" onclick="deleteMedia('${m.id}')">[DELETE]</button>
+                            ${currentCallsign.toLowerCase() === activeSessionUser.toLowerCase() ? `<button class="btn-del" onclick="deleteMedia('${m.id}')">[DELETE]</button>` : ''}
                         </div>
                     </div>
                 `).join('');
@@ -788,20 +934,6 @@
         }
     }
 
-    function attemptAdminLogin(username, password) {
-        if (username === 'blackbasilisk42' && password === '@croatoan') {
-            localStorage.setItem('userRole', 'admin');
-            localStorage.setItem('pantheon_active_session', 'blackbasilisk42');
-            localStorage.setItem('pantheon_director_authenticated', 'true');
-            window.location.href = 'admin.html';
-            return true;
-        } else {
-            alert('Invalid username or password. Access Denied.');
-            return false;
-        }
-    }
-
-
     function checkAdminAccess() {
         const userRole = localStorage.getItem('userRole');
         const adminLinks = document.querySelectorAll('.nav-admin-link, #nav-admin-dashboard');
@@ -815,25 +947,15 @@
         });
     }
 
-    function adminLogout() {
-        localStorage.removeItem('userRole');
-        localStorage.removeItem('pantheon_director_authenticated');
-        localStorage.removeItem('pantheon_active_session');
-        checkAdminAccess();
-        window.location.href = 'profile.html';
-    }
-
-    // Bind functions to window so inline HTML triggers can execute them
     window.unlockMaintenance = unlockMaintenance;
     window.copyPublicProfileLink = copyPublicProfileLink;
     window.logoutUser = logoutUser;
     window.updateOcPreview = updateOcPreview;
     window.savePersonalOC = savePersonalOC;
     window.uploadMediaAsset = uploadMediaAsset;
+    window.updateProfileVisuals = updateProfileVisuals;
     window.deleteOc = deleteOc;
     window.deleteMedia = deleteMedia;
-    window.attemptAdminLogin = attemptAdminLogin;
-    window.adminLogout = adminLogout;
 
     checkMaintenanceGate();
     loadUserProfile();
