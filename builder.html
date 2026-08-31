@@ -418,7 +418,22 @@
     </div>
 </div>
 
-<script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyD8k_5c_4mxpJCtKIYxiko8i1mY1vxg2dQ",
+        authDomain: "pantheon-ba229.firebaseapp.com",
+        projectId: "pantheon-ba229",
+        storageBucket: "pantheon-ba229.firebasestorage.app",
+        messagingSenderId: "578947122045",
+        appId: "1:578947122045:web:5343b13612fab74ea64214"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
     const DIRECTOR_PASSCODE = '@Sammyzzz3Jimbo21';
 
     function checkDirectorAuth() {
@@ -479,10 +494,12 @@
         document.getElementById('prev-lore').innerText = lore || 'No tactical notes provided.';
     }
 
-    function saveOfficialCharacter() {
+    async function saveOfficialCharacter() {
         const key = document.getElementById('hero-name').value.toLowerCase().replace(/[^a-z0-9]/g, '');
+        const docId = key || 'hero_' + Date.now();
+        
         const heroData = {
-            id: key || 'hero_' + Date.now(),
+            id: docId,
             initials: document.getElementById('hero-name').value.substring(0, 2).toUpperCase(),
             name: document.getElementById('hero-name').value.toUpperCase(),
             spec: `${document.getElementById('hero-race').value} // ${document.getElementById('hero-role').value}`,
@@ -494,16 +511,26 @@
             strikeSuper: `${document.getElementById('stat-str').value} / 100`,
             kiSuper: `${document.getElementById('stat-kib').value} / 100`,
             skills: document.getElementById('hero-skills').value.split(',').map(s => ({ name: s.trim(), type: 'strike' })),
-            lore: document.getElementById('hero-lore').value
+            lore: document.getElementById('hero-lore').value,
+            updatedAt: new Date().toISOString()
         };
 
-        const officialRoster = JSON.parse(localStorage.getItem('pantheon_official_roster') || '{}');
-        officialRoster[heroData.id] = heroData;
-        localStorage.setItem('pantheon_official_roster', JSON.stringify(officialRoster));
-
-        const status = document.getElementById('save-status');
-        status.style.display = 'block';
-        setTimeout(() => { status.style.display = 'none'; }, 3000);
+        try {
+            await setDoc(doc(db, "official_roster", docId), heroData);
+            
+            const status = document.getElementById('save-status');
+            status.style.display = 'block';
+            status.style.color = "var(--db-ki)";
+            status.innerText = "✓ CANON CHARACTER PUBLISHED TO OFFICIAL SHOW DATABASE";
+            setTimeout(() => { status.style.display = 'none'; }, 3000);
+        } catch (error) {
+            console.error("Error saving official roster entry:", error);
+            const status = document.getElementById('save-status');
+            status.style.display = 'block';
+            status.style.color = "var(--db-red)";
+            status.innerText = "ERROR: FAILED TO PUBLISH TO DATABASE";
+            setTimeout(() => { status.style.display = 'none'; }, 3000);
+        }
     }
 
     function attemptAdminLogin(username, password) {
@@ -518,7 +545,6 @@
             return false;
         }
     }
-
 
     function checkAdminAccess() {
         const userRole = localStorage.getItem('userRole');
@@ -540,6 +566,13 @@
         checkAdminAccess();
         window.location.href = 'login.html';
     }
+
+    // Expose functions to window
+    window.authenticateDirector = authenticateDirector;
+    window.updatePreview = updatePreview;
+    window.saveOfficialCharacter = saveOfficialCharacter;
+    window.attemptAdminLogin = attemptAdminLogin;
+    window.adminLogout = adminLogout;
 
     checkDirectorAuth();
     updatePreview();
