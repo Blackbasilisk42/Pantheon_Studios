@@ -967,7 +967,24 @@
     </div>
 </div>
 
-<script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+    // FIREBASE CLOUD CONFIGURATION
+    const firebaseConfig = {
+        apiKey: "AIzaSyD8k_5c_4mxpJCtKIYxiko8i1mY1vxg2dQ",
+        authDomain: "pantheon-ba229.firebaseapp.com",
+        projectId: "pantheon-ba229",
+        storageBucket: "pantheon-ba229.firebasestorage.app",
+        messagingSenderId: "578947122045",
+        appId: "1:578947122045:web:5343b13612fab74ea64214"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    window.db = db; // Attach to window just in case other scripts need it later
+
     const activeCallsign = localStorage.getItem('pantheon_active_session') || 'GUEST_FAN';
 
     // MAINTENANCE GATE CHECK LOGIC
@@ -1045,81 +1062,100 @@
         input.value = '';
     }
 
-    // Load Public Uploaded Feed
-    function loadPublicFeed() {
+    // Load Public Uploaded Feed FROM FIREBASE CLOUD
+    async function loadPublicFeed() {
         const feed = document.getElementById('public-feed');
-        const allMedia = JSON.parse(localStorage.getItem('pantheon_media') || '[]');
-        const allComments = JSON.parse(localStorage.getItem('pantheon_comments') || '{}');
+        
+        try {
+            // Fetch Media from Cloud
+            const mediaSnapshot = await getDocs(collection(db, "media"));
+            const allMedia = [];
+            mediaSnapshot.forEach((doc) => {
+                allMedia.push({ id: doc.id, ...doc.data() });
+            });
 
-        const publicMedia = allMedia.filter(m => m.privacy === 'public');
+            // Fetch Comments from Cloud
+            const commentsSnapshot = await getDocs(collection(db, "comments"));
+            const allComments = {};
+            commentsSnapshot.forEach((doc) => {
+                const data = doc.data();
+                if (!allComments[data.mediaId]) allComments[data.mediaId] = [];
+                allComments[data.mediaId].push(data);
+            });
 
-        if (publicMedia.length === 0) {
-            feed.innerHTML = `
-                <div class="feed-card" style="text-align:center; color:#8a9ba8; font-size:0.8rem;">
-                    No active media uploads broadcasted yet. Upload assets marked <strong>PUBLIC_HQ</strong> from your profile to populate this feed.
-                </div>
-            `;
-            return;
-        }
+            const publicMedia = allMedia.filter(m => m.privacy === 'public');
 
-        feed.innerHTML = publicMedia.map(item => {
-            const comments = allComments[item.id] || [];
-            
-            return `
-                <div class="feed-card">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                        <span style="color:#fff; font-weight:bold; font-size:0.95rem;">${item.title}</span>
-                        <span style="color:#8a9ba8; font-size:0.75rem;">DISPATCHED BY: [${item.owner}] // ${new Date(item.timestamp).toLocaleDateString()}</span>
+            if (publicMedia.length === 0) {
+                feed.innerHTML = `
+                    <div class="feed-card" style="text-align:center; color:#8a9ba8; font-size:0.8rem;">
+                        No active media uploads broadcasted yet. Upload assets marked <strong>PUBLIC_HQ</strong> from your profile to populate this feed.
                     </div>
+                `;
+                return;
+            }
 
-                    <img class="media-preview" src="${item.data}" alt="${item.title}">
-
-                    <div class="comments-block">
-                        <div style="font-size:0.75rem; color:var(--db-ki); margin-bottom:8px;">COMMUNITY FEEDBACK // COMMENTS (${comments.length})</div>
-                        
-                        <div style="display:flex; flex-direction:column; gap:8px; max-height:140px; overflow-y:auto; margin-bottom:10px;">
-                            ${comments.length === 0 
-                                ? '<div style="color:#607080; font-size:0.75rem;">No comments logged yet.</div>' 
-                                : comments.map(c => `
-                                    <div style="font-size:0.75rem; border-bottom:1px dotted rgba(0,229,255,0.15); padding-bottom:4px;">
-                                        <span style="color:var(--db-gold); font-weight:bold;">[${c.author}]</span>
-                                        <span style="color:#607080; font-size:0.65rem; margin-left:6px;">${new Date(c.timestamp).toLocaleTimeString()}</span>
-                                        <div style="color:#d0e0f0; margin-top:2px;">${c.text}</div>
-                                    </div>
-                                `).join('')
-                            }
+            feed.innerHTML = publicMedia.map(item => {
+                const comments = allComments[item.id] || [];
+                
+                return `
+                    <div class="feed-card">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                            <span style="color:#fff; font-weight:bold; font-size:0.95rem;">${item.title}</span>
+                            <span style="color:#8a9ba8; font-size:0.75rem;">DISPATCHED BY: [${item.owner}] // ${new Date(item.timestamp).toLocaleDateString()}</span>
                         </div>
 
-                        <form style="display:flex; gap:10px;" onsubmit="postComment(event, '${item.id}')">
-                            <input type="text" id="input-${item.id}" placeholder="Leave feedback on this episode..." required autocomplete="off" style="flex:1; background:rgba(6,9,19,0.9); border:1px solid rgba(0,229,255,0.4); color:#fff; padding:8px; font-family:var(--font-mono); font-size:0.8rem; outline:none;">
-                            <button type="submit" style="background:var(--db-gold); color:#000; border:none; padding:8px 16px; font-family:var(--font-mono); font-weight:bold; cursor:pointer; text-transform:uppercase; font-size:0.75rem;">TRANSMIT</button>
-                        </form>
+                        <img class="media-preview" src="${item.data}" alt="${item.title}">
+
+                        <div class="comments-block">
+                            <div style="font-size:0.75rem; color:var(--db-ki); margin-bottom:8px;">COMMUNITY FEEDBACK // COMMENTS (${comments.length})</div>
+                            
+                            <div style="display:flex; flex-direction:column; gap:8px; max-height:140px; overflow-y:auto; margin-bottom:10px;">
+                                ${comments.length === 0 
+                                    ? '<div style="color:#607080; font-size:0.75rem;">No comments logged yet.</div>' 
+                                    : comments.map(c => `
+                                        <div style="font-size:0.75rem; border-bottom:1px dotted rgba(0,229,255,0.15); padding-bottom:4px;">
+                                            <span style="color:var(--db-gold); font-weight:bold;">[${c.author}]</span>
+                                            <span style="color:#607080; font-size:0.65rem; margin-left:6px;">${new Date(c.timestamp).toLocaleTimeString()}</span>
+                                            <div style="color:#d0e0f0; margin-top:2px;">${c.text}</div>
+                                        </div>
+                                    `).join('')
+                                }
+                            </div>
+
+                            <form style="display:flex; gap:10px;" onsubmit="postComment(event, '${item.id}')">
+                                <input type="text" id="input-${item.id}" placeholder="Leave feedback on this episode..." required autocomplete="off" style="flex:1; background:rgba(6,9,19,0.9); border:1px solid rgba(0,229,255,0.4); color:#fff; padding:8px; font-family:var(--font-mono); font-size:0.8rem; outline:none;">
+                                <button type="submit" style="background:var(--db-gold); color:#000; border:none; padding:8px 16px; font-family:var(--font-mono); font-weight:bold; cursor:pointer; text-transform:uppercase; font-size:0.75rem;">TRANSMIT</button>
+                            </form>
+                        </div>
                     </div>
-                </div>
-            `;
-        }).join('');
+                `;
+            }).join('');
+        } catch (error) {
+            console.error("Cloud Sync Error:", error);
+            feed.innerHTML = `<div style="color:var(--db-red); text-align:center;">DATABASE CONNECTION FAILED: Check console logs.</div>`;
+        }
     }
 
-    function postComment(e, mediaId) {
+    // Post comment directly to Firestore Cloud
+    async function postComment(e, mediaId) {
         e.preventDefault();
         const input = document.getElementById(`input-${mediaId}`);
         const text = input.value.trim();
         if (!text) return;
 
-        const allComments = JSON.parse(localStorage.getItem('pantheon_comments') || '{}');
-        if (!allComments[mediaId]) {
-            allComments[mediaId] = [];
+        try {
+            await addDoc(collection(db, "comments"), {
+                mediaId: mediaId,
+                author: activeCallsign,
+                text: text,
+                timestamp: new Date().toISOString()
+            });
+
+            input.value = '';
+            loadPublicFeed(); // Refresh the feed after sending to the cloud
+        } catch (error) {
+            console.error("Error transmitting comment:", error);
         }
-
-        allComments[mediaId].push({
-            author: activeCallsign,
-            text: text,
-            timestamp: new Date().toISOString()
-        });
-
-        localStorage.setItem('pantheon_comments', JSON.stringify(allComments));
-        input.value = '';
-        loadPublicFeed();
     }
 
     // APPLY DYNAMIC VISUAL & MODULE CONFIG FROM ADMIN STUDIO
@@ -1188,6 +1224,15 @@
         checkAdminAccess();
         window.location.href = 'index.html';
     }
+
+    // EXPOSE FUNCTIONS TO WINDOW FOR INLINE HTML EVENT LISTENERS
+    window.unlockMaintenance = unlockMaintenance;
+    window.toggleTheme = toggleTheme;
+    window.filterUnits = filterUnits;
+    window.execTerminal = execTerminal;
+    window.postComment = postComment;
+    window.attemptAdminLogin = attemptAdminLogin;
+    window.adminLogout = adminLogout;
 
     // INITIALIZATION
     checkMaintenanceGate();
