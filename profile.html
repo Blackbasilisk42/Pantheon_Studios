@@ -516,7 +516,23 @@
     </div>
 </div>
 
-<script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyD8k_5c_4mxpJCtKIYxiko8i1mY1vxg2dQ",
+        authDomain: "pantheon-ba229.firebaseapp.com",
+        projectId: "pantheon-ba229",
+        storageBucket: "pantheon-ba229.firebasestorage.app",
+        messagingSenderId: "578947122045",
+        appId: "1:578947122045:web:5343b13612fab74ea64214"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    window.db = db;
+
     const DEV_PASSCODES = ['@jimbo21', '@zetsu', '@princeabu'];
     
     // Parse target user from ?user= parameter or fallback to active logged-in session
@@ -548,7 +564,7 @@
         }
     }
 
-    function loadUserProfile() {
+    async function loadUserProfile() {
         document.getElementById('display-callsign').innerText = currentCallsign.toUpperCase();
         document.getElementById('user-avatar-circle').innerText = currentCallsign.substring(0, 2).toUpperCase();
         
@@ -556,8 +572,8 @@
             document.getElementById('display-badge').innerText = `PUBLIC MEMBER PROFILE SHOWCASE`;
         }
 
-        renderPublicShowcaseCard();
-        renderUserAssets();
+        await renderPublicShowcaseCard();
+        await renderUserAssets();
     }
 
     function copyPublicProfileLink() {
@@ -566,7 +582,7 @@
         alert(`Public Profile Link Copied:\n${profileUrl}`);
     }
 
-    function renderPublicShowcaseCard() {
+    async function renderPublicShowcaseCard() {
         const showcaseBox = document.getElementById('showcase-content');
         const showcaseTitle = document.getElementById('showcase-owner-title');
         const shareUrlTag = document.getElementById('showcase-share-url');
@@ -574,41 +590,52 @@
         showcaseTitle.innerText = `${currentCallsign.toUpperCase()} // OFFICIAL MEMBER SHOWCASE`;
         shareUrlTag.innerText = `profile.html?user=${currentCallsign}`;
 
-        const allOcs = JSON.parse(localStorage.getItem('pantheon_user_oc') || '[]');
-        const myOcs = allOcs.filter(o => o.owner.toLowerCase() === currentCallsign.toLowerCase());
+        try {
+            const querySnapshot = await getDocs(collection(db, "user_ocs"));
+            const allOcs = [];
+            querySnapshot.forEach((doc) => {
+                allOcs.push({ id: doc.id, ...doc.data() });
+            });
 
-        if (myOcs.length === 0) {
-            showcaseBox.innerHTML = '<div style="color:#607080; font-size:0.8rem; font-style:italic;">No personal OC published to this profile yet. Use the editor below to save your custom build!</div>';
-            return;
+            const myOcs = allOcs.filter(o => o.owner.toLowerCase() === currentCallsign.toLowerCase());
+
+            if (myOcs.length === 0) {
+                showcaseBox.innerHTML = '<div style="color:#607080; font-size:0.8rem; font-style:italic;">No personal OC published to this profile yet. Use the editor below to save your custom build!</div>';
+                return;
+            }
+
+            // Sort by timestamp if available to get the actual latest
+            myOcs.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+            const latestOc = myOcs[myOcs.length - 1];
+            const stats = latestOc.stats || { hp: 80, ki: 85, stm: 75, str: 90 };
+
+            showcaseBox.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <div>
+                        <div style="font-size:1.3rem; font-weight:900; color:#fff;">${latestOc.name.toUpperCase()}</div>
+                        <div style="font-size:0.75rem; color:var(--db-ki); margin-top:2px;">SPECIES: ${latestOc.race}</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-size:0.65rem; color:var(--db-gold);">POWER RATING</div>
+                        <div style="font-size:1.2rem; font-weight:bold; color:#fff;">${latestOc.power}</div>
+                    </div>
+                </div>
+
+                <div class="stat-bar-container">
+                    <div class="stat-bar-row"><span class="stat-bar-label">HEALTH</span><div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${stats.hp}%;"></div></div><span class="stat-bar-val">${stats.hp}</span></div>
+                    <div class="stat-bar-row"><span class="stat-bar-label">KI SPECS</span><div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${stats.ki}%;"></div></div><span class="stat-bar-val">${stats.ki}</span></div>
+                    <div class="stat-bar-row"><span class="stat-bar-label">STAMINA</span><div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${stats.stm}%;"></div></div><span class="stat-bar-val">${stats.stm}</span></div>
+                    <div class="stat-bar-row"><span class="stat-bar-label">STRIKE SUPER</span><div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${stats.str}%;"></div></div><span class="stat-bar-val">${stats.str}</span></div>
+                </div>
+
+                <div style="margin-top:15px; border-top:1px dashed rgba(0,229,255,0.2); padding-top:10px;">
+                    <div style="font-size:0.7rem; color:var(--db-gold); margin-bottom:4px;">EQUIPPED SKILL LOADOUT</div>
+                    <div style="font-size:0.78rem; color:#ffffff;">${latestOc.skills || 'None equipped.'}</div>
+                </div>
+            `;
+        } catch (error) {
+            console.error("Error fetching OCs:", error);
         }
-
-        const latestOc = myOcs[myOcs.length - 1];
-        const stats = latestOc.stats || { hp: 80, ki: 85, stm: 75, str: 90 };
-
-        showcaseBox.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                <div>
-                    <div style="font-size:1.3rem; font-weight:900; color:#fff;">${latestOc.name.toUpperCase()}</div>
-                    <div style="font-size:0.75rem; color:var(--db-ki); margin-top:2px;">SPECIES: ${latestOc.race}</div>
-                </div>
-                <div style="text-align:right;">
-                    <div style="font-size:0.65rem; color:var(--db-gold);">POWER RATING</div>
-                    <div style="font-size:1.2rem; font-weight:bold; color:#fff;">${latestOc.power}</div>
-                </div>
-            </div>
-
-            <div class="stat-bar-container">
-                <div class="stat-bar-row"><span class="stat-bar-label">HEALTH</span><div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${stats.hp}%;"></div></div><span class="stat-bar-val">${stats.hp}</span></div>
-                <div class="stat-bar-row"><span class="stat-bar-label">KI SPECS</span><div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${stats.ki}%;"></div></div><span class="stat-bar-val">${stats.ki}</span></div>
-                <div class="stat-bar-row"><span class="stat-bar-label">STAMINA</span><div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${stats.stm}%;"></div></div><span class="stat-bar-val">${stats.stm}</span></div>
-                <div class="stat-bar-row"><span class="stat-bar-label">STRIKE SUPER</span><div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${stats.str}%;"></div></div><span class="stat-bar-val">${stats.str}</span></div>
-            </div>
-
-            <div style="margin-top:15px; border-top:1px dashed rgba(0,229,255,0.2); padding-top:10px;">
-                <div style="font-size:0.7rem; color:var(--db-gold); margin-bottom:4px;">EQUIPPED SKILL LOADOUT</div>
-                <div style="font-size:0.78rem; color:#ffffff;">${latestOc.skills || 'None equipped.'}</div>
-            </div>
-        `;
     }
 
     function logoutUser() {
@@ -623,9 +650,8 @@
         document.getElementById('v-str').innerText = document.getElementById('oc-str').value;
     }
 
-    function savePersonalOC() {
+    async function savePersonalOC() {
         const ocData = {
-            id: 'oc_' + Date.now(),
             owner: currentCallsign,
             name: document.getElementById('oc-name').value,
             race: document.getElementById('oc-race').value,
@@ -640,19 +666,21 @@
             timestamp: new Date().toISOString()
         };
 
-        const allOcs = JSON.parse(localStorage.getItem('pantheon_user_oc') || '[]');
-        allOcs.push(ocData);
-        localStorage.setItem('pantheon_user_oc', JSON.stringify(allOcs));
+        try {
+            await addDoc(collection(db, "user_ocs"), ocData);
+            
+            const status = document.getElementById('oc-status');
+            status.style.display = 'block';
+            setTimeout(() => { status.style.display = 'none'; }, 2500);
 
-        const status = document.getElementById('oc-status');
-        status.style.display = 'block';
-        setTimeout(() => { status.style.display = 'none'; }, 2500);
-
-        renderPublicShowcaseCard();
-        renderUserAssets();
+            await renderPublicShowcaseCard();
+            await renderUserAssets();
+        } catch (error) {
+            console.error("Error saving OC:", error);
+        }
     }
 
-    function uploadMediaAsset(e) {
+    async function uploadMediaAsset(e) {
         e.preventDefault();
         const title = document.getElementById('media-title').value;
         const privacy = document.getElementById('media-privacy').value;
@@ -661,9 +689,8 @@
         if (!fileInput.files || !fileInput.files[0]) return;
 
         const reader = new FileReader();
-        reader.onload = function(evt) {
+        reader.onload = async function(evt) {
             const mediaData = {
-                id: 'media_' + Date.now(),
                 owner: currentCallsign,
                 title: title,
                 privacy: privacy,
@@ -671,78 +698,94 @@
                 timestamp: new Date().toISOString()
             };
 
-            const allMedia = JSON.parse(localStorage.getItem('pantheon_media') || '[]');
-            allMedia.push(mediaData);
-            localStorage.setItem('pantheon_media', JSON.stringify(allMedia));
+            try {
+                await addDoc(collection(db, "media"), mediaData);
 
-            const status = document.getElementById('media-status');
-            status.style.display = 'block';
-            setTimeout(() => { status.style.display = 'none'; }, 2500);
+                const status = document.getElementById('media-status');
+                status.style.display = 'block';
+                setTimeout(() => { status.style.display = 'none'; }, 2500);
 
-            document.getElementById('media-title').value = '';
-            fileInput.value = '';
-            renderUserAssets();
+                document.getElementById('media-title').value = '';
+                fileInput.value = '';
+                await renderUserAssets();
+            } catch (error) {
+                console.error("Error uploading media:", error);
+            }
         };
 
         reader.readAsDataURL(fileInput.files[0]);
     }
 
-    function renderUserAssets() {
-        // Render Personal OCs
-        const ocBox = document.getElementById('user-oc-list');
-        const allOcs = JSON.parse(localStorage.getItem('pantheon_user_oc') || '[]');
-        const myOcs = allOcs.filter(o => o.owner.toLowerCase() === currentCallsign.toLowerCase());
+    async function renderUserAssets() {
+        try {
+            // Render Personal OCs
+            const ocBox = document.getElementById('user-oc-list');
+            const ocSnapshot = await getDocs(collection(db, "user_ocs"));
+            const allOcs = [];
+            ocSnapshot.forEach((doc) => allOcs.push({ id: doc.id, ...doc.data() }));
+            
+            const myOcs = allOcs.filter(o => o.owner.toLowerCase() === currentCallsign.toLowerCase());
 
-        if (myOcs.length === 0) {
-            ocBox.innerHTML = '<div style="color:#607080; font-size:0.75rem;">No personal OCs created yet.</div>';
-        } else {
-            ocBox.innerHTML = myOcs.map(oc => `
-                <div class="asset-box">
-                    <div class="asset-title">${oc.name.toUpperCase()}</div>
-                    <div style="font-size:0.7rem; color:var(--db-ki); margin-top:2px;">${oc.race} // POWER: ${oc.power}</div>
-                    <div style="font-size:0.7rem; color:#8a9ba8; margin-top:4px;">Skills: ${oc.skills}</div>
-                    <div class="asset-meta">
-                        <span>Created: ${new Date(oc.timestamp).toLocaleDateString()}</span>
-                        <button class="btn-del" onclick="deleteOc('${oc.id}')">[DELETE]</button>
+            if (myOcs.length === 0) {
+                ocBox.innerHTML = '<div style="color:#607080; font-size:0.75rem;">No personal OCs created yet.</div>';
+            } else {
+                ocBox.innerHTML = myOcs.map(oc => `
+                    <div class="asset-box">
+                        <div class="asset-title">${oc.name.toUpperCase()}</div>
+                        <div style="font-size:0.7rem; color:var(--db-ki); margin-top:2px;">${oc.race} // POWER: ${oc.power}</div>
+                        <div style="font-size:0.7rem; color:#8a9ba8; margin-top:4px;">Skills: ${oc.skills}</div>
+                        <div class="asset-meta">
+                            <span>Created: ${new Date(oc.timestamp).toLocaleDateString()}</span>
+                            <button class="btn-del" onclick="deleteOc('${oc.id}')">[DELETE]</button>
+                        </div>
                     </div>
-                </div>
-            `).join('');
-        }
+                `).join('');
+            }
 
-        // Render Uploaded Media
-        const mediaBox = document.getElementById('user-media-list');
-        const allMedia = JSON.parse(localStorage.getItem('pantheon_media') || '[]');
-        const myMedia = allMedia.filter(m => m.owner.toLowerCase() === currentCallsign.toLowerCase());
+            // Render Uploaded Media
+            const mediaBox = document.getElementById('user-media-list');
+            const mediaSnapshot = await getDocs(collection(db, "media"));
+            const allMedia = [];
+            mediaSnapshot.forEach((doc) => allMedia.push({ id: doc.id, ...doc.data() }));
 
-        if (myMedia.length === 0) {
-            mediaBox.innerHTML = '<div style="color:#607080; font-size:0.75rem;">No media assets transmitted yet.</div>';
-        } else {
-            mediaBox.innerHTML = myMedia.map(m => `
-                <div class="asset-box">
-                    <img src="${m.data}" alt="${m.title}">
-                    <div class="asset-title">${m.title}</div>
-                    <div class="asset-meta">
-                        <span style="color:${m.privacy === 'public' ? 'var(--db-ki)' : 'var(--db-gold)'};">[${m.privacy.toUpperCase()}]</span>
-                        <button class="btn-del" onclick="deleteMedia('${m.id}')">[DELETE]</button>
+            const myMedia = allMedia.filter(m => m.owner.toLowerCase() === currentCallsign.toLowerCase());
+
+            if (myMedia.length === 0) {
+                mediaBox.innerHTML = '<div style="color:#607080; font-size:0.75rem;">No media assets transmitted yet.</div>';
+            } else {
+                mediaBox.innerHTML = myMedia.map(m => `
+                    <div class="asset-box">
+                        <img src="${m.data}" alt="${m.title}">
+                        <div class="asset-title">${m.title}</div>
+                        <div class="asset-meta">
+                            <span style="color:${m.privacy === 'public' ? 'var(--db-ki)' : 'var(--db-gold)'};">[${m.privacy.toUpperCase()}]</span>
+                            <button class="btn-del" onclick="deleteMedia('${m.id}')">[DELETE]</button>
+                        </div>
                     </div>
-                </div>
-            `).join('');
+                `).join('');
+            }
+        } catch (error) {
+            console.error("Error rendering user assets:", error);
         }
     }
 
-    function deleteOc(id) {
-        let allOcs = JSON.parse(localStorage.getItem('pantheon_user_oc') || '[]');
-        allOcs = allOcs.filter(o => o.id !== id);
-        localStorage.setItem('pantheon_user_oc', JSON.stringify(allOcs));
-        renderPublicShowcaseCard();
-        renderUserAssets();
+    async function deleteOc(id) {
+        try {
+            await deleteDoc(doc(db, "user_ocs", id));
+            await renderPublicShowcaseCard();
+            await renderUserAssets();
+        } catch (error) {
+            console.error("Error deleting OC:", error);
+        }
     }
 
-    function deleteMedia(id) {
-        let allMedia = JSON.parse(localStorage.getItem('pantheon_media') || '[]');
-        allMedia = allMedia.filter(m => m.id !== id);
-        localStorage.setItem('pantheon_media', JSON.stringify(allMedia));
-        renderUserAssets();
+    async function deleteMedia(id) {
+        try {
+            await deleteDoc(doc(db, "media", id));
+            await renderUserAssets();
+        } catch (error) {
+            console.error("Error deleting media:", error);
+        }
     }
 
     function attemptAdminLogin(username, password) {
@@ -779,6 +822,18 @@
         checkAdminAccess();
         window.location.href = 'profile.html';
     }
+
+    // Bind functions to window so inline HTML triggers can execute them
+    window.unlockMaintenance = unlockMaintenance;
+    window.copyPublicProfileLink = copyPublicProfileLink;
+    window.logoutUser = logoutUser;
+    window.updateOcPreview = updateOcPreview;
+    window.savePersonalOC = savePersonalOC;
+    window.uploadMediaAsset = uploadMediaAsset;
+    window.deleteOc = deleteOc;
+    window.deleteMedia = deleteMedia;
+    window.attemptAdminLogin = attemptAdminLogin;
+    window.adminLogout = adminLogout;
 
     checkMaintenanceGate();
     loadUserProfile();
