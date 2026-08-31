@@ -318,7 +318,23 @@
     </div>
 </div>
 
-<script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyD8k_5c_4mxpJCtKIYxiko8i1mY1vxg2dQ",
+        authDomain: "pantheon-ba229.firebaseapp.com",
+        projectId: "pantheon-ba229",
+        storageBucket: "pantheon-ba229.firebasestorage.app",
+        messagingSenderId: "578947122045",
+        appId: "1:578947122045:web:5343b13612fab74ea64214"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    window.db = db;
+
     const DEV_PASSCODES = ['@jimbo21', '@zetsu', '@princeabu'];
 
     function checkMaintenanceGate() {
@@ -498,12 +514,22 @@
         window.location.href = 'dossier.html';
     }
 
+    // Expose functions to window
+    window.unlockMaintenance = unlockMaintenance;
+    window.loadHero = loadHero;
+    window.attemptAdminLogin = attemptAdminLogin;
+    window.adminLogout = adminLogout;
+
     // Auto load based on URL parameter ?id=...
     const urlParams = new URLSearchParams(window.location.search);
     const targetHero = urlParams.get('id') || 'kaige';
 
     checkMaintenanceGate();
-    loadHero(targetHero, document.querySelector(`.hero-tab-btn[onclick*="${targetHero}"]`));
+    
+    // Find the correct button to pass to loadHero so it gets the 'active' styling
+    const activeBtn = document.querySelector(`.hero-tab-btn[onclick*="${targetHero}"]`);
+    loadHero(targetHero, activeBtn);
+    
     checkAdminAccess();
 </script>
 
