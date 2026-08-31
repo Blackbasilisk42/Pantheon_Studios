@@ -223,12 +223,27 @@
     </div>
 </div>
 
-<script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyD8k_5c_4mxpJCtKIYxiko8i1mY1vxg2dQ",
+        authDomain: "pantheon-ba229.firebaseapp.com",
+        projectId: "pantheon-ba229",
+        storageBucket: "pantheon-ba229.firebasestorage.app",
+        messagingSenderId: "578947122045",
+        appId: "1:578947122045:web:5343b13612fab74ea64214"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
     // Check if user is already logged in as admin or standard member
     if (localStorage.getItem('userRole') === 'admin') {
         window.location.href = 'admin.html';
     } else if (localStorage.getItem('pantheon_active_session')) {
-        window.location.href = 'account.html';
+        window.location.href = 'profile.html'; // Changed from account.html to match profile context
     }
 
     /**
@@ -245,7 +260,9 @@
             window.location.href = 'admin.html';
             return true;
         } else {
-            alert('Invalid username or password. Access Denied.');
+            const msg = document.getElementById('auth-msg');
+            msg.style.color = 'var(--db-red)';
+            msg.innerText = 'INVALID CREDENTIALS. ACCESS DENIED.';
             return false;
         }
     }
@@ -298,7 +315,7 @@
         }
     }
 
-    function handleSignup(e) {
+    async function handleSignup(e) {
         e.preventDefault();
         const callsign = document.getElementById('signup-callsign').value.trim();
         const password = document.getElementById('signup-password').value;
@@ -306,37 +323,47 @@
 
         if (!callsign || !password) return;
 
-        let accounts = JSON.parse(localStorage.getItem('pantheon_accounts') || '{}');
-        
-        if (accounts[callsign.toLowerCase()]) {
+        msg.style.color = 'var(--db-gold)';
+        msg.innerText = 'COMMUNICATING WITH SERVER...';
+
+        try {
+            const docRef = doc(db, "users", callsign.toLowerCase());
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                msg.style.color = 'var(--db-red)';
+                msg.innerText = 'ERROR: CALLSIGN ALREADY REGISTERED';
+                return;
+            }
+
+            // Register new user to Firestore
+            await setDoc(docRef, {
+                callsign: callsign,
+                password: password, // Note: In a production app, use Firebase Auth instead of storing plaintext passwords
+                role: 'user',
+                joined: new Date().toISOString()
+            });
+
+            localStorage.setItem('pantheon_active_session', callsign);
+            localStorage.setItem('userRole', 'user');
+
+            checkAdminAccess();
+
+            msg.style.color = 'var(--db-ki)';
+            msg.innerText = 'ACCOUNT CREATED. REDIRECTING TO WORKSPACE...';
+
+            setTimeout(() => {
+                window.location.href = 'profile.html';
+            }, 1200);
+
+        } catch (error) {
+            console.error("Signup Error:", error);
             msg.style.color = 'var(--db-red)';
-            msg.innerText = 'ERROR: CALLSIGN ALREADY REGISTERED';
-            return;
+            msg.innerText = 'SERVER ERROR: UNABLE TO REGISTER ACCOUNT.';
         }
-
-        // Register new user
-        accounts[callsign.toLowerCase()] = {
-            callsign: callsign,
-            password: password,
-            role: 'user',
-            joined: new Date().toISOString()
-        };
-
-        localStorage.setItem('pantheon_accounts', JSON.stringify(accounts));
-        localStorage.setItem('pantheon_active_session', callsign);
-        localStorage.setItem('userRole', 'user');
-
-        checkAdminAccess();
-
-        msg.style.color = 'var(--db-ki)';
-        msg.innerText = 'ACCOUNT CREATED. REDIRECTING TO ACCOUNT WORKSPACE...';
-
-        setTimeout(() => {
-            window.location.href = 'account.html';
-        }, 1200);
     }
 
-    function handleLogin(e) {
+    async function handleLogin(e) {
         e.preventDefault();
         const callsign = document.getElementById('login-callsign').value.trim();
         const password = document.getElementById('login-password').value;
@@ -348,28 +375,44 @@
             return;
         }
 
-        // Check standard user accounts
-        let accounts = JSON.parse(localStorage.getItem('pantheon_accounts') || '{}');
-        const user = accounts[callsign.toLowerCase()];
+        msg.style.color = 'var(--db-gold)';
+        msg.innerText = 'AUTHENTICATING...';
 
-        if (user && user.password === password) {
-            localStorage.setItem('pantheon_active_session', user.callsign);
-            const role = user.role || 'user';
-            localStorage.setItem('userRole', role);
+        try {
+            const docRef = doc(db, "users", callsign.toLowerCase());
+            const docSnap = await getDoc(docRef);
 
-            checkAdminAccess();
+            if (docSnap.exists() && docSnap.data().password === password) {
+                const user = docSnap.data();
+                localStorage.setItem('pantheon_active_session', user.callsign);
+                const role = user.role || 'user';
+                localStorage.setItem('userRole', role);
 
-            msg.style.color = 'var(--db-ki)';
-            msg.innerText = 'AUTHENTICATED. ACCESSING WORKSPACE...';
+                checkAdminAccess();
 
-            setTimeout(() => {
-                window.location.href = role === 'admin' ? 'admin.html' : 'account.html';
-            }, 1000);
-        } else {
-            // Fallback attempt admin check with alert
-            attemptAdminLogin(callsign, password);
+                msg.style.color = 'var(--db-ki)';
+                msg.innerText = 'AUTHENTICATED. ACCESSING WORKSPACE...';
+
+                setTimeout(() => {
+                    window.location.href = role === 'admin' ? 'admin.html' : 'profile.html';
+                }, 1000);
+            } else {
+                msg.style.color = 'var(--db-red)';
+                msg.innerText = 'INVALID CALLSIGN OR PASSKEY.';
+            }
+        } catch (error) {
+            console.error("Login Error:", error);
+            msg.style.color = 'var(--db-red)';
+            msg.innerText = 'SERVER ERROR: UNABLE TO AUTHENTICATE.';
         }
     }
+
+    // Expose functions to window
+    window.switchTab = switchTab;
+    window.handleSignup = handleSignup;
+    window.handleLogin = handleLogin;
+    window.attemptAdminLogin = attemptAdminLogin;
+    window.adminLogout = adminLogout;
 
     checkAdminAccess();
 
