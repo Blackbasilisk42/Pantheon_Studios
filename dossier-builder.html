@@ -142,6 +142,19 @@
             border-radius: 4px;
             font-family: inherit;
         }
+        
+        /* Special styling for file input */
+        input[type="file"]::-webkit-file-upload-button {
+            background: var(--accent-green);
+            color: #000;
+            border: none;
+            padding: 6px 12px;
+            margin-right: 10px;
+            font-family: var(--font-mono);
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 2px;
+        }
 
         textarea { height: 100px; resize: vertical; }
 
@@ -251,8 +264,8 @@
         </div>
 
         <div class="form-group">
-            <label>Photo URL or Path</label>
-            <input type="text" id="in-photo" value="images/kaige-portrait.jpg" placeholder="e.g. images/kaige.jpg or http://...">
+            <label>Portrait Photo (Upload Image)</label>
+            <input type="file" id="in-photo-upload" accept="image/png, image/jpeg, image/gif, image/webp">
         </div>
 
         <div class="form-group">
@@ -331,7 +344,7 @@
         </div>
 
         <div class="dossier-section">
-            <h2>V. SHOW ROLE & MULTIVERSE NARRATIVE ARC</h2>
+            <h2>V. SHOW ROLE & MULTIVERSE NARRATIVE Arc</h2>
             <div id="out-sec5"></div>
         </div>
     </div>
@@ -352,6 +365,9 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    
+    // Store existing photo data globally to prevent overwriting if user only edits text
+    window.currentDossierPhoto = ''; 
 
     // Format plain text into styled HTML paragraphs and bullet points
     function formatText(text) {
@@ -381,6 +397,20 @@
         btnSave.innerText = "SAVING...";
         btnSave.disabled = true;
 
+        const fileInput = document.getElementById('in-photo-upload');
+        let photoData = window.currentDossierPhoto;
+
+        if (fileInput.files.length > 0) {
+            const toBase64 = file => new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+            photoData = await toBase64(fileInput.files[0]);
+            window.currentDossierPhoto = photoData;
+        }
+
         const data = {
             title: document.getElementById('in-title').value,
             classification: document.getElementById('in-class').value,
@@ -388,7 +418,7 @@
             height: document.getElementById('in-height').value,
             tag: document.getElementById('in-tag').value,
             affil: document.getElementById('in-affil').value,
-            photo: document.getElementById('in-photo').value,
+            photo: photoData,
             sec1: document.getElementById('in-sec1').value,
             sec2: document.getElementById('in-sec2').value,
             sec3: document.getElementById('in-sec3').value,
@@ -452,7 +482,9 @@
                 document.getElementById('in-height').value = data.height || '';
                 document.getElementById('in-tag').value = data.tag || '';
                 document.getElementById('in-affil').value = data.affil || '';
-                document.getElementById('in-photo').value = data.photo || '';
+                
+                window.currentDossierPhoto = data.photo || ''; // Load existing image to state
+                
                 document.getElementById('in-sec1').value = data.sec1 || '';
                 document.getElementById('in-sec2').value = data.sec2 || '';
                 document.getElementById('in-sec3').value = data.sec3 || '';
