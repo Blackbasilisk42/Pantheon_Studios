@@ -92,6 +92,16 @@
             padding-bottom: 8px;
         }
 
+        .roster-select-bar::-webkit-scrollbar {
+            height: 6px;
+        }
+        .roster-select-bar::-webkit-scrollbar-track {
+            background: rgba(0, 229, 255, 0.05);
+        }
+        .roster-select-bar::-webkit-scrollbar-thumb {
+            background: var(--db-cyan);
+        }
+
         .hero-tab-btn {
             background: rgba(12, 18, 32, 0.85);
             border: 1px solid rgba(0, 229, 255, 0.3);
@@ -313,10 +323,8 @@
 
     <!-- HERO TAB SELECTOR -->
     <div class="roster-select-bar" id="roster-tabs">
-        <button class="hero-tab-btn active" onclick="loadHero('kaige', this)">[KAIGE // TITAN]</button>
-        <button class="hero-tab-btn" onclick="loadHero('ghostwire', this)">[GHOSTWIRE // TACTICAL]</button>
-        <button class="hero-tab-btn" onclick="loadHero('novaframe', this)">[NOVAFRAME // VISUAL]</button>
-        <button class="hero-tab-btn" onclick="loadHero('razorbyte', this)">[RAZORBYTE // STRIKE]</button>
+        <!-- Injected dynamically from Firebase -->
+        <span style="color:#8a9ba8; font-size:0.8rem;">Syncing archives...</span>
     </div>
 
     <!-- MAIN DOSSIER INSPECTOR -->
@@ -327,7 +335,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyD8k_5c_4mxpJCtKIYxiko8i1mY1vxg2dQ",
@@ -343,6 +351,7 @@
     window.db = db;
 
     const DEV_PASSCODES = ['@jimbo21', '@zetsu', '@princeabu'];
+    let currentRoster = {};
 
     function checkMaintenanceGate() {
         const urlParams = new URLSearchParams(window.location.search);
@@ -368,126 +377,122 @@
         }
     }
 
-    // BUILT-IN HERO DATABASE
-    const HERO_DATABASE = {
-        kaige: {
-            initials: "KG",
-            name: "KAIGE",
-            spec: "Frieza Race // Spatial Titan & Heavy Strike Lead",
-            power: "9,240,000",
-            health: "95 / 100",
-            ki: "70 / 100",
-            stamina: "85 / 100",
-            strikeSuper: "100 / 100",
-            kiSuper: "60 / 100",
-            skills: [
-                { name: "Shadow Crusher", type: "strike" },
-                { name: "Sledgehammer", type: "strike" },
-                { name: "Meteor Burst", type: "ki" },
-                { name: "Evasive Teleport", type: "ki" }
-            ],
-            lore: "Primary front-line spatial combat lead. Specialized in heavy strike counters, pressure locking, and absolute battlefield control during high-intensity engagements."
-        },
-        ghostwire: {
-            initials: "GW",
-            name: "GHOSTWIRE",
-            spec: "Aria Kade // Narrative Lead & Tactical Analyst",
-            power: "7,810,000",
-            health: "80 / 100",
-            ki: "95 / 100",
-            stamina: "90 / 100",
-            strikeSuper: "50 / 100",
-            kiSuper: "90 / 100",
-            skills: [
-                { name: "Ki Blast Cannon", type: "ki" },
-                { name: "Instant Transmission", type: "ki" },
-                { name: "Sonic Kick", type: "strike" }
-            ],
-            lore: "Tactical node operator managing field communications and strategic coordination across multi-node operations."
-        },
-        novaframe: {
-            initials: "NV",
-            name: "NOVAFRAME",
-            spec: "Nico Vale // Visual Systems & Defense",
-            power: "6,950,000",
-            health: "75 / 100",
-            ki: "80 / 100",
-            stamina: "75 / 100",
-            strikeSuper: "65 / 100",
-            kiSuper: "85 / 100",
-            skills: [
-                { name: "Energy Zone", type: "ki" },
-                { name: "Barrier Shield", type: "ki" }
-            ],
-            lore: "Visual media architecture and defense barrier controller, providing continuous dynamic shielding."
-        },
-        razorbyte: {
-            initials: "RX",
-            name: "RAZORBYTE",
-            spec: "Rex Onyx // Field Specialist & Rapid Strike",
-            power: "8,100,000",
-            health: "88 / 100",
-            ki: "75 / 100",
-            stamina: "90 / 100",
-            strikeSuper: "95 / 100",
-            kiSuper: "55 / 100",
-            skills: [
-                { name: "Justice Combination", type: "strike" },
-                { name: "Mach Dash", type: "strike" }
-            ],
-            lore: "Fast response tactical operative executing precise strike combos and fast flanking movements."
-        }
-    };
+    // DYNAMIC FIREBASE LOAD
+    async function loadOfficialRoster() {
+        const tabsContainer = document.getElementById('roster-tabs');
+        
+        try {
+            const rosterSnap = await getDocs(collection(db, "official_roster"));
+            currentRoster = {};
+            let tabsHTML = '';
+            
+            rosterSnap.forEach(doc => {
+                const data = doc.data();
+                data.id = doc.id;
+                currentRoster[doc.id] = data;
+                
+                const displayName = data.name ? data.name.toUpperCase() : doc.id.toUpperCase();
+                const shortSpec = data.spec ? data.spec.split('//')[0].trim().toUpperCase() : 'OPERATIVE';
+                
+                tabsHTML += `<button class="hero-tab-btn" id="tab-${doc.id}" onclick="selectHero('${doc.id}')">[${displayName} // ${shortSpec}]</button>`;
+            });
 
-    function loadHero(heroKey, btn) {
-        if (btn) {
-            document.querySelectorAll('.hero-tab-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-        }
+            if (Object.keys(currentRoster).length === 0) {
+                tabsContainer.innerHTML = '<span style="color:#8a9ba8; font-size:0.8rem;">No heroes found in database.</span>';
+                document.getElementById('dossier-display').innerHTML = '<div style="color:#8a9ba8; text-align:center;">No data available.</div>';
+                return;
+            }
 
-        const hero = HERO_DATABASE[heroKey] || HERO_DATABASE['kaige'];
+            tabsContainer.innerHTML = tabsHTML;
+
+            // Check URL parameters for direct linking (e.g. ?id=kaige)
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetHero = urlParams.get('id');
+            
+            if (targetHero && currentRoster[targetHero]) {
+                selectHero(targetHero);
+            } else {
+                // Select the first one available if no ID or bad ID is provided
+                selectHero(Object.keys(currentRoster)[0]);
+            }
+
+        } catch (error) {
+            console.error("Error loading roster:", error);
+            tabsContainer.innerHTML = '<span style="color:var(--db-red); font-size:0.8rem;">DATABASE CONNECTION FAILED</span>';
+        }
+    }
+
+    function selectHero(heroId) {
+        // Manage active tab styling
+        document.querySelectorAll('.hero-tab-btn').forEach(b => b.classList.remove('active'));
+        const activeTab = document.getElementById(`tab-${heroId}`);
+        if (activeTab) activeTab.classList.add('active');
+
+        const hero = currentRoster[heroId];
+        if (!hero) return;
+
         const display = document.getElementById('dossier-display');
+        
+        // Handle Avatar rendering safely
+        const avatarSrc = hero.avatarUrl || hero.photo || `assets/${heroId}.png`;
+        const avatarInitials = hero.initials || (hero.name ? hero.name.substring(0, 2).toUpperCase() : '??');
+
+        // Handle Array or String mapped Skills safely
+        let skillsHTML = '';
+        if (Array.isArray(hero.skills)) {
+            skillsHTML = hero.skills.map(s => {
+                if (typeof s === 'object') {
+                    return `<span class="skill-chip ${s.type || 'ki'}">${s.name.toUpperCase()}</span>`;
+                }
+                return `<span class="skill-chip ki">${String(s).toUpperCase()}</span>`;
+            }).join('');
+        } else if (typeof hero.skills === 'string') {
+            skillsHTML = hero.skills.split(',').map(s => `<span class="skill-chip ki">${s.trim().toUpperCase()}</span>`).join('');
+        } else {
+            skillsHTML = '<span style="color:#8a9ba8; font-size:0.75rem;">NO COMBAT SKILLS LOGGED</span>';
+        }
 
         display.innerHTML = `
             <div class="dossier-header-grid">
                 <div class="big-avatar">
-                    <img src="assets/${heroKey}.png" class="avatar-img" alt="${hero.initials}" onerror="this.style.display='none'; this.parentNode.innerHTML='${hero.initials}';">
+                    <img src="${avatarSrc}" class="avatar-img" alt="${avatarInitials}" onerror="this.style.display='none'; this.parentNode.innerHTML='${avatarInitials}';">
                 </div>
                 <div class="hero-title-group">
-                    <h1>${hero.name}</h1>
-                    <div class="spec-tag">${hero.spec}</div>
+                    <h1>${hero.name || 'UNKNOWN OPERATIVE'}</h1>
+                    <div class="spec-tag">${hero.spec || 'Unclassified Data'}</div>
                 </div>
                 <div class="power-rank-badge">
                     <div class="power-rank-label">RECORDED POWER LEVEL</div>
-                    <div class="power-rank-value">${hero.power}</div>
+                    <div class="power-rank-value">${hero.power || 'CLASSIFIED'}</div>
                 </div>
             </div>
 
             <div class="spec-grid">
                 <div class="spec-box">
                     <div class="spec-box-title">COMBAT METRICS & SPECS</div>
-                    <div class="stat-line"><span class="stat-name">MAX HEALTH</span><span class="stat-val-num">${hero.health}</span></div>
-                    <div class="stat-line"><span class="stat-name">MAX KI SPECS</span><span class="stat-val-num">${hero.ki}</span></div>
-                    <div class="stat-line"><span class="stat-name">MAX STAMINA</span><span class="stat-val-num">${hero.stamina}</span></div>
-                    <div class="stat-line"><span class="stat-name">STRIKE SUPER POWER</span><span class="stat-val-num">${hero.strikeSuper}</span></div>
-                    <div class="stat-line"><span class="stat-name">KI BLAST SUPER POWER</span><span class="stat-val-num">${hero.kiSuper}</span></div>
+                    <div class="stat-line"><span class="stat-name">MAX HEALTH</span><span class="stat-val-num">${hero.health || '0 / 100'}</span></div>
+                    <div class="stat-line"><span class="stat-name">MAX KI SPECS</span><span class="stat-val-num">${hero.ki || '0 / 100'}</span></div>
+                    <div class="stat-line"><span class="stat-name">MAX STAMINA</span><span class="stat-val-num">${hero.stamina || '0 / 100'}</span></div>
+                    <div class="stat-line"><span class="stat-name">STRIKE SUPER POWER</span><span class="stat-val-num">${hero.strikeSuper || '0 / 100'}</span></div>
+                    <div class="stat-line"><span class="stat-name">KI BLAST SUPER POWER</span><span class="stat-val-num">${hero.kiSuper || '0 / 100'}</span></div>
                 </div>
 
                 <div class="spec-box">
                     <div class="spec-box-title">EQUIPPED COMBAT SKILLS</div>
                     <div class="skill-chip-list">
-                        ${hero.skills.map(s => `<span class="skill-chip ${s.type}">${s.name.toUpperCase()}</span>`).join('')}
+                        ${skillsHTML}
                     </div>
                 </div>
             </div>
 
             <div class="lore-box">
                 <div class="lore-title">TACTICAL DOSSIER & LORE NOTES</div>
-                ${hero.lore}
+                ${hero.lore || 'No tactical lore logged for this operative.'}
             </div>
         `;
     }
 
+    // SUPER ADMIN AUTHENTICATION
     function attemptAdminLogin(username, password) {
         if (username === 'blackbasilisk42' && password === '@croatoan') {
             localStorage.setItem('userRole', 'admin');
@@ -500,7 +505,6 @@
             return false;
         }
     }
-
 
     function checkAdminAccess() {
         const userRole = localStorage.getItem('userRole');
@@ -525,20 +529,13 @@
 
     // Expose functions to window
     window.unlockMaintenance = unlockMaintenance;
-    window.loadHero = loadHero;
+    window.selectHero = selectHero;
     window.attemptAdminLogin = attemptAdminLogin;
     window.adminLogout = adminLogout;
 
-    // Auto load based on URL parameter ?id=...
-    const urlParams = new URLSearchParams(window.location.search);
-    const targetHero = urlParams.get('id') || 'kaige';
-
+    // Initialization Sequence
     checkMaintenanceGate();
-    
-    // Find the correct button to pass to loadHero so it gets the 'active' styling
-    const activeBtn = document.querySelector(`.hero-tab-btn[onclick*="${targetHero}"]`);
-    loadHero(targetHero, activeBtn);
-    
+    loadOfficialRoster();
     checkAdminAccess();
 </script>
 
