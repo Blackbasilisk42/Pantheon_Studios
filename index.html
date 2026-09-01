@@ -750,11 +750,11 @@
         <div class="stat-box-grid">
             <div class="stat-box green">
                 <div class="stat-lbl">TOTAL ROSTER COUNT</div>
-                <div class="stat-val">006 // ACTIVE</div>
+                <div class="stat-val" id="stat-roster-count">...</div>
             </div>
             <div class="stat-box gold">
                 <div class="stat-lbl">MAX POWER RECORDED</div>
-                <div class="stat-val">9,240,000</div>
+                <div class="stat-val" id="stat-max-power">...</div>
             </div>
             <div class="stat-box pink">
                 <div class="stat-lbl">ACTIVE COMBAT TEAMS</div>
@@ -806,99 +806,10 @@
         </div>
     </div>
 
-    <!-- HERO ROSTER CARDS WITH XENOVERSE ATTRIBUTES -->
+    <!-- DYNAMIC HERO ROSTER CARDS WITH XENOVERSE ATTRIBUTES -->
     <div class="dossier-grid" id="dossier-container">
-        <!-- HERO 1: KAIGE -->
-        <div class="dossier-card" data-type="strike">
-            <div class="dossier-top">
-                <span style="color:#8a9ba8;">FRIEZA RACE // TITAN</span>
-                <span class="status-tag">UNLEASHED</span>
-            </div>
-            <div class="dossier-body">
-                <div class="avatar-circle">
-                    <img src="assets/kaige.png" class="avatar-img" alt="KG" onerror="this.style.display='none'; this.parentNode.innerHTML='KG';">
-                </div>
-                <div class="dossier-info">
-                    <div class="callsign-title">KAIGE</div>
-                    <div class="sub-name">Lead Heavy Strike / Spatial Titan</div>
-                </div>
-            </div>
-            <div class="skill-group">
-                <div class="skill-row"><span class="skill-label">MAX HEALTH</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block"></div></div></div>
-                <div class="skill-row"><span class="skill-label">STRIKE SUPER</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div></div></div>
-                <div class="skill-row"><span class="skill-label">KI BLAST SUPER</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block"></div><div class="skill-block"></div><div class="skill-block"></div></div></div>
-            </div>
-            <a href="dossier.html?id=kaige" class="inspect-btn">[VIEW HERO WIKI]</a>
-        </div>
-
-        <!-- HERO 2: GHOSTWIRE -->
-        <div class="dossier-card" data-type="lead">
-            <div class="dossier-top">
-                <span style="color:#8a9ba8;">TACTICAL LEAD</span>
-                <span class="status-tag">ACTIVE</span>
-            </div>
-            <div class="dossier-body">
-                <div class="avatar-circle">
-                    <img src="assets/ghostwire.png" class="avatar-img" alt="GW" onerror="this.style.display='none'; this.parentNode.innerHTML='GW';">
-                </div>
-                <div class="dossier-info">
-                    <div class="callsign-title">GHOSTWIRE</div>
-                    <div class="sub-name">Aria Kade // Narrative Lead</div>
-                </div>
-            </div>
-            <div class="skill-group">
-                <div class="skill-row"><span class="skill-label">MAX KI</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block"></div></div></div>
-                <div class="skill-row"><span class="skill-label">STAMINA</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block"></div><div class="skill-block"></div></div></div>
-                <div class="skill-row"><span class="skill-label">KI BLAST SUPER</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block"></div><div class="skill-block"></div></div></div>
-            </div>
-            <a href="dossier.html?id=ghostwire" class="inspect-btn">[VIEW HERO WIKI]</a>
-        </div>
-
-        <!-- HERO 3: NOVAFRAME -->
-        <div class="dossier-card" data-type="support">
-            <div class="dossier-top">
-                <span style="color:#8a9ba8;">VISUAL ARCHITECT</span>
-                <span class="status-tag standby">STANDBY</span>
-            </div>
-            <div class="dossier-body">
-                <div class="avatar-circle">
-                    <img src="assets/novaframe.png" class="avatar-img" alt="NV" onerror="this.style.display='none'; this.parentNode.innerHTML='NV';">
-                </div>
-                <div class="dossier-info">
-                    <div class="callsign-title">NOVAFRAME</div>
-                    <div class="sub-name">Nico Vale // Visual Systems</div>
-                </div>
-            </div>
-            <div class="skill-group">
-                <div class="skill-row"><span class="skill-label">BASIC ATTACK</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block"></div></div></div>
-                <div class="skill-row"><span class="skill-label">KI BLAST SUPER</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block"></div><div class="skill-block"></div></div></div>
-                <div class="skill-row"><span class="skill-label">STAMINA</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block"></div><div class="skill-block"></div><div class="skill-block"></div></div></div>
-            </div>
-            <a href="dossier.html?id=novaframe" class="inspect-btn">[VIEW HERO WIKI]</a>
-        </div>
-
-        <!-- HERO 4: RAZORBYTE -->
-        <div class="dossier-card" data-type="strike">
-            <div class="dossier-top">
-                <span style="color:#8a9ba8;">STRIKE OPERATIVE</span>
-                <span class="status-tag">ACTIVE</span>
-            </div>
-            <div class="dossier-body">
-                <div class="avatar-circle">
-                    <img src="assets/razorbyte.png" class="avatar-img" alt="RX" onerror="this.style.display='none'; this.parentNode.innerHTML='RX';">
-                </div>
-                <div class="dossier-info">
-                    <div class="callsign-title">RAZORBYTE</div>
-                    <div class="sub-name">Rex Onyx // Field Specialist</div>
-                </div>
-            </div>
-            <div class="skill-group">
-                <div class="skill-row"><span class="skill-label">BASIC ATTACK</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block"></div><div class="skill-block"></div></div></div>
-                <div class="skill-row"><span class="skill-label">STRIKE SUPER</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block"></div></div></div>
-                <div class="skill-row"><span class="skill-label">STAMINA</span><div class="skill-bar"><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block fill"></div><div class="skill-block"></div><div class="skill-block"></div></div></div>
-            </div>
-            <a href="dossier.html?id=razorbyte" class="inspect-btn">[VIEW HERO WIKI]</a>
-        </div>
+        <!-- Dynamically rendered from Firebase -->
+        <div style="color:#8a9ba8; grid-column: span 2; text-align: center;">Syncing official roster data...</div>
     </div>
 
     <!-- MEDIA // PROJECT SHOWCASE -->
@@ -1173,6 +1084,95 @@
         }
     }
 
+    // DYNAMIC OFFICIAL ROSTER LOADING
+    async function loadOfficialRoster() {
+        const container = document.getElementById('dossier-container');
+        try {
+            const rosterSnap = await getDocs(collection(db, "official_roster"));
+            const roster = [];
+            rosterSnap.forEach(doc => {
+                roster.push({ id: doc.id, ...doc.data() });
+            });
+
+            if (roster.length === 0) {
+                container.innerHTML = '<div style="color:#8a9ba8; grid-column: span 2; text-align: center;">No official roster data found in database. Use the Show Builder to deploy characters.</div>';
+                return;
+            }
+
+            // Update stats
+            document.getElementById('stat-roster-count').innerText = `${String(roster.length).padStart(3, '0')} // ACTIVE`;
+            let maxPowerStr = roster.reduce((max, hero) => {
+                let pVal = parseInt((hero.power || '0').replace(/,/g, ''));
+                return pVal > max ? pVal : max;
+            }, 0);
+            document.getElementById('stat-max-power').innerText = maxPowerStr.toLocaleString();
+
+            container.innerHTML = roster.map(hero => {
+                // Map roles for the filter buttons
+                let filterType = 'all';
+                const specLower = hero.spec ? hero.spec.toLowerCase() : '';
+                if (specLower.includes('strike')) filterType = 'strike';
+                else if (specLower.includes('support') || specLower.includes('visual')) filterType = 'support';
+                else if (specLower.includes('lead')) filterType = 'lead';
+
+                // Map avatar image or initials
+                let avatarHTML = '';
+                if (hero.avatarUrl) {
+                    avatarHTML = `<img src="${hero.avatarUrl}" class="avatar-img" alt="${hero.initials}">`;
+                } else {
+                    avatarHTML = hero.initials || '??';
+                }
+
+                // Helper to parse "95 / 100" to blocks out of 10
+                const getStat = (val) => {
+                    if(!val) return 0;
+                    return parseInt(val.toString().split('/')[0].trim()) || 0;
+                };
+
+                const hp = Math.min(10, Math.ceil(getStat(hero.health) / 10));
+                const stm = Math.min(10, Math.ceil(getStat(hero.stamina) / 10));
+                const str = Math.min(10, Math.ceil(getStat(hero.strikeSuper) / 10));
+                const kib = Math.min(10, Math.ceil(getStat(hero.kiSuper) / 10));
+
+                const makeBars = (count) => {
+                    let bars = '';
+                    for(let i=0; i<10; i++) {
+                        bars += `<div class="skill-block ${i < count ? 'fill' : ''}"></div>`;
+                    }
+                    return bars;
+                };
+
+                return `
+                <div class="dossier-card" data-type="${filterType}">
+                    <div class="dossier-top">
+                        <span style="color:#8a9ba8;">${hero.spec ? hero.spec.split('//')[0].trim().toUpperCase() : 'UNKNOWN ORIGIN'}</span>
+                        <span class="status-tag ${hero.status === 'STANDBY' ? 'standby' : ''}">${hero.status || 'ACTIVE'}</span>
+                    </div>
+                    <div class="dossier-body">
+                        <div class="avatar-circle">
+                            ${avatarHTML}
+                        </div>
+                        <div class="dossier-info">
+                            <div class="callsign-title">${hero.name}</div>
+                            <div class="sub-name">${hero.spec ? hero.spec.split('//')[1]?.trim() || hero.spec : 'Operative'}</div>
+                        </div>
+                    </div>
+                    <div class="skill-group">
+                        <div class="skill-row"><span class="skill-label">MAX HEALTH</span><div class="skill-bar">${makeBars(hp)}</div></div>
+                        <div class="skill-row"><span class="skill-label">STAMINA</span><div class="skill-bar">${makeBars(stm)}</div></div>
+                        <div class="skill-row"><span class="skill-label">STRIKE SUPER</span><div class="skill-bar">${makeBars(str)}</div></div>
+                        <div class="skill-row"><span class="skill-label">KI BLAST SUPER</span><div class="skill-bar">${makeBars(kib)}</div></div>
+                    </div>
+                    <a href="dossier.html?id=${hero.id}" class="inspect-btn">[VIEW HERO WIKI]</a>
+                </div>
+                `;
+            }).join('');
+        } catch (err) {
+            console.error("Error loading roster:", err);
+            container.innerHTML = '<div style="color:var(--db-red); grid-column: span 2; text-align: center;">DATABASE SYNC FAILED</div>';
+        }
+    }
+
     // APPLY DYNAMIC VISUAL & MODULE CONFIG FROM ADMIN STUDIO
     function applySiteConfig() {
         const cfg = JSON.parse(localStorage.getItem('pantheon_site_config') || '{}');
@@ -1253,6 +1253,7 @@
     checkMaintenanceGate();
     applySiteConfig();
     loadPublicFeed();
+    loadOfficialRoster();
     checkAdminAccess();
 </script>
 
