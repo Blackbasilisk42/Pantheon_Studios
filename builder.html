@@ -82,7 +82,6 @@
             color: var(--db-gold);
         }
 
-
         .admin-banner {
             background: rgba(255, 183, 0, 0.1);
             border: 1px solid var(--db-gold);
@@ -147,6 +146,18 @@
             outline: none;
             box-sizing: border-box;
         }
+        
+        /* Special styling for file input */
+        .form-input[type="file"]::-webkit-file-upload-button {
+            background: var(--db-cyan);
+            color: #000;
+            border: none;
+            padding: 6px 12px;
+            margin-right: 10px;
+            font-family: var(--font-mono);
+            font-weight: bold;
+            cursor: pointer;
+        }
 
         .form-input:focus, .form-select:focus, .form-textarea:focus {
             border-color: var(--db-gold);
@@ -206,6 +217,13 @@
             color: #ffffff;
             background: #000;
             box-shadow: 0 0 10px rgba(255, 183, 0, 0.4);
+            overflow: hidden;
+        }
+
+        .avatar-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .attr-bar-container {
@@ -259,6 +277,12 @@
             cursor: pointer;
             letter-spacing: 1.5px;
             clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+        }
+
+        .btn-save:disabled {
+            background: #444;
+            color: #888;
+            cursor: not-allowed;
         }
 
         /* DIRECTOR AUTH OVERLAY */
@@ -324,6 +348,11 @@
                     <label class="form-label">CHARACTER NAME / CALLSIGN</label>
                     <input type="text" id="hero-name" class="form-input" value="KAIGE" required>
                 </div>
+                
+                <div class="form-group">
+                    <label class="form-label">AVATAR PORTRAIT (UPLOAD IMAGE)</label>
+                    <input type="file" id="hero-avatar-upload" class="form-input" accept="image/png, image/jpeg, image/gif, image/webp" onchange="updatePreview()">
+                </div>
 
                 <div class="form-group">
                     <label class="form-label">RACE / SPECIES ORIGIN</label>
@@ -368,7 +397,7 @@
                 </div>
 
                 <div class="btn-action-group">
-                    <button type="button" class="btn-save" onclick="saveOfficialCharacter()">PUBLISH TO CANON ROSTER</button>
+                    <button type="button" class="btn-save" id="btn-save-canon" onclick="saveOfficialCharacter()">PUBLISH TO CANON ROSTER</button>
                 </div>
             </form>
         </div>
@@ -472,6 +501,9 @@
 
         const skills = document.getElementById('hero-skills').value;
         const lore = document.getElementById('hero-lore').value;
+        
+        const fileInput = document.getElementById('hero-avatar-upload');
+        const previewAvatar = document.getElementById('prev-avatar');
 
         document.getElementById('val-hp').innerText = hp;
         document.getElementById('val-ki').innerText = ki;
@@ -482,7 +514,20 @@
         document.getElementById('prev-name').innerText = name.toUpperCase();
         document.getElementById('prev-spec').innerText = `${race} // ${role}`;
         document.getElementById('prev-power').innerText = power;
-        document.getElementById('prev-avatar').innerText = name.substring(0, 2).toUpperCase();
+        
+        // Handle image preview
+        if (fileInput.files && fileInput.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewAvatar.innerHTML = `<img src="${e.target.result}" class="avatar-img" alt="${name.substring(0, 2).toUpperCase()}">`;
+            }
+            reader.readAsDataURL(fileInput.files[0]);
+        } else {
+            // Keep existing image if it's there, otherwise text initials
+            if (!previewAvatar.querySelector('img')) {
+                previewAvatar.innerText = name.substring(0, 2).toUpperCase();
+            }
+        }
 
         document.getElementById('bar-hp').style.width = hp + '%';
         document.getElementById('bar-ki').style.width = ki + '%';
@@ -497,6 +542,23 @@
     async function saveOfficialCharacter() {
         const key = document.getElementById('hero-name').value.toLowerCase().replace(/[^a-z0-9]/g, '');
         const docId = key || 'hero_' + Date.now();
+        const saveBtn = document.getElementById('btn-save-canon');
+        
+        saveBtn.disabled = true;
+        saveBtn.innerText = "PUBLISHING TO DB...";
+
+        const fileInput = document.getElementById('hero-avatar-upload');
+        let avatarBase64 = null;
+
+        if (fileInput.files.length > 0) {
+            const toBase64 = file => new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+            avatarBase64 = await toBase64(fileInput.files[0]);
+        }
         
         const heroData = {
             id: docId,
@@ -515,21 +577,35 @@
             updatedAt: new Date().toISOString()
         };
 
+        if (avatarBase64) {
+            heroData.avatarUrl = avatarBase64;
+        }
+
         try {
-            await setDoc(doc(db, "official_roster", docId), heroData);
+            await setDoc(doc(db, "official_roster", docId), heroData, { merge: true });
             
             const status = document.getElementById('save-status');
             status.style.display = 'block';
             status.style.color = "var(--db-ki)";
             status.innerText = "✓ CANON CHARACTER PUBLISHED TO OFFICIAL SHOW DATABASE";
-            setTimeout(() => { status.style.display = 'none'; }, 3000);
+            
+            setTimeout(() => { 
+                status.style.display = 'none'; 
+                saveBtn.disabled = false;
+                saveBtn.innerText = "PUBLISH TO CANON ROSTER";
+            }, 3000);
         } catch (error) {
             console.error("Error saving official roster entry:", error);
             const status = document.getElementById('save-status');
             status.style.display = 'block';
             status.style.color = "var(--db-red)";
             status.innerText = "ERROR: FAILED TO PUBLISH TO DATABASE";
-            setTimeout(() => { status.style.display = 'none'; }, 3000);
+            
+            setTimeout(() => { 
+                status.style.display = 'none'; 
+                saveBtn.disabled = false;
+                saveBtn.innerText = "PUBLISH TO CANON ROSTER";
+            }, 3000);
         }
     }
 
