@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PANTHEON STUDIOS // OFFICIAL SHOW ROSTER MANAGER</title>
+    <!-- Cropper.js CSS for image reframing -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
     <style>
         :root {
             --bg-void: #060913;
@@ -147,7 +149,6 @@
             box-sizing: border-box;
         }
         
-        /* Special styling for file input */
         .form-input[type="file"]::-webkit-file-upload-button {
             background: var(--db-cyan);
             color: #000;
@@ -218,6 +219,7 @@
             background: #000;
             box-shadow: 0 0 10px rgba(255, 183, 0, 0.4);
             overflow: hidden;
+            flex-shrink: 0;
         }
 
         .avatar-img {
@@ -285,6 +287,34 @@
             cursor: not-allowed;
         }
 
+        .btn-delete {
+            background: var(--db-red);
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            font-family: var(--font-mono);
+            font-weight: 900;
+            font-size: 0.8rem;
+            cursor: pointer;
+            letter-spacing: 1.5px;
+            clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+            display: none;
+        }
+
+        .btn-delete:hover {
+            background: #cc0000;
+        }
+
+        .manager-toolbar {
+            background: rgba(255, 183, 0, 0.05);
+            border: 1px solid rgba(255, 183, 0, 0.3);
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
         /* DIRECTOR AUTH OVERLAY */
         #director-auth-overlay {
             position: fixed;
@@ -304,6 +334,51 @@
             padding: 30px;
             text-align: center;
         }
+
+        /* CROPPER MODAL STYLES */
+        #cropper-modal {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(6, 9, 19, 0.95);
+            z-index: 999999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .cropper-container-wrapper {
+            width: 90%;
+            max-width: 600px;
+            height: 60vh;
+            background: #000;
+            border: 2px solid var(--db-cyan);
+            margin-bottom: 20px;
+        }
+
+        .cropper-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-crop-confirm {
+            background: var(--db-cyan);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-family: var(--font-mono);
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-crop-cancel {
+            background: #333;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 10px 20px;
+            font-family: var(--font-mono);
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -318,6 +393,18 @@
             <button type="submit" style="background:var(--db-gold); color:#000; border:none; padding:10px 18px; font-family:var(--font-mono); font-weight:bold; cursor:pointer; width:100%;">AUTHENTICATE DIRECTOR</button>
         </form>
         <div id="auth-error" style="color:var(--db-red); font-size:0.75rem; margin-top:12px; font-weight:bold;"></div>
+    </div>
+</div>
+
+<!-- IMAGE CROPPER MODAL -->
+<div id="cropper-modal">
+    <div style="color:var(--db-cyan); font-weight:bold; margin-bottom:10px; letter-spacing:2px;">REFRAME AVATAR</div>
+    <div class="cropper-container-wrapper">
+        <img id="cropper-image" src="" alt="To Crop" style="max-width: 100%; display: block;">
+    </div>
+    <div class="cropper-actions">
+        <button class="btn-crop-cancel" onclick="cancelCrop()">CANCEL</button>
+        <button class="btn-crop-confirm" onclick="confirmCrop()">CONFIRM FRAME</button>
     </div>
 </div>
 
@@ -339,11 +426,23 @@
         <span style="color:var(--db-ki);">DIRECTOR ACCESS GRANTED</span>
     </div>
 
+    <!-- ROSTER MANAGEMENT TOOLBAR -->
+    <div class="manager-toolbar">
+        <label class="form-label" style="margin-bottom:0; color:var(--db-gold);">DATABASE ROSTER</label>
+        <select id="roster-select" class="form-select" style="flex:1;" onchange="loadSelectedCharacter(this.value)">
+            <option value="">-- CREATE NEW CHARACTER --</option>
+            <!-- Dynamically populated -->
+        </select>
+    </div>
+
     <div class="builder-grid">
         <!-- FORM PANEL -->
         <div class="builder-card">
             <div class="card-header">CANON CAST SPECIFICATIONS</div>
             <form id="hero-builder-form" oninput="updatePreview()">
+                <!-- Hidden ID field for updates -->
+                <input type="hidden" id="hero-id" value="">
+
                 <div class="form-group">
                     <label class="form-label">CHARACTER NAME / CALLSIGN</label>
                     <input type="text" id="hero-name" class="form-input" value="KAIGE" required>
@@ -351,7 +450,7 @@
                 
                 <div class="form-group">
                     <label class="form-label">AVATAR PORTRAIT (UPLOAD IMAGE)</label>
-                    <input type="file" id="hero-avatar-upload" class="form-input" accept="image/png, image/jpeg, image/gif, image/webp" onchange="updatePreview()">
+                    <input type="file" id="hero-avatar-upload" class="form-input" accept="image/png, image/jpeg, image/gif, image/webp" onchange="handleImageSelect(event)">
                 </div>
 
                 <div class="form-group">
@@ -398,6 +497,7 @@
 
                 <div class="btn-action-group">
                     <button type="button" class="btn-save" id="btn-save-canon" onclick="saveOfficialCharacter()">PUBLISH TO CANON ROSTER</button>
+                    <button type="button" class="btn-delete" id="btn-delete-canon" onclick="deleteOfficialCharacter()">DELETE</button>
                 </div>
             </form>
         </div>
@@ -447,9 +547,12 @@
     </div>
 </div>
 
+<!-- Cropper.js Script -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDocs, getDoc, collection, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyD8k_5c_4mxpJCtKIYxiko8i1mY1vxg2dQ",
@@ -464,17 +567,184 @@
     const db = getFirestore(app);
 
     const DIRECTOR_PASSCODE = '@Sammyzzz3Jimbo21';
+    let cropperInstance = null;
+
+    // --- Image Cropping Logic ---
+    function handleImageSelect(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const imageElement = document.getElementById('cropper-image');
+            imageElement.src = e.target.result;
+            
+            document.getElementById('cropper-modal').style.display = 'flex';
+            
+            // Destroy existing instance if someone uploads twice
+            if (cropperInstance) {
+                cropperInstance.destroy();
+            }
+
+            // Init Cropper forcing a 1:1 square ratio
+            cropperInstance = new Cropper(imageElement, {
+                aspectRatio: 1,
+                viewMode: 1,
+                dragMode: 'move',
+                autoCropArea: 1,
+                restore: false,
+                guides: true,
+                center: true,
+                highlight: false,
+                cropBoxMovable: true,
+                cropBoxResizable: true,
+                toggleDragModeOnDblclick: false,
+            });
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function confirmCrop() {
+        if (!cropperInstance) return;
+
+        // Get the cropped canvas and compress to JPEG base64 automatically
+        const canvas = cropperInstance.getCroppedCanvas({
+            width: 400,
+            height: 400
+        });
+        
+        const croppedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+        
+        // Store the final cropped image in the dataset to be grabbed during save
+        const previewAvatar = document.getElementById('prev-avatar');
+        previewAvatar.dataset.pendingAvatar = croppedBase64;
+        
+        document.getElementById('cropper-modal').style.display = 'none';
+        cropperInstance.destroy();
+        cropperInstance = null;
+        
+        updatePreview();
+    }
+
+    function cancelCrop() {
+        document.getElementById('cropper-modal').style.display = 'none';
+        document.getElementById('hero-avatar-upload').value = "";
+        if (cropperInstance) {
+            cropperInstance.destroy();
+            cropperInstance = null;
+        }
+    }
+    // --- End Cropping Logic ---
+
+    async function fetchRosterList() {
+        const select = document.getElementById('roster-select');
+        select.innerHTML = '<option value="">-- CREATE NEW CHARACTER --</option>';
+        try {
+            const snapshot = await getDocs(collection(db, "official_roster"));
+            snapshot.forEach(docSnap => {
+                const data = docSnap.data();
+                const option = document.createElement('option');
+                option.value = docSnap.id;
+                option.text = `${data.name} [${data.spec.split(' // ')[0]}]`;
+                select.appendChild(option);
+            });
+        } catch (error) {
+            console.error("Error fetching roster:", error);
+        }
+    }
+
+    async function loadSelectedCharacter(id) {
+        const saveBtn = document.getElementById('btn-save-canon');
+        const deleteBtn = document.getElementById('btn-delete-canon');
+        const previewAvatar = document.getElementById('prev-avatar');
+
+        if (!id) {
+            document.getElementById('hero-builder-form').reset();
+            document.getElementById('hero-id').value = "";
+            saveBtn.innerText = "PUBLISH TO CANON ROSTER";
+            deleteBtn.style.display = 'none';
+            delete previewAvatar.dataset.savedBase64;
+            delete previewAvatar.dataset.pendingAvatar;
+            updatePreview();
+            return;
+        }
+
+        try {
+            const docRef = doc(db, "official_roster", id);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                
+                document.getElementById('hero-id').value = id;
+                document.getElementById('hero-name').value = data.name;
+                document.getElementById('hero-race').value = data.spec.split(' // ')[0] || '';
+                document.getElementById('hero-role').value = data.spec.split(' // ')[1] || '';
+                document.getElementById('hero-power').value = data.power;
+                document.getElementById('hero-status').value = data.status;
+                
+                document.getElementById('stat-hp').value = parseInt(data.health);
+                document.getElementById('stat-ki').value = parseInt(data.ki);
+                document.getElementById('stat-stm').value = parseInt(data.stamina);
+                document.getElementById('stat-str').value = parseInt(data.strikeSuper);
+                document.getElementById('stat-kib').value = parseInt(data.kiSuper);
+                
+                document.getElementById('hero-skills').value = data.skills.map(s => s.name).join(', ');
+                document.getElementById('hero-lore').value = data.lore;
+
+                // Handle saved avatar persistence
+                delete previewAvatar.dataset.pendingAvatar;
+                if (data.avatarUrl) {
+                    previewAvatar.dataset.savedBase64 = data.avatarUrl;
+                } else {
+                    delete previewAvatar.dataset.savedBase64;
+                }
+
+                document.getElementById('hero-avatar-upload').value = "";
+
+                saveBtn.innerText = "UPDATE CANON RECORD";
+                deleteBtn.style.display = 'block';
+
+                updatePreview();
+            }
+        } catch (error) {
+            console.error("Error loading character:", error);
+        }
+    }
+
+    async function deleteOfficialCharacter() {
+        const id = document.getElementById('hero-id').value;
+        if (!id) return;
+
+        if (confirm("WARNING: Are you sure you want to permanently delete this character from the canon database?")) {
+            try {
+                await deleteDoc(doc(db, "official_roster", id));
+                const status = document.getElementById('save-status');
+                status.style.display = 'block';
+                status.style.color = "var(--db-red)";
+                status.innerText = "✓ CANON CHARACTER DELETED";
+                
+                setTimeout(() => { 
+                    status.style.display = 'none'; 
+                    fetchRosterList(); 
+                    loadSelectedCharacter(''); 
+                }, 2000);
+            } catch (error) {
+                console.error("Error deleting character:", error);
+            }
+        }
+    }
 
     function checkDirectorAuth() {
         if (localStorage.getItem('userRole') === 'admin' || localStorage.getItem('pantheon_director_authenticated') === 'true') {
             localStorage.setItem('userRole', 'admin');
             localStorage.setItem('pantheon_director_authenticated', 'true');
             document.getElementById('director-auth-overlay').style.display = 'none';
+            fetchRosterList(); 
         } else {
             document.getElementById('director-auth-overlay').style.display = 'flex';
         }
     }
-
 
     function authenticateDirector(e) {
         e.preventDefault();
@@ -482,6 +752,7 @@
         if (inputKey === DIRECTOR_PASSCODE) {
             localStorage.setItem('pantheon_director_authenticated', 'true');
             document.getElementById('director-auth-overlay').style.display = 'none';
+            fetchRosterList();
         } else {
             document.getElementById('auth-error').innerText = 'ACCESS DENIED: INVALID DIRECTOR PASSKEY';
         }
@@ -502,7 +773,6 @@
         const skills = document.getElementById('hero-skills').value;
         const lore = document.getElementById('hero-lore').value;
         
-        const fileInput = document.getElementById('hero-avatar-upload');
         const previewAvatar = document.getElementById('prev-avatar');
 
         document.getElementById('val-hp').innerText = hp;
@@ -515,18 +785,13 @@
         document.getElementById('prev-spec').innerText = `${race} // ${role}`;
         document.getElementById('prev-power').innerText = power;
         
-        // Handle image preview
-        if (fileInput.files && fileInput.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                previewAvatar.innerHTML = `<img src="${e.target.result}" class="avatar-img" alt="${name.substring(0, 2).toUpperCase()}">`;
-            }
-            reader.readAsDataURL(fileInput.files[0]);
+        // Priority: 1. Newly Cropped Image 2. Existing Database Image 3. Text Initials
+        if (previewAvatar.dataset.pendingAvatar) {
+            previewAvatar.innerHTML = `<img src="${previewAvatar.dataset.pendingAvatar}" class="avatar-img" alt="${name.substring(0, 2).toUpperCase()}">`;
+        } else if (previewAvatar.dataset.savedBase64) {
+            previewAvatar.innerHTML = `<img src="${previewAvatar.dataset.savedBase64}" class="avatar-img" alt="${name.substring(0, 2).toUpperCase()}">`;
         } else {
-            // Keep existing image if it's there, otherwise text initials
-            if (!previewAvatar.querySelector('img')) {
-                previewAvatar.innerText = name.substring(0, 2).toUpperCase();
-            }
+            previewAvatar.innerHTML = name.substring(0, 2).toUpperCase();
         }
 
         document.getElementById('bar-hp').style.width = hp + '%';
@@ -540,25 +805,17 @@
     }
 
     async function saveOfficialCharacter() {
+        const currentId = document.getElementById('hero-id').value;
         const key = document.getElementById('hero-name').value.toLowerCase().replace(/[^a-z0-9]/g, '');
-        const docId = key || 'hero_' + Date.now();
+        const docId = currentId || key || 'hero_' + Date.now();
         const saveBtn = document.getElementById('btn-save-canon');
+        const previewAvatar = document.getElementById('prev-avatar');
         
         saveBtn.disabled = true;
         saveBtn.innerText = "PUBLISHING TO DB...";
 
-        const fileInput = document.getElementById('hero-avatar-upload');
-        let avatarBase64 = null;
-
-        if (fileInput.files.length > 0) {
-            const toBase64 = file => new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            });
-            avatarBase64 = await toBase64(fileInput.files[0]);
-        }
+        // Grab whichever image is active (either the fresh crop or the existing DB one)
+        let avatarBase64 = previewAvatar.dataset.pendingAvatar || previewAvatar.dataset.savedBase64 || null;
         
         const heroData = {
             id: docId,
@@ -584,15 +841,23 @@
         try {
             await setDoc(doc(db, "official_roster", docId), heroData, { merge: true });
             
+            // Promote pending image to saved status now that it's in the DB
+            if (previewAvatar.dataset.pendingAvatar) {
+                previewAvatar.dataset.savedBase64 = previewAvatar.dataset.pendingAvatar;
+                delete previewAvatar.dataset.pendingAvatar;
+            }
+
             const status = document.getElementById('save-status');
             status.style.display = 'block';
             status.style.color = "var(--db-ki)";
-            status.innerText = "✓ CANON CHARACTER PUBLISHED TO OFFICIAL SHOW DATABASE";
+            status.innerText = currentId ? "✓ CANON RECORD UPDATED" : "✓ CANON CHARACTER PUBLISHED";
             
+            fetchRosterList();
+
             setTimeout(() => { 
                 status.style.display = 'none'; 
                 saveBtn.disabled = false;
-                saveBtn.innerText = "PUBLISH TO CANON ROSTER";
+                saveBtn.innerText = currentId ? "UPDATE CANON RECORD" : "PUBLISH TO CANON ROSTER";
             }, 3000);
         } catch (error) {
             console.error("Error saving official roster entry:", error);
@@ -604,7 +869,7 @@
             setTimeout(() => { 
                 status.style.display = 'none'; 
                 saveBtn.disabled = false;
-                saveBtn.innerText = "PUBLISH TO CANON ROSTER";
+                saveBtn.innerText = currentId ? "UPDATE CANON RECORD" : "PUBLISH TO CANON ROSTER";
             }, 3000);
         }
     }
@@ -647,8 +912,13 @@
     window.authenticateDirector = authenticateDirector;
     window.updatePreview = updatePreview;
     window.saveOfficialCharacter = saveOfficialCharacter;
+    window.loadSelectedCharacter = loadSelectedCharacter;
+    window.deleteOfficialCharacter = deleteOfficialCharacter;
     window.attemptAdminLogin = attemptAdminLogin;
     window.adminLogout = adminLogout;
+    window.handleImageSelect = handleImageSelect;
+    window.confirmCrop = confirmCrop;
+    window.cancelCrop = cancelCrop;
 
     checkDirectorAuth();
     updatePreview();
