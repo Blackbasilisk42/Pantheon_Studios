@@ -308,6 +308,18 @@
             box-sizing: border-box;
         }
 
+        /* Special styling for file input */
+        .form-input[type="file"]::-webkit-file-upload-button {
+            background: var(--db-cyan);
+            color: #000;
+            border: none;
+            padding: 6px 12px;
+            margin-right: 10px;
+            font-family: var(--font-mono);
+            font-weight: bold;
+            cursor: pointer;
+        }
+
         .form-input:focus, .form-select:focus, .form-textarea:focus {
             border-color: var(--db-gold);
             box-shadow: 0 0 8px rgba(255, 183, 0, 0.3);
@@ -490,8 +502,9 @@
             <div class="card-header" style="color:var(--db-cyan); border-bottom-color: rgba(0, 229, 255, 0.4);">PROFILE VISUALS // EXTERNAL MEDIA LINKING</div>
             <form onsubmit="updateProfileVisuals(event)" style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
                 <div class="form-group">
-                    <label class="form-label">CUSTOM AVATAR (EXTERNAL IMAGE URL)</label>
-                    <input type="url" id="avatar-url" class="form-input" placeholder="https://i.imgur.com/...png">
+                    <label class="form-label">CUSTOM AVATAR (UPLOAD IMAGE)</label>
+                    <!-- Changed to file input for direct uploads -->
+                    <input type="file" id="avatar-upload" class="form-input" accept="image/png, image/jpeg, image/gif, image/webp">
                 </div>
 
                 <div class="form-group">
@@ -660,14 +673,15 @@
         await renderUserAssets();
     }
 
+    // Handles File to Base64 Conversion & Uploads to Firestore
     async function updateProfileVisuals(e) {
         e.preventDefault();
         const btn = document.getElementById('btn-update-visuals');
         const status = document.getElementById('visuals-status');
-        const avatarUrl = document.getElementById('avatar-url').value.trim();
+        const fileInput = document.getElementById('avatar-upload');
         const bgUrl = document.getElementById('bg-url').value.trim();
 
-        if (!avatarUrl && !bgUrl) return;
+        if (fileInput.files.length === 0 && !bgUrl) return;
 
         btn.disabled = true;
         btn.innerText = "LINKING ASSETS...";
@@ -675,9 +689,23 @@
 
         try {
             const updateData = {};
-            if (avatarUrl) updateData.avatarUrl = avatarUrl;
             if (bgUrl) updateData.bgUrl = bgUrl;
 
+            // Helper function to read file as Base64 string
+            const toBase64 = file => new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+
+            // Convert and attach uploaded image data
+            if (fileInput.files.length > 0) {
+                const base64Img = await toBase64(fileInput.files[0]);
+                updateData.avatarUrl = base64Img;
+            }
+
+            // Save to Firestore
             const userRef = doc(db, "users", currentCallsign.toLowerCase());
             await setDoc(userRef, updateData, { merge: true });
 
