@@ -556,7 +556,13 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const DIRECTOR_PASSCODE = '@Sammyzzz3Jimbo21';
+    const VALID_DIRECTOR_PASSCODES = ['@Sammyzzz3Jimbo21', '@princeabu'];
+
+    const ADMIN_ACCOUNTS = {
+        "blackbasilisk42": "@croatoan",
+        "AdminPrinceAbu": "@princeabu"
+    };
+
     let cropperInstance = null;
 
     // --- Image Cropping Logic ---
@@ -739,7 +745,7 @@
     function authenticateDirector(e) {
         e.preventDefault();
         const inputKey = document.getElementById('director-key-input').value.trim();
-        if (inputKey === DIRECTOR_PASSCODE) {
+        if (VALID_DIRECTOR_PASSCODES.includes(inputKey)) {
             localStorage.setItem('pantheon_director_authenticated', 'true');
             document.getElementById('director-auth-overlay').style.display = 'none';
             fetchRosterList();
@@ -865,13 +871,7 @@
     }
 
     function attemptAdminLogin(username, password) {
-        // First Admin Account (Yours)
-        const isOriginalAdmin = (username === 'blackbasilisk42' && password === '@croatoan');
-        
-        // Second Admin Account (Update these strings to whatever you want)
-        const isNewAdmin = (username === 'PrinceAbu64' && password === '@princeabu');
-
-        if (isOriginalAdmin || isNewAdmin) {
+        if (ADMIN_ACCOUNTS.hasOwnProperty(username) && ADMIN_ACCOUNTS[username] === password) {
             localStorage.setItem('userRole', 'admin');
             localStorage.setItem('pantheon_active_session', username);
             localStorage.setItem('pantheon_director_authenticated', 'true');
