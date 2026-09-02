@@ -443,7 +443,6 @@
 <div id="dynamic-bg"></div>
 <div id="bg-overlay"></div>
 
-<!-- MAINTENANCE LOCKOUT OVERLAY -->
 <div id="maintenance-overlay">
     <div class="maint-card">
         <div style="color:var(--db-red); font-weight:bold; margin-bottom:10px;">⚠️ PROFILE RESTRICTED</div>
@@ -457,7 +456,6 @@
 </div>
 
 <div class="container">
-    <!-- NAV HEADER -->
     <div class="nav-header">
         <div class="nav-brand">PANTHEON STUDIOS // USER HQ</div>
         <div class="nav-menu">
@@ -469,7 +467,6 @@
         </div>
     </div>
 
-    <!-- USER SESSION BANNER -->
     <div class="session-card">
         <div class="user-identity">
             <div class="user-avatar" id="user-avatar-circle">GF</div>
@@ -484,7 +481,6 @@
         </div>
     </div>
 
-    <!-- PUBLIC PROFILE DOSSIER SHOWCASE (LIVE PROFILE CARD) -->
     <div class="public-showcase-card" id="showcase-card">
         <div class="showcase-header">
             <div class="showcase-title" id="showcase-owner-title">PUBLIC MEMBER SHOWCASE // ACTIVE OC</div>
@@ -497,13 +493,11 @@
 
     <div class="profile-grid" id="profile-editor-grid">
 
-        <!-- PROFILE VISUALS BYPASS -->
         <div class="profile-card" style="grid-column: span 2;">
             <div class="card-header" style="color:var(--db-cyan); border-bottom-color: rgba(0, 229, 255, 0.4);">PROFILE VISUALS // EXTERNAL MEDIA LINKING</div>
             <form onsubmit="updateProfileVisuals(event)" style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
                 <div class="form-group">
                     <label class="form-label">CUSTOM AVATAR (UPLOAD IMAGE)</label>
-                    <!-- Changed to file input for direct uploads -->
                     <input type="file" id="avatar-upload" class="form-input" accept="image/png, image/jpeg, image/gif, image/webp">
                 </div>
 
@@ -520,7 +514,6 @@
         </div>
 
 
-        <!-- PERSONAL OC BUILDER (COMMUNITY OC) -->
         <div class="profile-card" style="grid-column: span 2;">
             <div class="card-header">PERSONAL OC CREATOR & SOCIAL ROUTING</div>
             <form id="oc-builder-form" oninput="updateOcPreview()" style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
@@ -551,7 +544,6 @@
                     <input type="text" id="oc-skills" class="form-input" value="Shadow Crusher, Sledgehammer">
                 </div>
 
-                <!-- Attributes Box -->
                 <div class="form-group" style="grid-column: span 2; border:1px solid rgba(255,183,0,0.2); padding:15px; background:rgba(0,0,0,0.3);">
                     <div style="font-size:0.75rem; color:var(--db-gold); margin-bottom:12px; font-weight:bold;">XENOVERSE ATTRIBUTES</div>
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
@@ -562,7 +554,6 @@
                     </div>
                 </div>
 
-                <!-- Social Media Routing -->
                 <div class="form-group" style="grid-column: span 1;">
                     <label class="form-label" style="color:var(--db-gold);">EXTERNAL CONTENT (YOUTUBE LINK)</label>
                     <input type="url" id="oc-youtube" class="form-input" placeholder="https://youtube.com/...">
@@ -582,12 +573,10 @@
 
     </div>
 
-    <!-- SAVED ASSETS & PERSONAL OCs -->
     <div class="assets-card">
         <div class="card-header" style="margin-bottom:10px;">YOUR SAVED COMMUNITY OCs</div>
         <div class="asset-list" id="user-oc-list">
-            <!-- User OCs render here -->
-        </div>
+            </div>
     </div>
 </div>
 
