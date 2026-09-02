@@ -239,11 +239,17 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+    // Define Approved Admin Accounts
+    const ADMIN_ACCOUNTS = {
+        "blackbasilisk42": "@croatoan",
+        "AdminPrinceAbu": "@princeabu"
+    };
+
     // Check if user is already logged in as admin or standard member
     if (localStorage.getItem('userRole') === 'admin') {
         window.location.href = 'admin.html';
     } else if (localStorage.getItem('pantheon_active_session')) {
-        window.location.href = 'profile.html'; // Changed from account.html to match profile context
+        window.location.href = 'profile.html';
     }
 
     /**
@@ -253,19 +259,16 @@
      * @returns {boolean}
      */
     function attemptAdminLogin(username, password) {
-        const isOriginalAdmin = (username === 'blackbasilisk42' && password === '@croatoan');
-        const isNewAdmin = (username === 'PrinceAbu64' && password === '@princeabu');
-
-        if (isOriginalAdmin || isNewAdmin) {
+        if (ADMIN_ACCOUNTS.hasOwnProperty(username) && ADMIN_ACCOUNTS[username] === password) {
             localStorage.setItem('userRole', 'admin');
-            localStorage.setItem('pantheon_active_session', username); // Uses the specific admin's name
+            localStorage.setItem('pantheon_active_session', username);
             localStorage.setItem('pantheon_director_authenticated', 'true');
             window.location.href = 'admin.html';
             return true;
         } else {
             const msg = document.getElementById('auth-msg');
             msg.style.color = 'var(--db-red)';
-            msg.innerText = 'INVALID CREDENTIALS. ACCESS DENIED.';
+            msg.innerText = 'INVALID CALLSIGN OR PASSKEY.';
             return false;
         }
     }
@@ -342,7 +345,7 @@
             // Register new user to Firestore
             await setDoc(docRef, {
                 callsign: callsign,
-                password: password, // Note: In a production app, use Firebase Auth instead of storing plaintext passwords
+                password: password, 
                 role: 'user',
                 joined: new Date().toISOString()
             });
@@ -373,7 +376,7 @@
         const msg = document.getElementById('auth-msg');
 
         // Check if matching either Super Admin account
-        if (callsign === 'blackbasilisk42' || callsign === 'NEW_ADMIN_USERNAME') {
+        if (ADMIN_ACCOUNTS.hasOwnProperty(callsign)) {
             attemptAdminLogin(callsign, password);
             return;
         }
