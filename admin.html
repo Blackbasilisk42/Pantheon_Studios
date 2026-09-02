@@ -413,7 +413,9 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const DIRECTOR_PASSCODE = '@Sammyzzz3Jimbo21';
+    
+    // Array of valid master passcodes for the admin dashboard
+    const VALID_DIRECTOR_PASSCODES = ['@Sammyzzz3Jimbo21', '@princeabu'];
 
     function checkDirectorAuth() {
         if (localStorage.getItem('userRole') === 'admin' || localStorage.getItem('pantheon_director_authenticated') === 'true') {
@@ -430,7 +432,8 @@
     function authenticateDirector(e) {
         e.preventDefault();
         const inputKey = document.getElementById('director-key-input').value.trim();
-        if (inputKey === DIRECTOR_PASSCODE) {
+        
+        if (VALID_DIRECTOR_PASSCODES.includes(inputKey)) {
             localStorage.setItem('pantheon_director_authenticated', 'true');
             localStorage.setItem('userRole', 'admin');
             document.getElementById('admin-auth-overlay').style.display = 'none';
