@@ -253,9 +253,12 @@
      * @returns {boolean}
      */
     function attemptAdminLogin(username, password) {
-        if (username === 'blackbasilisk42' && password === '@croatoan') {
+        const isOriginalAdmin = (username === 'blackbasilisk42' && password === '@croatoan');
+        const isNewAdmin = (username === 'NEW_ADMIN_USERNAME' && password === 'NEW_ADMIN_PASSWORD');
+
+        if (isOriginalAdmin || isNewAdmin) {
             localStorage.setItem('userRole', 'admin');
-            localStorage.setItem('pantheon_active_session', 'blackbasilisk42');
+            localStorage.setItem('pantheon_active_session', username); // Uses the specific admin's name
             localStorage.setItem('pantheon_director_authenticated', 'true');
             window.location.href = 'admin.html';
             return true;
@@ -369,8 +372,8 @@
         const password = document.getElementById('login-password').value;
         const msg = document.getElementById('auth-msg');
 
-        // Check if matching Super Admin
-        if (callsign === 'blackbasilisk42') {
+        // Check if matching either Super Admin account
+        if (callsign === 'blackbasilisk42' || callsign === 'NEW_ADMIN_USERNAME') {
             attemptAdminLogin(callsign, password);
             return;
         }
