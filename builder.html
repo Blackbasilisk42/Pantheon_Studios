@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PANTHEON STUDIOS // OFFICIAL SHOW ROSTER MANAGER</title>
-    <!-- Cropper.js CSS for image reframing -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
     <style>
         :root {
@@ -383,7 +382,6 @@
 </head>
 <body>
 
-<!-- DIRECTOR AUTHENTICATION GATE OVERLAY -->
 <div id="director-auth-overlay">
     <div class="auth-card">
         <div style="color:var(--db-gold); font-size:1.1rem; font-weight:bold; letter-spacing:2px; margin-bottom:8px;">🔒 DIRECTOR ACCESS LOCK</div>
@@ -396,7 +394,6 @@
     </div>
 </div>
 
-<!-- IMAGE CROPPER MODAL -->
 <div id="cropper-modal">
     <div style="color:var(--db-cyan); font-weight:bold; margin-bottom:10px; letter-spacing:2px;">REFRAME AVATAR</div>
     <div class="cropper-container-wrapper">
@@ -409,7 +406,6 @@
 </div>
 
 <div class="container">
-    <!-- NAV HEADER -->
     <div class="nav-header">
         <div class="nav-brand">PANTHEON STUDIOS // SHOW BUILDER</div>
         <div class="nav-menu">
@@ -426,21 +422,17 @@
         <span style="color:var(--db-ki);">DIRECTOR ACCESS GRANTED</span>
     </div>
 
-    <!-- ROSTER MANAGEMENT TOOLBAR -->
     <div class="manager-toolbar">
         <label class="form-label" style="margin-bottom:0; color:var(--db-gold);">DATABASE ROSTER</label>
         <select id="roster-select" class="form-select" style="flex:1;" onchange="loadSelectedCharacter(this.value)">
             <option value="">-- CREATE NEW CHARACTER --</option>
-            <!-- Dynamically populated -->
-        </select>
+            </select>
     </div>
 
     <div class="builder-grid">
-        <!-- FORM PANEL -->
         <div class="builder-card">
             <div class="card-header">CANON CAST SPECIFICATIONS</div>
             <form id="hero-builder-form" oninput="updatePreview()">
-                <!-- Hidden ID field for updates -->
                 <input type="hidden" id="hero-id" value="">
 
                 <div class="form-group">
@@ -502,7 +494,6 @@
             </form>
         </div>
 
-        <!-- PREVIEW PANEL -->
         <div class="builder-card">
             <div class="card-header">CANON TELEMETRY PREVIEW</div>
             
@@ -547,7 +538,6 @@
     </div>
 </div>
 
-<!-- Cropper.js Script -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
 <script type="module">
@@ -875,9 +865,15 @@
     }
 
     function attemptAdminLogin(username, password) {
-        if (username === 'blackbasilisk42' && password === '@croatoan') {
+        // First Admin Account (Yours)
+        const isOriginalAdmin = (username === 'blackbasilisk42' && password === '@croatoan');
+        
+        // Second Admin Account (Update these strings to whatever you want)
+        const isNewAdmin = (username === 'PrinceAbu64' && password === '@princeabu');
+
+        if (isOriginalAdmin || isNewAdmin) {
             localStorage.setItem('userRole', 'admin');
-            localStorage.setItem('pantheon_active_session', 'blackbasilisk42');
+            localStorage.setItem('pantheon_active_session', username);
             localStorage.setItem('pantheon_director_authenticated', 'true');
             window.location.href = 'admin.html';
             return true;
