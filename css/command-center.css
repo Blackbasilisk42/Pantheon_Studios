@@ -27,7 +27,6 @@ body[data-theme="obsidian"] {
 }
 
 html {
-    min-width: 320px;
     background: var(--bg-void);
 }
 
