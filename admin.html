@@ -522,7 +522,7 @@
 
     async function clearCustomHeroes() {
         if (confirm("Purge all custom created hero OCs from the database?")) {
-            await clearCollection("user_ocs", "Cleared custom hero repository.");
+            await clearCollection("official_roster", "Cleared custom hero repository.");
         }
     }
 

@@ -153,7 +153,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getFirestore, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyD8k_5c_4mxpJCtKIYxiko8i1mY1vxg2dQ",
@@ -183,11 +183,11 @@
     async function fetchRecentArchives() {
         const feedContainer = document.getElementById('live-feed-container');
         let combinedData = [];
+        const toDate = timestamp => timestamp?.toDate ? timestamp.toDate() : new Date(timestamp);
 
         try {
             // Fetch latest OCs
-            const ocQuery = query(collection(db, "user_ocs"), orderBy("timestamp", "desc"), limit(5));
-            const ocSnapshot = await getDocs(ocQuery);
+            const ocSnapshot = await getDocs(collection(db, "user_ocs"));
             ocSnapshot.forEach(doc => {
                 const data = doc.data();
                 combinedData.push({
@@ -200,8 +200,7 @@
             });
 
             // Fetch latest Media
-            const mediaQuery = query(collection(db, "media"), orderBy("timestamp", "desc"), limit(5));
-            const mediaSnapshot = await getDocs(mediaQuery);
+            const mediaSnapshot = await getDocs(collection(db, "media"));
             mediaSnapshot.forEach(doc => {
                 const data = doc.data();
                 if(data.privacy === 'public') {
@@ -217,7 +216,7 @@
 
             // Sort combined data by timestamp descending
             combinedData.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-            // Limit to top 8 items total
+            combinedData.sort((a, b) => toDate(b.timestamp) - toDate(a.timestamp));
             combinedData = combinedData.slice(0, 8);
 
             if (combinedData.length === 0) {
@@ -227,7 +226,7 @@
 
             feedContainer.innerHTML = combinedData.map(item => `
                 <div class="data-row">
-                    <div class="data-date">${new Date(item.timestamp).toLocaleDateString()}</div>
+                    <div class="data-date">${toDate(item.timestamp).toLocaleDateString()}</div>
                     <div class="data-type ${item.typeClass}">${item.type}</div>
                     <div class="data-title">${item.title.toUpperCase()}</div>
                     <div class="data-owner">OP: @${item.owner.toUpperCase()}</div>
