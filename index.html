@@ -101,16 +101,60 @@
             font-size: clamp(2.4rem, 6vw, 4.6rem);
             font-weight: 900;
             font-style: italic;
-            color: #f7dc75;
-            background: linear-gradient(180deg, #fff4bd 0%, #f3d46a 48%, #ae7218 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
             -webkit-text-stroke: 2px #000;
             letter-spacing: 1px;
             margin: 0 0 12px 0;
             filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.7))
                     drop-shadow(0 3px 5px rgba(0, 0, 0, 0.85));
+        }
+
+        .hero-title .title-yellow {
+            color: #ffd629;
+            background: linear-gradient(180deg, #fff500 0%, #ffd500 52%, #f39a00 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-title .title-red {
+            color: #ed1818;
+            background: linear-gradient(180deg, #ff2929 0%, #e31111 58%, #8d0909 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-title .title-gold {
+            color: #f7dc75;
+            background: linear-gradient(180deg, #fff4bd 0%, #f3d46a 48%, #ae7218 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-title .dragon-ball {
+            position: relative;
+            display: inline-grid;
+            width: 0.9em;
+            height: 0.9em;
+            place-items: center;
+            vertical-align: -0.04em;
+            border: 2px solid #000;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 28%, #ffe79a 0%, #ffad27 56%, #d8660a 100%);
+            -webkit-text-stroke: 0;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-title .dragon-ball::after {
+            position: absolute;
+            content: "★";
+            color: #c62b1e;
+            font-family: Arial, sans-serif;
+            font-size: 0.46em;
+            font-style: normal;
+            line-height: 1;
+            -webkit-text-fill-color: #c62b1e;
         }
 
         .hero-desc {
@@ -744,7 +788,7 @@
 
     <!-- HERO BANNER -->
     <div class="hero-section">
-        <h1 class="hero-title">DRAGONBALL LEGA-Z-Y REBORN</h1>
+        <h1 class="hero-title"><span class="title-yellow">DRAG</span><span class="dragon-ball" aria-label="O">O</span><span class="title-yellow">N</span><span class="title-red">BALL</span> <span class="title-gold">LEGA-Z-Y REBORN</span></h1>
         <div class="hero-desc">
             Explore Xenoverse roster archives, examine Ki & Strike combat specs, and build custom character dossiers.
         </div>
