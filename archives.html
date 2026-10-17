@@ -214,7 +214,6 @@
             });
 
             // Sort combined data by timestamp descending
-            combinedData.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
             combinedData.sort((a, b) => toDate(b.timestamp) - toDate(a.timestamp));
             combinedData = combinedData.slice(0, 8);
 
