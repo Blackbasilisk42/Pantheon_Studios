@@ -37,6 +37,11 @@
         return;
     }
 
+    const panel = document.querySelector(".webmaster-widget details");
+    if (panel && window.matchMedia("(max-width: 700px)").matches) {
+        panel.open = false;
+    }
+
     document.querySelectorAll("[data-webmaster-command]").forEach(function (button) {
         button.addEventListener("click", function () {
             commandInput.value = button.dataset.webmasterCommand || "";
