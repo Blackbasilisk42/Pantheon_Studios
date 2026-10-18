@@ -254,7 +254,7 @@ def _dispatch_command(command: str) -> tuple[str, object]:
         return "run_news_crawler", result
     raise ValueError(
         "Command is not supported. Try a dossier update, news update, "
-        "site health check, or rollback."
+        "official-source staging, site health check, or rollback."
     )
 
 

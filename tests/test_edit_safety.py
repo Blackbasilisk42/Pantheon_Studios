@@ -53,6 +53,23 @@ class EditSafetyTests(unittest.TestCase):
             ]
             self.assertEqual(events[-1]["action"], "rollback builder.html")
 
+    def test_rollback_removes_a_file_created_by_the_latest_write(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            target = root / "news.html"
+            edit_safety.write_text(target, "new content", "create news", root)
+
+            edit_safety.rollback_latest(root)
+
+            self.assertFalse(target.exists())
+            events = [
+                json.loads(line)
+                for line in (root / edit_safety.EDIT_LOG_NAME)
+                .read_text(encoding="utf-8")
+                .splitlines()
+            ]
+            self.assertEqual(events[-1]["action"], "rollback news.html")
+
     def test_write_rejects_targets_outside_workspace(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

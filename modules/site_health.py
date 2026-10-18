@@ -49,7 +49,12 @@ def inspect_site(root: Path) -> dict[str, object]:
                     target = resolved_root / local_path.lstrip("/")
                 else:
                     target = html_file.parent / local_path
-                if not target.exists() and len(missing_references) < MAX_FINDINGS:
+                try:
+                    target.resolve().relative_to(resolved_root)
+                    exists = target.exists()
+                except ValueError:
+                    exists = False
+                if not exists and len(missing_references) < MAX_FINDINGS:
                     missing_references.append(
                         {
                             "file": relative_file.as_posix(),
