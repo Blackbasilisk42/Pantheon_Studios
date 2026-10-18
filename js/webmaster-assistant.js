@@ -37,7 +37,13 @@
                 },
                 body: JSON.stringify({ command: command })
             });
+            if (response.status === 404) {
+                throw new Error("Local Webmaster API unavailable. Start hub_server.py.");
+            }
             const payload = await response.json();
+            if (!payload || typeof payload !== "object") {
+                throw new Error("The Webmaster returned an invalid response.");
+            }
             if (!response.ok) {
                 throw new Error(
                     typeof payload.error === "string"
@@ -52,7 +58,9 @@
         } catch (error) {
             status.textContent = error instanceof TypeError
                 ? "Unable to reach the local engine. Start hub_server.py."
-                : error.message;
+                : error instanceof Error
+                    ? error.message
+                    : String(error);
             console.error("Webmaster request failed.", error);
         } finally {
             submit.disabled = false;

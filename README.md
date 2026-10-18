@@ -55,6 +55,8 @@ previous file version is copied to `backups/` and the action, UTC timestamp,
 target, and snapshot path are appended to `edit_log.jsonl`. A rollback restores
 or removes the target of the latest logged write and itself creates an audited
 snapshot.
+The Command Center includes a compact assistant widget for submitting these
+requests when opened through the local server.
 
 The browser JavaScript is built from the readable `js/command-center.js` source:
 
@@ -70,7 +72,8 @@ backend does not add metrics to the remotely hosted static site.
 ## Human-reviewed update staging
 
 The dossier generator reads its layout reference from `dossier.html` and uses
-native Python data injection; it does not require Ollama or a local web server.
+native Python data injection; it does not require a text-generation service or
+local server.
 Run:
 
 ```powershell
