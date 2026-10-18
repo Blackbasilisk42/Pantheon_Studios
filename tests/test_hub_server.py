@@ -140,6 +140,46 @@ class HubServerTests(unittest.TestCase):
             "site_health_check",
         )
 
+    def test_execute_endpoint_routes_official_source_staging(self):
+        html_path = hub_server.ROOT / "staged_updates" / "update.html"
+        receipt_path = hub_server.ROOT / "staged_updates" / "update.txt"
+        with (
+            patch(
+                "hub_server.webmaster.scrape_source",
+                return_value=(
+                    "https://dbxv2.bn-ent.net/update/",
+                    "Patch notes\nBalance changes",
+                ),
+            ) as scrape,
+            patch(
+                "hub_server.webmaster.generate_update",
+                return_value={
+                    "title": "Patch notes",
+                    "summary": "Balance changes",
+                },
+            ) as format_update,
+            patch(
+                "hub_server.webmaster.stage_update",
+                return_value=(html_path, receipt_path),
+            ) as stage,
+        ):
+            response = self.client.post(
+                "/api/execute",
+                json={"command": "Stage official source update"},
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.get_json()["action"],
+            "stage_official_update",
+        )
+        scrape.assert_called_once()
+        format_update.assert_called_once_with("Patch notes\nBalance changes")
+        stage.assert_called_once_with(
+            "https://dbxv2.bn-ent.net/update/",
+            {"title": "Patch notes", "summary": "Balance changes"},
+        )
+
     def test_execute_endpoint_rejects_invalid_and_unrecognized_requests(self):
         missing_command = self.client.post("/api/execute", json={})
         unsupported = self.client.post(
