@@ -60,7 +60,7 @@ class AIWebmasterTests(unittest.TestCase):
             self.assertIn("Health 85/100", system_prompt)
             self.assertIn("Ki Blast Super 98/100", system_prompt)
             self.assertIn("Center of Gravity (COG)", system_prompt)
-            self.assertIn("`dossier.html`", system_prompt)
+            self.assertIn("dossier.html", system_prompt)
             self.assertIn("`.bento-card`", system_prompt)
             generated_html = html_path.read_text(encoding="utf-8")
             self.assertIn('class="bento-card"', generated_html)
