@@ -1,0 +1,120 @@
+.webmaster-widget {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 99998;
+    width: min(360px, calc(100vw - 2rem));
+    color: #c0daf0;
+    font-family: "Courier New", Courier, monospace;
+}
+
+.webmaster-widget details {
+    border: 1px solid rgba(0, 255, 136, 0.65);
+    background: rgba(6, 9, 19, 0.98);
+    box-shadow: 0 0 24px rgba(0, 255, 136, 0.2);
+}
+
+.webmaster-widget summary {
+    padding: 0.9rem 1rem;
+    color: #00ff88;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: bold;
+    letter-spacing: 0.1em;
+}
+
+.webmaster-panel {
+    padding: 0 1rem 1rem;
+}
+
+.webmaster-panel h2 {
+    margin: 0;
+    color: #fff;
+    font-size: 1rem;
+}
+
+.webmaster-panel > p {
+    color: #aab8c5;
+    font-family: "Segoe UI", Tahoma, sans-serif;
+    font-size: 0.8rem;
+    line-height: 1.45;
+}
+
+.webmaster-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.webmaster-widget button,
+.webmaster-widget input {
+    border: 1px solid rgba(0, 229, 255, 0.4);
+    border-radius: 0;
+    background: rgba(12, 18, 32, 0.96);
+    color: #c0daf0;
+    font-family: inherit;
+}
+
+.webmaster-widget button {
+    padding: 0.5rem 0.6rem;
+    color: #00ff88;
+    cursor: pointer;
+    font-size: 0.62rem;
+    font-weight: bold;
+    letter-spacing: 0.04em;
+}
+
+.webmaster-widget button:hover,
+.webmaster-widget button:focus-visible {
+    border-color: #00ff88;
+    outline: 2px solid transparent;
+}
+
+#webmaster-form {
+    display: grid;
+    gap: 0.5rem;
+    margin-top: 0.85rem;
+}
+
+#webmaster-form label {
+    color: #aab8c5;
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+}
+
+#webmaster-form input {
+    width: 100%;
+    min-height: 2.5rem;
+    padding: 0.55rem;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, sans-serif;
+    font-size: 0.9rem;
+}
+
+#webmaster-form input:focus-visible {
+    border-color: #00ff88;
+    outline: 2px solid rgba(0, 255, 136, 0.2);
+}
+
+.webmaster-widget .webmaster-submit {
+    min-height: 2.5rem;
+    border-color: #00ff88;
+    background: rgba(0, 255, 136, 0.1);
+}
+
+.webmaster-widget button:disabled {
+    cursor: wait;
+    opacity: 0.6;
+}
+
+#webmaster-result {
+    max-height: 10rem;
+    overflow: auto;
+    margin: 0.75rem 0 0;
+    padding: 0.65rem;
+    border: 1px solid rgba(0, 229, 255, 0.25);
+    color: #c0daf0;
+    font-size: 0.68rem;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
