@@ -13,6 +13,7 @@ import requests
 import schedule
 from bs4 import BeautifulSoup
 
+from modules import edit_safety
 
 ROOT = Path(__file__).parent.resolve()
 DOSSIER_FILE = ROOT / "dossier.html"
@@ -259,7 +260,12 @@ def _write_dossier_receipt(status: str) -> None:
         "Character payload injected:\n"
         f"{json.dumps(KAIGE, ensure_ascii=False, indent=2)}\n"
     )
-    DOSSIER_RECEIPT.write_text(receipt, encoding="utf-8")
+    edit_safety.write_text(
+        DOSSIER_RECEIPT,
+        receipt,
+        "write dossier generation receipt",
+        ROOT,
+    )
 
 
 def generate_character_dossier() -> tuple[Path, Path]:
@@ -284,7 +290,12 @@ def generate_character_dossier() -> tuple[Path, Path]:
             logging.warning("Dossier card not found; using fallback template.")
     except (OSError, UnicodeError, ValueError) as error:
         logging.warning("Unable to clone dossier.html (%s); using fallback.", error)
-    DOSSIER_OUTPUT.write_text(card_html + "\n", encoding="utf-8")
+    edit_safety.write_text(
+        DOSSIER_OUTPUT,
+        card_html + "\n",
+        "generate character dossier",
+        ROOT,
+    )
     _write_dossier_receipt(status)
     logging.info("Staged Kaige dossier: %s", DOSSIER_OUTPUT)
     logging.info("Wrote dossier receipt: %s", DOSSIER_RECEIPT)
@@ -434,8 +445,12 @@ def _append_crawler_receipt(
         + (f"Error: {error}\n" if error else "")
         + "\n"
     )
-    with NEWS_RECEIPT.open("a", encoding="utf-8") as receipt_file:
-        receipt_file.write(receipt)
+    edit_safety.append_text(
+        NEWS_RECEIPT,
+        receipt,
+        "append news crawler receipt",
+        ROOT,
+    )
 
 
 def _news_unavailable_html(error: str) -> str:
@@ -463,7 +478,12 @@ def run_news_crawler() -> tuple[Path, Path] | None:
     try:
         pages = _scrape_update_sources()
         STAGED_DIRECTORY.mkdir(parents=True, exist_ok=True)
-        NEWS_OUTPUT.write_text(_news_bulletin_html(pages) + "\n", encoding="utf-8")
+        edit_safety.write_text(
+            NEWS_OUTPUT,
+            _news_bulletin_html(pages) + "\n",
+            "stage news bulletin",
+            ROOT,
+        )
         _append_crawler_receipt("news bulletin staged", pages)
         logging.info("Staged news bulletin: %s", NEWS_OUTPUT)
         logging.info("Appended crawler receipt: %s", NEWS_RECEIPT)
@@ -477,9 +497,11 @@ def run_news_crawler() -> tuple[Path, Path] | None:
         logging.exception("News crawler run failed: %s", error)
         try:
             STAGED_DIRECTORY.mkdir(parents=True, exist_ok=True)
-            NEWS_OUTPUT.write_text(
+            edit_safety.write_text(
+                NEWS_OUTPUT,
                 _news_unavailable_html(str(error)) + "\n",
-                encoding="utf-8",
+                "stage crawler unavailable status",
+                ROOT,
             )
             _append_crawler_receipt(
                 "source unavailable; no news staged",

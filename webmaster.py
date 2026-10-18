@@ -1,7 +1,5 @@
 import argparse
 import html
-import json
-import os
 import re
 import sys
 from datetime import datetime, timezone
@@ -10,14 +8,13 @@ from urllib.parse import urljoin, urlparse
 
 import requests
 from bs4 import BeautifulSoup
-from dotenv import load_dotenv
 
+from modules import edit_safety
 
 ROOT = Path(__file__).resolve().parent
 STAGED_DIRECTORY = ROOT / "staged_updates"
 DEFAULT_SOURCE_URL = "https://dbxv2.bn-ent.net/"
 ALLOWED_SOURCE_HOSTS = {"dbxv2.bn-ent.net"}
-OLLAMA_URL = "http://127.0.0.1:11434/api/generate"
 REQUEST_TIMEOUT_SECONDS = 30
 MAX_SOURCE_CHARACTERS = 20_000
 UPDATE_LINK_PATTERN = re.compile(
@@ -25,17 +22,6 @@ UPDATE_LINK_PATTERN = re.compile(
     r"アップデート|お知らせ|メンテナンス|更新",
     re.IGNORECASE,
 )
-
-SYSTEM_PROMPT = (
-    "You write accurate, review-ready news for the Lega-Z-y Hub. "
-    "Use only facts present in the supplied official source text. Do not "
-    "invent dates, features, quotes, or claims. Return a JSON object with "
-    'exactly three string fields: "title", "summary", and "lore". '
-    "The title is concise, summary is a factual update in plain language, "
-    "and lore is a short Dragon Ball-inspired in-universe framing that "
-    "does not present invented game features as fact. Do not include HTML."
-)
-
 
 def validate_source_url(source_url: str) -> str:
     parsed = urlparse(source_url)
@@ -99,56 +85,28 @@ def scrape_source(source_url: str) -> tuple[str, str]:
     return source_url, source_text[:MAX_SOURCE_CHARACTERS]
 
 
-def generate_update(source_text: str, model: str) -> dict[str, str]:
-    response = requests.post(
-        OLLAMA_URL,
-        json={
-            "model": model,
-            "system": SYSTEM_PROMPT,
-            "prompt": (
-                "Create the requested JSON news object from this official "
-                f"source text:\n\n{source_text}"
-            ),
-            "format": "json",
-            "stream": False,
-        },
-        timeout=REQUEST_TIMEOUT_SECONDS,
-    )
-    response.raise_for_status()
-    payload = response.json()
-    generated = payload.get("response")
-    if not isinstance(generated, str):
-        raise ValueError("Ollama response did not contain generated text.")
-    result = json.loads(generated)
-    if not isinstance(result, dict):
-        raise ValueError("Ollama response was not a JSON object.")
-    update = {}
-    for field in ("title", "summary", "lore"):
-        value = result.get(field)
-        if not isinstance(value, str):
-            raise ValueError(f"Ollama response field {field} was not text.")
-        update[field] = value.strip()
-    if any(not value or len(value) > 2_000 for value in update.values()):
-        raise ValueError("Ollama returned missing or overlong update content.")
-    return update
+def generate_update(source_text: str) -> dict[str, str]:
+    lines = [line.strip() for line in source_text.splitlines() if line.strip()]
+    if not lines:
+        raise ValueError("Official source text is empty.")
+    title = lines[0][:200]
+    summary = " ".join(lines[1:]) or lines[0]
+    return {"title": title, "summary": summary[:2_000]}
 
 
 def render_html_block(update: dict[str, str]) -> str:
-    title, summary, lore = (
-        html.escape(update[field], quote=True)
-        for field in ("title", "summary", "lore")
-    )
+    title = html.escape(update["title"], quote=True)
+    summary = html.escape(update["summary"], quote=True)
     return (
         '<article class="hud-card lore-update">\n'
         f'  <h2 class="card-header">{title}</h2>\n'
         f'  <p class="lattice-logs">{summary}</p>\n'
-        f'  <p class="lattice-logs">{lore}</p>\n'
         "</article>\n"
     )
 
 
 def stage_update(
-    source_url: str, model: str, update: dict[str, str]
+    source_url: str, update: dict[str, str]
 ) -> tuple[Path, Path]:
     STAGED_DIRECTORY.mkdir(exist_ok=True)
     timestamp = datetime.now(timezone.utc)
@@ -162,22 +120,31 @@ def stage_update(
         "Pantheon Studios Webmaster - Staged Update Receipt\n"
         f"Scraped at (UTC): {timestamp.isoformat()}\n"
         f"Source URL: {source_url}\n"
-        f"Ollama model: {model}\n"
+        "Content formatted deterministically from the official source.\n"
         "Files generated:\n"
         f"- {html_path.relative_to(ROOT)}\n"
         f"- {receipt_path.relative_to(ROOT)}\n"
         "Review required: this staged HTML was not added to index.html.\n"
     )
-    html_path.write_text(render_html_block(update), encoding="utf-8")
-    receipt_path.write_text(receipt, encoding="utf-8")
+    edit_safety.write_text(
+        html_path,
+        render_html_block(update),
+        "stage generated official update",
+        ROOT,
+    )
+    edit_safety.write_text(
+        receipt_path,
+        receipt,
+        "write official update receipt",
+        ROOT,
+    )
     return html_path, receipt_path
 
 
 def main() -> int:
-    load_dotenv(ROOT / ".env")
     parser = argparse.ArgumentParser(
         description=(
-            "Scrape official Xenoverse updates and stage an Ollama-generated "
+            "Scrape official Xenoverse updates and stage a deterministic "
             "HTML block for manual review."
         )
     )
@@ -186,18 +153,13 @@ def main() -> int:
         default=DEFAULT_SOURCE_URL,
         help="Official Xenoverse source on dbxv2.bn-ent.net",
     )
-    parser.add_argument(
-        "--model",
-        default=os.getenv("OLLAMA_MODEL", "llama3.1"),
-        help="Installed local Ollama model name",
-    )
     args = parser.parse_args()
 
     try:
         source_url, source_text = scrape_source(args.source_url)
-        update = generate_update(source_text, args.model)
-        html_file, receipt_file = stage_update(source_url, args.model, update)
-    except (requests.RequestException, ValueError, json.JSONDecodeError) as error:
+        update = generate_update(source_text)
+        html_file, receipt_file = stage_update(source_url, update)
+    except (requests.RequestException, ValueError) as error:
         print(f"Webmaster run failed: {error}", file=sys.stderr)
         return 1
 

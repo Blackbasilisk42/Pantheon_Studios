@@ -30,6 +30,28 @@ logging credentials and produce HTTP 502. Missing credentials leave that
 provider disconnected. Keep `.env` private and rotate any credential that was
 ever committed or shared.
 
+The server also runs the Webmaster's dossier and news routines in a background
+scheduler. It generates a dossier and runs a news crawl at startup, refreshes
+news every three hours, and regenerates the dossier daily. The threaded Flask
+server remains available while those jobs run.
+
+`POST /api/execute` accepts a JSON `command` and routes recognized requests to
+the dossier generator, news crawler, site health check, or latest-edit rollback.
+For example:
+
+```powershell
+Invoke-RestMethod -Method Post -Uri http://127.0.0.1:5000/api/execute `
+  -ContentType "application/json" `
+  -Body '{"command":"Check for broken elements"}'
+```
+
+The endpoint dispatches only these known routines; it does not interpret
+requests as Python or shell commands. `/api/health` runs the local-reference
+check directly. Before Webmaster output files are changed, the previous file
+version is copied to `backups/` and the action, UTC timestamp, target, and
+snapshot path are appended to `edit_log.jsonl`. A rollback restores the target
+of the latest logged write and itself creates an audited snapshot.
+
 The browser JavaScript is built from the readable `js/command-center.js` source:
 
 ```powershell

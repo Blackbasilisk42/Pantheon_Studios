@@ -77,7 +77,6 @@ class AIWebmasterTests(unittest.TestCase):
         receipt = receipt_path.read_text(encoding="utf-8")
         self.assertIn("cloned dossier.html template", receipt)
         self.assertIn('"name": "KAIGE"', receipt)
-        self.assertNotIn("ollama", output.lower())
 
     def test_dossier_uses_native_fallback_when_reference_missing(self):
         self.dossier.unlink()

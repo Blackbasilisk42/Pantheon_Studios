@@ -1,16 +1,25 @@
 import logging
 import os
+import re
+import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path, PurePosixPath
 from typing import Callable
 
 import requests
 from dotenv import load_dotenv
-from flask import Flask, jsonify, send_from_directory
+import schedule
+from flask import Flask, jsonify, request, send_from_directory
+
+import ai_webmaster
+import webmaster
+from modules import edit_safety, site_health
 
 
 ROOT = Path(__file__).resolve().parent
 REQUEST_TIMEOUT_SECONDS = 6
+SCHEDULER_POLL_SECONDS = 1
+MAX_COMMAND_LENGTH = 1000
 PUBLIC_SUFFIXES = {
     ".avif",
     ".css",
@@ -30,6 +39,7 @@ PUBLIC_SUFFIXES = {
 PRIVATE_DIRECTORIES = {
     ".git",
     ".venv",
+    "backups",
     "dist",
     "lore",
     "modules",
@@ -42,6 +52,10 @@ load_dotenv(ROOT / ".env")
 
 app = Flask(__name__, static_folder=None)
 app.logger.setLevel(logging.INFO)
+webmaster_scheduler = schedule.Scheduler()
+_scheduler_stop = threading.Event()
+_scheduler_lock = threading.Lock()
+_scheduler_thread: threading.Thread | None = None
 
 
 class MetricProviderError(RuntimeError):
@@ -164,6 +178,125 @@ def metrics():
     return jsonify(values), (502 if provider_errors else 200)
 
 
+def _run_scheduled(action: str, operation: Callable[[], object]) -> None:
+    try:
+        operation()
+    except Exception:
+        app.logger.exception("Scheduled Webmaster action failed: %s", action)
+
+
+def _scheduler_loop() -> None:
+    _run_scheduled("startup dossier generation", ai_webmaster.generate_character_dossier)
+    _run_scheduled("startup news crawl", ai_webmaster.run_news_crawler)
+    while not _scheduler_stop.wait(SCHEDULER_POLL_SECONDS):
+        webmaster_scheduler.run_pending()
+
+
+def start_scheduler() -> None:
+    global _scheduler_thread
+    with _scheduler_lock:
+        if _scheduler_thread and _scheduler_thread.is_alive():
+            return
+        _scheduler_stop.clear()
+        webmaster_scheduler.clear()
+        webmaster_scheduler.every(1).day.do(
+            _run_scheduled,
+            "daily dossier generation",
+            ai_webmaster.generate_character_dossier,
+        )
+        webmaster_scheduler.every(3).hours.do(
+            _run_scheduled,
+            "news crawler",
+            ai_webmaster.run_news_crawler,
+        )
+        _scheduler_thread = threading.Thread(
+            target=_scheduler_loop,
+            name="webmaster-scheduler",
+            daemon=True,
+        )
+        _scheduler_thread.start()
+        app.logger.info("Webmaster scheduler started.")
+
+
+def stop_scheduler() -> None:
+    _scheduler_stop.set()
+    if _scheduler_thread and _scheduler_thread.is_alive():
+        _scheduler_thread.join(timeout=SCHEDULER_POLL_SECONDS + 1)
+
+
+def _dispatch_command(command: str) -> tuple[str, object]:
+    normalized = re.sub(r"\s+", " ", command.strip().lower())
+    if re.search(r"\b(rollback|revert|restore)\b", normalized):
+        return "rollback", edit_safety.rollback_latest(ROOT)
+    if re.search(
+        r"\b(health|diagnostic|diagnostics|broken|site check|check site)\b",
+        normalized,
+    ):
+        return "site_health_check", site_health.inspect_site(ROOT)
+    if re.search(r"\b(kaige|character|dossier)\b", normalized):
+        return "generate_character_dossier", ai_webmaster.generate_character_dossier()
+    if re.search(
+        r"\b(stage|generate|scrape)\b.*\b(official|source|update)\b",
+        normalized,
+    ):
+        source_url, source_text = webmaster.scrape_source(
+            webmaster.DEFAULT_SOURCE_URL
+        )
+        update = webmaster.generate_update(source_text)
+        return "stage_official_update", webmaster.stage_update(
+            source_url,
+            update,
+        )
+    if re.search(r"\b(news|crawler|update|maintenance)\b", normalized):
+        result = ai_webmaster.run_news_crawler()
+        if result is None:
+            raise RuntimeError("News crawler could not write its results.")
+        return "run_news_crawler", result
+    raise ValueError(
+        "Command is not supported. Try a dossier update, news update, "
+        "site health check, or rollback."
+    )
+
+
+@app.get("/api/health")
+def site_health_status():
+    try:
+        return jsonify(site_health.inspect_site(ROOT))
+    except (OSError, UnicodeError, ValueError):
+        app.logger.exception("Site health check failed.")
+        return jsonify({"error": "Site health check failed."}), 500
+
+
+@app.post("/api/execute")
+def execute_command():
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, dict):
+        return jsonify({"error": "A JSON object with a command is required."}), 400
+    command = payload.get("command")
+    if not isinstance(command, str) or not command.strip():
+        return jsonify({"error": "Command must be a non-empty string."}), 400
+    if len(command) > MAX_COMMAND_LENGTH:
+        return jsonify({"error": "Command exceeds the maximum length."}), 413
+
+    try:
+        action, result = _dispatch_command(command)
+    except ValueError as error:
+        return jsonify({"error": str(error)}), 400
+    except (OSError, RuntimeError, UnicodeError):
+        app.logger.exception("Webmaster command failed.")
+        return jsonify({"error": "Webmaster command failed."}), 500
+
+    if isinstance(result, tuple) and all(isinstance(path, Path) for path in result):
+        serialized_result = [
+            path.relative_to(ROOT).as_posix() for path in result
+        ]
+    elif isinstance(result, Path):
+        serialized_result = result.relative_to(ROOT).as_posix()
+    else:
+        serialized_result = result
+    return jsonify({"action": action, "result": serialized_result})
+
+
 @app.get("/")
 def home():
     return send_from_directory(ROOT, "command-center.html")
@@ -182,4 +315,11 @@ def public_file(filename: str):
 
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=5000, debug=False, use_reloader=False)
+    start_scheduler()
+    app.run(
+        host="127.0.0.1",
+        port=5000,
+        debug=False,
+        threaded=True,
+        use_reloader=False,
+    )

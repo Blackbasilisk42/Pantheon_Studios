@@ -90,9 +90,65 @@ class HubServerTests(unittest.TestCase):
     def test_static_server_does_not_expose_private_files(self):
         self.assertEqual(self.client.get("/.env").status_code, 404)
         self.assertEqual(self.client.get("/hub_server.py").status_code, 404)
+        self.assertEqual(self.client.get("/backups/latest.html").status_code, 404)
         response = self.client.get("/command-center.html")
         self.assertEqual(response.status_code, 200)
         response.close()
+
+    def test_execute_endpoint_routes_character_requests(self):
+        dossier = hub_server.ROOT / "staged_updates" / "kaige_dossier.html"
+        receipt = hub_server.ROOT / "staged_updates" / "kaige_receipt.txt"
+        with patch(
+            "hub_server.ai_webmaster.generate_character_dossier",
+            return_value=(dossier, receipt),
+        ) as generate:
+            response = self.client.post(
+                "/api/execute",
+                json={"command": "Update Kaige's stats"},
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.get_json(),
+            {
+                "action": "generate_character_dossier",
+                "result": [
+                    "staged_updates/kaige_dossier.html",
+                    "staged_updates/kaige_receipt.txt",
+                ],
+            },
+        )
+        generate.assert_called_once()
+
+    def test_execute_endpoint_routes_health_requests(self):
+        with patch(
+            "hub_server.site_health.inspect_site",
+            return_value={
+                "status": "healthy",
+                "checked_files": 1,
+                "missing_references": [],
+            },
+        ):
+            response = self.client.post(
+                "/api/execute",
+                json={"command": "Check for broken elements"},
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.get_json()["action"],
+            "site_health_check",
+        )
+
+    def test_execute_endpoint_rejects_invalid_and_unrecognized_requests(self):
+        missing_command = self.client.post("/api/execute", json={})
+        unsupported = self.client.post(
+            "/api/execute",
+            json={"command": "run arbitrary Python"},
+        )
+
+        self.assertEqual(missing_command.status_code, 400)
+        self.assertEqual(unsupported.status_code, 400)
 
 
 if __name__ == "__main__":

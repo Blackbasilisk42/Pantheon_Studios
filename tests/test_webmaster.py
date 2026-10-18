@@ -55,28 +55,23 @@ class WebmasterTests(unittest.TestCase):
         self.assertIn("Balance changes", text)
         self.assertEqual(request_get.call_count, 2)
 
-    @patch("webmaster.requests.post")
-    def test_ollama_returns_validated_text_fields(self, request_post):
-        response = Mock()
-        response.json.return_value = {
-            "response": '{"title":"News","summary":"Facts","lore":"Framing"}'
-        }
-        request_post.return_value = response
-
-        update = webmaster.generate_update("Official source", "test-model")
-
+    def test_update_formatter_uses_source_text_without_inventing_content(self):
+        update = webmaster.generate_update(
+            "Official Patch Notes\nBalance changes\nServer maintenance"
+        )
         self.assertEqual(
             update,
-            {"title": "News", "summary": "Facts", "lore": "Framing"},
+            {
+                "title": "Official Patch Notes",
+                "summary": "Balance changes Server maintenance",
+            },
         )
-        self.assertEqual(request_post.call_args.args[0], webmaster.OLLAMA_URL)
 
-    def test_generated_html_escapes_model_content(self):
+    def test_generated_html_escapes_source_content(self):
         block = webmaster.render_html_block(
             {
                 "title": '<script>alert("x")</script>',
                 "summary": "Update summary",
-                "lore": "Lore update",
             }
         )
 
@@ -86,18 +81,26 @@ class WebmasterTests(unittest.TestCase):
     def test_stage_writes_html_and_receipt_without_touching_live_index(self):
         index_path = webmaster.ROOT / "index.html"
         original_index = index_path.read_bytes()
-        with tempfile.TemporaryDirectory(dir=webmaster.ROOT) as temporary:
-            with patch.object(webmaster, "STAGED_DIRECTORY", Path(temporary)):
+        with tempfile.TemporaryDirectory() as temporary:
+            temporary_root = Path(temporary)
+            with (
+                patch.object(webmaster, "ROOT", temporary_root),
+                patch.object(
+                    webmaster,
+                    "STAGED_DIRECTORY",
+                    temporary_root / "staged_updates",
+                ),
+            ):
                 html_path, receipt_path = webmaster.stage_update(
                     webmaster.DEFAULT_SOURCE_URL,
-                    "test-model",
-                    {"title": "Patch Update", "summary": "Summary", "lore": "Lore"},
+                    {"title": "Patch Update", "summary": "Summary"},
                 )
 
             self.assertTrue(html_path.is_file())
             self.assertTrue(receipt_path.is_file())
             receipt = receipt_path.read_text(encoding="utf-8")
             self.assertIn(webmaster.DEFAULT_SOURCE_URL, receipt)
+            self.assertIn("formatted deterministically", receipt)
             self.assertIn(html_path.name, receipt)
             self.assertIn(receipt_path.name, receipt)
             self.assertIn("not added to index.html", receipt)
