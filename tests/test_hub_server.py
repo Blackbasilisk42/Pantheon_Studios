@@ -1,4 +1,5 @@
 import os
+import threading
 import unittest
 from unittest.mock import patch
 
@@ -189,6 +190,28 @@ class HubServerTests(unittest.TestCase):
 
         self.assertEqual(missing_command.status_code, 400)
         self.assertEqual(unsupported.status_code, 400)
+
+    def test_scheduler_runs_background_jobs_and_stays_active(self):
+        dossier_ran = threading.Event()
+        news_ran = threading.Event()
+        with (
+            patch(
+                "hub_server.ai_webmaster.generate_character_dossier",
+                side_effect=dossier_ran.set,
+            ),
+            patch(
+                "hub_server.ai_webmaster.run_news_crawler",
+                side_effect=news_ran.set,
+            ),
+        ):
+            hub_server.start_scheduler()
+            try:
+                self.assertTrue(dossier_ran.wait(timeout=1))
+                self.assertTrue(news_ran.wait(timeout=1))
+                self.assertTrue(hub_server._scheduler_thread.is_alive())
+                self.assertEqual(len(hub_server.webmaster_scheduler.jobs), 2)
+            finally:
+                hub_server.stop_scheduler()
 
 
 if __name__ == "__main__":
