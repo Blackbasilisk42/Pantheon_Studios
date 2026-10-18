@@ -99,6 +99,12 @@ def _render_bento_card(title: str, content: str, content_class: str) -> str:
 
 
 def _sanitize_dossier_html(generated_html: str) -> str:
+    generated_html = re.sub(
+        r"\A\s*```(?:html)?\s*|\s*```\s*\Z",
+        "",
+        generated_html,
+        flags=re.IGNORECASE,
+    ).strip()
     allowed_tags = {
         "article",
         "b",

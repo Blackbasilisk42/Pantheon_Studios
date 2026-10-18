@@ -39,10 +39,12 @@ class AIWebmasterTests(unittest.TestCase):
                 patch.object(
                     ai_webmaster,
                     "_ollama_generate",
-                    return_value=(
+                    return_value="```html\n"
+                    + (
                         '<article class="bento-card"><h2>Kaige</h2>'
                         "<p>Kaige dossier</p><script>bad()</script></article>"
-                    ),
+                    )
+                    + "\n```",
                 ) as generate,
             ):
                 html_path, receipt_path = ai_webmaster.generate_character_dossier()
@@ -66,6 +68,7 @@ class AIWebmasterTests(unittest.TestCase):
             self.assertIn('class="bento-card"', generated_html)
             self.assertIn("Kaige dossier", generated_html)
             self.assertNotIn("<script>", generated_html)
+            self.assertNotIn("```", generated_html)
             self.assertIn("Generated at (UTC):", receipt_path.read_text(encoding="utf-8"))
 
     def test_news_crawler_stages_text_only_bulletin_and_receipt(self):
