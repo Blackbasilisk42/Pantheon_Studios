@@ -28,12 +28,26 @@ UPDATE_LINK_PATTERN = re.compile(
     re.IGNORECASE,
 )
 DOSSIER_SYSTEM_PROMPT = (
-    "Analyze the provided reference profile for structure, layout, and tone. "
-    "Using that exact same structural framework, write a new character dossier "
-    "for Kaige. Kaige's details: Level 199 Elite Patroller, tall Frieza-race "
-    "with a solid black body design, green eyes, dark emerald green aura, and "
-    "a pure Ki-blast primary combat build utilizing Shadow Crusher and Backflip "
-    "for orbital positioning and Center of Gravity combat mechanics."
+    "You are an expert lore writer for the Pantheon Studios Lega-Z-y project. "
+    "Analyze the provided reference profile (`aj_profile_reference.txt`) for "
+    "structural layout, category headings, and analytical tone. Using that "
+    "exact same framework, write a complete character dossier for Kaige.\n\n"
+    "Integrate these specific details into his Tactical Dossier and Lore Notes:\n\n"
+    "- Subtitle: Frieza-race // Elite Patroller.\n"
+    "- Visuals: A tall, original solid black body design with green eyes (a "
+    "legacy design predating Black Frieza by 6 years) and a dark emerald green "
+    "aura.\n"
+    "- Combat Style: A pure Ki-blast primary build.\n"
+    "- Key Attributes: He utilizes the 'Center of Gravity' (COG) technique, "
+    "focusing heavily on precise orbital positioning relative to locked-on "
+    "targets.\n"
+    "- Evasive/Counter Tactics: While predominantly a distant zoner and "
+    "Ki-blast specialist, he employs secondary Strike counters like Shadow "
+    "Crusher and Backflip to punish opponents who attempt to close the gap, "
+    "immediately repositioning to maintain his spatial advantage.\n"
+    "- Output the final result formatted as clean HTML matching the "
+    "`.bento-card` CSS structure, utilizing the exact same metric categories "
+    "and lore sub-headings as the reference file."
 )
 NEWS_PROMPT = (
     "Summarize this DBZ/Xenoverse update into a short, lore-friendly news "
@@ -85,6 +99,62 @@ def _render_bento_card(title: str, content: str, content_class: str) -> str:
     )
 
 
+def _sanitize_dossier_html(generated_html: str) -> str:
+    allowed_tags = {
+        "article",
+        "b",
+        "blockquote",
+        "br",
+        "div",
+        "em",
+        "h1",
+        "h2",
+        "h3",
+        "h4",
+        "h5",
+        "h6",
+        "hr",
+        "i",
+        "li",
+        "ol",
+        "p",
+        "section",
+        "span",
+        "strong",
+        "ul",
+    }
+    soup = BeautifulSoup(generated_html, "html.parser")
+    for element in soup.find_all(["script", "style", "iframe", "object", "svg"]):
+        element.decompose()
+    for element in soup.find_all(True):
+        if element.name not in allowed_tags:
+            element.unwrap()
+            continue
+        classes = element.get("class", [])
+        safe_classes = [
+            name for name in classes
+            if re.fullmatch(r"[A-Za-z0-9_-]+", name)
+        ]
+        element.attrs = {"class": safe_classes} if safe_classes else {}
+    return str(soup).strip()
+
+
+def _render_dossier_html(generated_html: str) -> str:
+    sanitized = _sanitize_dossier_html(generated_html)
+    soup = BeautifulSoup(sanitized, "html.parser")
+    if soup.find("article", class_="bento-card"):
+        return sanitized + "\n"
+    return (
+        '<article class="bento-card">\n'
+        '  <div class="card-topline">\n'
+        '    <span class="card-kicker">LEGA-Z-Y HUB</span>\n'
+        '    <span class="card-index">STAGED UPDATE</span>\n'
+        "  </div>\n"
+        f'  <h2>Kaige</h2>\n  <div class="dossier-content">\n{sanitized}\n'
+        "  </div>\n</article>\n"
+    )
+
+
 def _write_receipt(
     receipt_path: Path,
     generated_files: list[Path],
@@ -109,9 +179,7 @@ def generate_character_dossier() -> tuple[Path, Path]:
     if not reference:
         raise ValueError(f"{REFERENCE_FILE.name} is empty.")
     dossier = _ollama_generate(
-        "Reference profile:\n\n"
-        f"{reference}\n\n"
-        "Write the Kaige dossier using the required structural framework.",
+        f"Reference profile (`aj_profile_reference.txt`):\n\n{reference}",
         DOSSIER_SYSTEM_PROMPT,
     )
     STAGED_DIRECTORY.mkdir(parents=True, exist_ok=True)
@@ -120,10 +188,7 @@ def generate_character_dossier() -> tuple[Path, Path]:
     receipt_path = STAGED_DIRECTORY / (
         f"kaige_dossier_{timestamp.strftime('%Y%m%d_%H%M%S_%fZ')}.txt"
     )
-    html_path.write_text(
-        _render_bento_card("Kaige", dossier, "dossier-content"),
-        encoding="utf-8",
-    )
+    html_path.write_text(_render_dossier_html(dossier), encoding="utf-8")
     _write_receipt(
         receipt_path,
         [html_path, receipt_path],

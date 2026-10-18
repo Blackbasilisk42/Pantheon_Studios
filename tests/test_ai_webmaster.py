@@ -30,7 +30,10 @@ class AIWebmasterTests(unittest.TestCase):
                 patch.object(
                     ai_webmaster,
                     "_ollama_generate",
-                    return_value="Kaige dossier",
+                    return_value=(
+                        '<article class="bento-card"><h2>Kaige</h2>'
+                        "<p>Kaige dossier</p><script>bad()</script></article>"
+                    ),
                 ) as generate,
             ):
                 html_path, receipt_path = ai_webmaster.generate_character_dossier()
@@ -40,8 +43,40 @@ class AIWebmasterTests(unittest.TestCase):
             self.assertIn(
                 "Reference layout", generate.call_args.args[0]
             )
-            self.assertIn("Level 199 Elite Patroller", generate.call_args.args[1])
-            self.assertIn("Kaige dossier", html_path.read_text(encoding="utf-8"))
+            self.assertEqual(
+                generate.call_args.args[1],
+                (
+                    "You are an expert lore writer for the Pantheon Studios "
+                    "Lega-Z-y project. Analyze the provided reference profile "
+                    "(`aj_profile_reference.txt`) for structural layout, "
+                    "category headings, and analytical tone. Using that exact "
+                    "same framework, write a complete character dossier for "
+                    "Kaige.\n\n"
+                    "Integrate these specific details into his Tactical Dossier "
+                    "and Lore Notes:\n\n"
+                    "- Subtitle: Frieza-race // Elite Patroller.\n"
+                    "- Visuals: A tall, original solid black body design with "
+                    "green eyes (a legacy design predating Black Frieza by 6 "
+                    "years) and a dark emerald green aura.\n"
+                    "- Combat Style: A pure Ki-blast primary build.\n"
+                    "- Key Attributes: He utilizes the 'Center of Gravity' "
+                    "(COG) technique, focusing heavily on precise orbital "
+                    "positioning relative to locked-on targets.\n"
+                    "- Evasive/Counter Tactics: While predominantly a distant "
+                    "zoner and Ki-blast specialist, he employs secondary Strike "
+                    "counters like Shadow Crusher and Backflip to punish "
+                    "opponents who attempt to close the gap, immediately "
+                    "repositioning to maintain his spatial advantage.\n"
+                    "- Output the final result formatted as clean HTML matching "
+                    "the `.bento-card` CSS structure, utilizing the exact same "
+                    "metric categories and lore sub-headings as the reference "
+                    "file."
+                ),
+            )
+            generated_html = html_path.read_text(encoding="utf-8")
+            self.assertIn('class="bento-card"', generated_html)
+            self.assertIn("Kaige dossier", generated_html)
+            self.assertNotIn("<script>", generated_html)
 
     def test_news_crawler_stages_text_only_bulletin_and_receipt(self):
         with tempfile.TemporaryDirectory() as temporary:
