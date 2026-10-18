@@ -7,6 +7,7 @@
     <meta name="description" content="Pantheon Studios command center: public links, creator tools, and platform status.">
     <title>PANTHEON STUDIOS // COMMAND CENTER</title>
     <link rel="stylesheet" href="css/command-center.css">
+    <link rel="stylesheet" href="css/webmaster-assistant.css">
     <script src="js/command-center.obfuscated.js" defer></script>
     <script src="js/webmaster-assistant.js" defer></script>
 </head>
@@ -179,7 +180,7 @@
         </footer>
     </div>
     <aside class="webmaster-widget" aria-label="Webmaster assistant">
-        <details>
+        <details open>
             <summary>LOCAL WEBMASTER</summary>
             <div class="webmaster-panel">
                 <h2>Execution Console</h2>
@@ -194,7 +195,7 @@
                     <input id="webmaster-command" name="command" type="text" maxlength="1000" required autocomplete="off">
                     <button class="webmaster-submit" type="submit">RUN REQUEST</button>
                 </form>
-                <p id="webmaster-status" role="status" aria-live="polite">Start the local server to connect.</p>
+                <p id="webmaster-status" role="status" aria-live="polite">Ready to send a local request.</p>
                 <pre id="webmaster-result" aria-live="polite" hidden></pre>
             </div>
         </details>

@@ -1,4 +1,32 @@
 (function () {
+    if (!document.querySelector(".webmaster-widget")) {
+        const widget = document.createElement("aside");
+        widget.className = "webmaster-widget";
+        widget.setAttribute("aria-label", "Webmaster assistant");
+        widget.innerHTML = `
+            <details open>
+                <summary>LOCAL WEBMASTER</summary>
+                <div class="webmaster-panel">
+                    <h2>Execution Console</h2>
+                    <p>Send a request to the local Webmaster engine.</p>
+                    <div class="webmaster-suggestions" aria-label="Example requests">
+                        <button type="button" data-webmaster-command="Update Kaige's dossier">DOSSIER</button>
+                        <button type="button" data-webmaster-command="Run news update">NEWS UPDATE</button>
+                        <button type="button" data-webmaster-command="Check for broken elements">SITE CHECK</button>
+                    </div>
+                    <form id="webmaster-form">
+                        <label for="webmaster-command">Execution request</label>
+                        <input id="webmaster-command" name="command" type="text" maxlength="1000" required autocomplete="off">
+                        <button class="webmaster-submit" type="submit">RUN REQUEST</button>
+                    </form>
+                    <p id="webmaster-status" role="status" aria-live="polite">Ready to send a local request.</p>
+                    <pre id="webmaster-result" aria-live="polite" hidden></pre>
+                </div>
+            </details>
+        `;
+        document.body.append(widget);
+    }
+
     const form = document.getElementById("webmaster-form");
     const commandInput = document.getElementById("webmaster-command");
     const status = document.getElementById("webmaster-status");
