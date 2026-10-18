@@ -111,14 +111,13 @@ class HubServerTests(unittest.TestCase):
                 self.assertIn(b"webmaster-assistant.css", response.data)
                 response.close()
 
-        self.assertEqual(
-            self.client.get("/js/webmaster-assistant.js").status_code,
-            200,
-        )
-        self.assertEqual(
-            self.client.get("/css/webmaster-assistant.css").status_code,
-            200,
-        )
+        for asset in (
+            "/js/webmaster-assistant.js",
+            "/css/webmaster-assistant.css",
+        ):
+            response = self.client.get(asset)
+            self.assertEqual(response.status_code, 200)
+            response.close()
 
     def test_execute_endpoint_routes_character_requests(self):
         dossier = hub_server.ROOT / "staged_updates" / "kaige_dossier.html"
