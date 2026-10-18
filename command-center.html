@@ -8,6 +8,7 @@
     <title>PANTHEON STUDIOS // COMMAND CENTER</title>
     <link rel="stylesheet" href="css/command-center.css">
     <script src="js/command-center.obfuscated.js" defer></script>
+    <script src="js/webmaster-assistant.js" defer></script>
 </head>
 <body>
     <div class="command-center">
@@ -177,5 +178,26 @@
             <a href="index.html">RETURN TO SHOW HUB ↑</a>
         </footer>
     </div>
+    <aside class="webmaster-widget" aria-label="Webmaster assistant">
+        <details>
+            <summary>LOCAL WEBMASTER</summary>
+            <div class="webmaster-panel">
+                <h2>Execution Console</h2>
+                <p>Send a request to the local Webmaster engine.</p>
+                <div class="webmaster-suggestions" aria-label="Example requests">
+                    <button type="button" data-webmaster-command="Update Kaige's dossier">DOSSIER</button>
+                    <button type="button" data-webmaster-command="Run news update">NEWS UPDATE</button>
+                    <button type="button" data-webmaster-command="Check for broken elements">SITE CHECK</button>
+                </div>
+                <form id="webmaster-form">
+                    <label for="webmaster-command">Execution request</label>
+                    <input id="webmaster-command" name="command" type="text" maxlength="1000" required autocomplete="off">
+                    <button class="webmaster-submit" type="submit">RUN REQUEST</button>
+                </form>
+                <p id="webmaster-status" role="status" aria-live="polite">Start the local server to connect.</p>
+                <pre id="webmaster-result" aria-live="polite" hidden></pre>
+            </div>
+        </details>
+    </aside>
 </body>
 </html>
