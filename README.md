@@ -55,5 +55,6 @@ The script stages Kaige's dossier to `staged_updates/kaige_dossier.html` and a
 timestamped payload receipt to `staged_updates/kaige_receipt.txt`. It also runs
 the news crawler immediately, writes `staged_updates/news_bulletin.html`,
 appends to `staged_updates/crawler_receipt.txt`, and repeats news scraping every
-three hours. It never edits `index.html`; review and merge staged content
-manually.
+three hours. If the source is unreachable, it stages an explicit
+`SOURCE UNAVAILABLE` status and records the failure rather than inventing news.
+It never edits `index.html`; review and merge staged content manually.
