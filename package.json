@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "scripts": {
+    "obfuscate": "javascript-obfuscator js/command-center.js --output js/command-center.obfuscated.js --compact true --control-flow-flattening false --rename-globals false --string-array true"
+  },
+  "devDependencies": {
+    "javascript-obfuscator": "^4.1.1"
+  }
+}
