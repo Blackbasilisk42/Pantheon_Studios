@@ -178,6 +178,14 @@ a {
     color: var(--text-muted);
 }
 
+.dossier-content,
+.news-content {
+    color: var(--text-muted);
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+}
+
 .intro-meta strong {
     color: var(--db-gold);
 }
