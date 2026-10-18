@@ -13,9 +13,10 @@ from bs4 import BeautifulSoup
 
 
 ROOT = Path(__file__).resolve().parent
-REFERENCE_FILE = ROOT / "aj_profile_reference.txt"
+DOSSIER_REFERENCE_FILE = ROOT / "dossier.html"
 STAGED_DIRECTORY = ROOT / "staged_updates"
 OLLAMA_URL = "http://127.0.0.1:11434/api/generate"
+OLLAMA_MODEL = "qwen2.5-coder:7b"
 UPDATE_SOURCE_URL = "https://dbxv2.bn-ent.net/"
 ALLOWED_SOURCE_HOSTS = {"dbxv2.bn-ent.net"}
 REQUEST_TIMEOUT_SECONDS = 30
@@ -28,26 +29,23 @@ UPDATE_LINK_PATTERN = re.compile(
     re.IGNORECASE,
 )
 DOSSIER_SYSTEM_PROMPT = (
-    "You are an expert lore writer for the Pantheon Studios Lega-Z-y project. "
-    "Analyze the provided reference profile (`aj_profile_reference.txt`) for "
-    "structural layout, category headings, and analytical tone. Using that "
-    "exact same framework, write a complete character dossier for Kaige.\n\n"
-    "Integrate these specific details into his Tactical Dossier and Lore Notes:\n\n"
-    "- Subtitle: Frieza-race // Elite Patroller.\n"
-    "- Visuals: A tall, original solid black body design with green eyes (a "
-    "legacy design predating Black Frieza by 6 years) and a dark emerald green "
-    "aura.\n"
-    "- Combat Style: A pure Ki-blast primary build.\n"
-    "- Key Attributes: He utilizes the 'Center of Gravity' (COG) technique, "
-    "focusing heavily on precise orbital positioning relative to locked-on "
-    "targets.\n"
-    "- Evasive/Counter Tactics: While predominantly a distant zoner and "
-    "Ki-blast specialist, he employs secondary Strike counters like Shadow "
-    "Crusher and Backflip to punish opponents who attempt to close the gap, "
-    "immediately repositioning to maintain his spatial advantage.\n"
-    "- Output the final result formatted as clean HTML matching the "
-    "`.bento-card` CSS structure, utilizing the exact same metric categories "
-    "and lore sub-headings as the reference file."
+    "Mirror the layout, metric categories, and lore styling of dossier.html. "
+    "Output only a clean HTML block wrapped in a container with the "
+    "`.bento-card` class. Include the dossier's structural sections for the "
+    "character heading, subtitle, power level, combat metrics, equipped combat "
+    "skills, and tactical dossier and lore notes.\n\n"
+    "Hardcoded Kaige character payload:\n"
+    "- Name: KAIGE\n"
+    "- Subtitle: Frieza-Race // Elite Patroller\n"
+    "- Power Level: LEVEL 199 MAX\n"
+    "- Specs: Health 85/100, Ki Specs 100/100, Stamina 88/100, Strike Super "
+    "75/100, Ki Blast Super 98/100\n"
+    "- Visual Details: Tall, original solid black body design, green eyes, "
+    "dark emerald green aura.\n"
+    "- Lore/Tactics: Pure Ki-blast primary build utilizing the Center of "
+    "Gravity (COG) technique for orbital positioning relative to locked-on "
+    "targets. Employs secondary Strike counters including Shadow Crusher and "
+    "Backflip to punish gap-closers and reset distance."
 )
 NEWS_PROMPT = (
     "Summarize this DBZ/Xenoverse update into a short, lore-friendly news "
@@ -69,7 +67,7 @@ def _ollama_generate(prompt: str, system: str) -> str:
     response = requests.post(
         OLLAMA_URL,
         json={
-            "model": "llama3.1",
+            "model": OLLAMA_MODEL,
             "system": system,
             "prompt": prompt,
             "stream": False,
@@ -175,29 +173,69 @@ def _write_receipt(
 
 
 def generate_character_dossier() -> tuple[Path, Path]:
-    reference = REFERENCE_FILE.read_text(encoding="utf-8").strip()
-    if not reference:
-        raise ValueError(f"{REFERENCE_FILE.name} is empty.")
-    dossier = _ollama_generate(
-        f"Reference profile (`aj_profile_reference.txt`):\n\n{reference}",
-        DOSSIER_SYSTEM_PROMPT,
-    )
+    dossier_html = DOSSIER_REFERENCE_FILE.read_text(encoding="utf-8")
+    if not dossier_html.strip():
+        raise ValueError(f"{DOSSIER_REFERENCE_FILE.name} is empty.")
+    dossier_reference = _extract_dossier_reference(dossier_html)
+    dossier = _ollama_generate(dossier_reference, DOSSIER_SYSTEM_PROMPT)
     STAGED_DIRECTORY.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now(timezone.utc)
     html_path = STAGED_DIRECTORY / "kaige_dossier.html"
-    receipt_path = STAGED_DIRECTORY / (
-        f"kaige_dossier_{timestamp.strftime('%Y%m%d_%H%M%S_%fZ')}.txt"
-    )
+    receipt_path = STAGED_DIRECTORY / "kaige_receipt.txt"
     html_path.write_text(_render_dossier_html(dossier), encoding="utf-8")
     _write_receipt(
         receipt_path,
         [html_path, receipt_path],
-        REFERENCE_FILE.name,
+        DOSSIER_REFERENCE_FILE.name,
         timestamp,
     )
     logging.info("Staged character dossier: %s", html_path)
     logging.info("Generated receipt: %s", receipt_path)
     return html_path, receipt_path
+
+
+def _extract_dossier_reference(dossier_html: str) -> str:
+    soup = BeautifulSoup(dossier_html, "html.parser")
+    style = soup.find("style")
+    scripts = "\n".join(script.get_text() for script in soup.find_all("script"))
+    template_match = re.search(
+        r"display\.innerHTML\s*=\s*`(.*?)`;", scripts, re.DOTALL
+    )
+    selectors = {
+        ".dossier-main-panel",
+        ".dossier-header-grid",
+        ".hero-title-group",
+        ".power-rank-badge",
+        ".spec-grid",
+        ".spec-box",
+        ".spec-box-title",
+        ".stat-line",
+        ".stat-name",
+        ".stat-val-num",
+        ".skill-chip-list",
+        ".skill-chip",
+        ".lore-box",
+        ".lore-title",
+    }
+    style_rules = []
+    if style:
+        for rule in re.finditer(r"([^{}]+)\{([^{}]*)\}", style.get_text()):
+            if any(
+                selector in rule.group(1)
+                for selector in selectors
+            ):
+                style_rules.append(rule.group(0).strip())
+    template = template_match.group(1).strip() if template_match else ""
+    if not template or not style_rules:
+        raise ValueError(
+            "Could not extract dossier structure and styles from dossier.html."
+        )
+    return (
+        "Dossier HTML structural reference:\n"
+        f"{template}\n\n"
+        "Relevant dossier CSS rules:\n"
+        + "\n".join(style_rules)
+    )
 
 
 def _validate_source_url(source_url: str) -> str:
