@@ -43,16 +43,17 @@ backend does not add metrics to the remotely hosted static site.
 
 ## Human-reviewed update staging
 
-Add `aj_profile_reference.txt` to the repository root with the profile whose
-structure should be followed. Install/run Ollama locally and pull `llama3.1`.
-Then run:
+The dossier generator reads its layout reference from `dossier.html`. Install
+and run Ollama locally with the `qwen2.5-coder:7b` model available, then run:
 
 ```powershell
 .\.venv\Scripts\python.exe ai_webmaster.py
 ```
 
-The script immediately stages Kaige's dossier, then runs the news crawler every
-three hours. It scrapes official Xenoverse links on `dbxv2.bn-ent.net` and uses
-Ollama at `127.0.0.1:11434`. Generated HTML and receipts are written under
+The script immediately stages Kaige's dossier to
+`staged_updates/kaige_dossier.html` and writes a timestamped receipt log to
+`staged_updates/kaige_receipt.txt`, then runs the news crawler every three
+hours. It scrapes official Xenoverse links on `dbxv2.bn-ent.net` and uses Ollama
+at `127.0.0.1:11434`. Generated HTML and receipts are written under
 `staged_updates/`. It never edits `index.html`; review and merge staged content
 manually.

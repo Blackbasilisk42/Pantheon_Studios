@@ -17,15 +17,24 @@ class AIWebmasterTests(unittest.TestCase):
         self.assertIn("&lt;img", card)
         self.assertNotIn("<img", card)
 
-    def test_dossier_generation_reads_reference_and_stages_receipt(self):
+    def test_dossier_generation_reads_html_and_stages_fixed_receipt(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            reference = root / "aj_profile_reference.txt"
-            reference.write_text("Reference layout", encoding="utf-8")
+            reference = root / "dossier.html"
+            reference.write_text(
+                "<style>.spec-box { display: grid; }"
+                ".lore-box { color: gold; }</style>"
+                "<script>display.innerHTML = `"
+                '<div class="spec-box">COMBAT METRICS &amp; SPECS</div>'
+                '<div class="lore-box"><div class="lore-title">'
+                "TACTICAL DOSSIER &amp; LORE NOTES</div></div>`;</script>"
+                "<p>private unrelated content</p>",
+                encoding="utf-8",
+            )
             staged = root / "staged_updates"
             with (
                 patch.object(ai_webmaster, "ROOT", root),
-                patch.object(ai_webmaster, "REFERENCE_FILE", reference),
+                patch.object(ai_webmaster, "DOSSIER_REFERENCE_FILE", reference),
                 patch.object(ai_webmaster, "STAGED_DIRECTORY", staged),
                 patch.object(
                     ai_webmaster,
@@ -39,44 +48,25 @@ class AIWebmasterTests(unittest.TestCase):
                 html_path, receipt_path = ai_webmaster.generate_character_dossier()
 
             self.assertEqual(html_path.name, "kaige_dossier.html")
+            self.assertEqual(receipt_path.name, "kaige_receipt.txt")
             self.assertTrue(receipt_path.is_file())
-            self.assertIn(
-                "Reference layout", generate.call_args.args[0]
-            )
-            self.assertEqual(
-                generate.call_args.args[1],
-                (
-                    "You are an expert lore writer for the Pantheon Studios "
-                    "Lega-Z-y project. Analyze the provided reference profile "
-                    "(`aj_profile_reference.txt`) for structural layout, "
-                    "category headings, and analytical tone. Using that exact "
-                    "same framework, write a complete character dossier for "
-                    "Kaige.\n\n"
-                    "Integrate these specific details into his Tactical Dossier "
-                    "and Lore Notes:\n\n"
-                    "- Subtitle: Frieza-race // Elite Patroller.\n"
-                    "- Visuals: A tall, original solid black body design with "
-                    "green eyes (a legacy design predating Black Frieza by 6 "
-                    "years) and a dark emerald green aura.\n"
-                    "- Combat Style: A pure Ki-blast primary build.\n"
-                    "- Key Attributes: He utilizes the 'Center of Gravity' "
-                    "(COG) technique, focusing heavily on precise orbital "
-                    "positioning relative to locked-on targets.\n"
-                    "- Evasive/Counter Tactics: While predominantly a distant "
-                    "zoner and Ki-blast specialist, he employs secondary Strike "
-                    "counters like Shadow Crusher and Backflip to punish "
-                    "opponents who attempt to close the gap, immediately "
-                    "repositioning to maintain his spatial advantage.\n"
-                    "- Output the final result formatted as clean HTML matching "
-                    "the `.bento-card` CSS structure, utilizing the exact same "
-                    "metric categories and lore sub-headings as the reference "
-                    "file."
-                ),
-            )
+            dossier_reference, system_prompt = generate.call_args.args
+            self.assertIn("COMBAT METRICS", dossier_reference)
+            self.assertIn("TACTICAL DOSSIER", dossier_reference)
+            self.assertIn(".spec-box", dossier_reference)
+            self.assertNotIn("private unrelated content", dossier_reference)
+            self.assertIn("Name: KAIGE", system_prompt)
+            self.assertIn("Frieza-Race // Elite Patroller", system_prompt)
+            self.assertIn("Health 85/100", system_prompt)
+            self.assertIn("Ki Blast Super 98/100", system_prompt)
+            self.assertIn("Center of Gravity (COG)", system_prompt)
+            self.assertIn("`dossier.html`", system_prompt)
+            self.assertIn("`.bento-card`", system_prompt)
             generated_html = html_path.read_text(encoding="utf-8")
             self.assertIn('class="bento-card"', generated_html)
             self.assertIn("Kaige dossier", generated_html)
             self.assertNotIn("<script>", generated_html)
+            self.assertIn("Generated at (UTC):", receipt_path.read_text(encoding="utf-8"))
 
     def test_news_crawler_stages_text_only_bulletin_and_receipt(self):
         with tempfile.TemporaryDirectory() as temporary:
