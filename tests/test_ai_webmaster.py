@@ -24,6 +24,7 @@ class AIWebmasterTests(unittest.TestCase):
             reference.write_text("Reference layout", encoding="utf-8")
             staged = root / "staged_updates"
             with (
+                patch.object(ai_webmaster, "ROOT", root),
                 patch.object(ai_webmaster, "REFERENCE_FILE", reference),
                 patch.object(ai_webmaster, "STAGED_DIRECTORY", staged),
                 patch.object(
@@ -44,11 +45,13 @@ class AIWebmasterTests(unittest.TestCase):
 
     def test_news_crawler_stages_text_only_bulletin_and_receipt(self):
         with tempfile.TemporaryDirectory() as temporary:
-            staged = Path(temporary)
+            root = Path(temporary)
+            staged = root / "staged_updates"
             pages = [
                 ("https://dbxv2.bn-ent.net/update/", "Official update text")
             ]
             with (
+                patch.object(ai_webmaster, "ROOT", root),
                 patch.object(ai_webmaster, "STAGED_DIRECTORY", staged),
                 patch.object(
                     ai_webmaster, "_scrape_update_sources", return_value=pages
