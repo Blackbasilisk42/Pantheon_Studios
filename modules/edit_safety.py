@@ -45,7 +45,6 @@ def _backup_existing(
 
 def _record_edit(
     root: Path,
-    target: Path,
     relative_target: Path,
     action: str,
     backup: Path | None,
@@ -77,7 +76,6 @@ def write_text(
         )
         _record_edit(
             resolved_root,
-            resolved_target,
             relative_target,
             action,
             backup,
@@ -103,7 +101,6 @@ def write_bytes(
         )
         _record_edit(
             resolved_root,
-            resolved_target,
             relative_target,
             action,
             backup,
@@ -129,7 +126,6 @@ def append_text(
         )
         _record_edit(
             resolved_root,
-            resolved_target,
             relative_target,
             action,
             backup,
@@ -153,7 +149,6 @@ def delete_file(target: Path, action: str, root: Path) -> Path:
         )
         _record_edit(
             resolved_root,
-            resolved_target,
             relative_target,
             action,
             backup,
