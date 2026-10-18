@@ -3,6 +3,7 @@ import shutil
 import threading
 from datetime import datetime, timezone
 from pathlib import Path
+from uuid import uuid4
 
 
 BACKUP_DIRECTORY_NAME = "backups"
@@ -37,7 +38,12 @@ def _backup_existing(
     if not target.is_file():
         return None
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
-    backup = root / BACKUP_DIRECTORY_NAME / timestamp / relative_target
+    backup = (
+        root
+        / BACKUP_DIRECTORY_NAME
+        / f"{timestamp}_{uuid4().hex[:8]}"
+        / relative_target
+    )
     backup.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(target, backup)
     return backup
