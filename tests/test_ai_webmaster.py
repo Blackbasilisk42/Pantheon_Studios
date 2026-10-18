@@ -132,9 +132,12 @@ class AIWebmasterTests(unittest.TestCase):
             "_scrape_update_sources",
             side_effect=OSError("connection unavailable"),
         ):
-            result = ai_webmaster.run_news_crawler()
+            with self.assertLogs(level="WARNING") as logs:
+                result = ai_webmaster.run_news_crawler()
 
         self.assertIsNotNone(result)
+        self.assertIn("News crawler source unavailable", logs.output[0])
+        self.assertNotIn("Traceback", "\n".join(logs.output))
         html_path, receipt_path = result
         self.assertIn(
             "SOURCE UNAVAILABLE",

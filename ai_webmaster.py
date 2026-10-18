@@ -494,7 +494,10 @@ def run_news_crawler() -> tuple[Path, Path] | None:
         UnicodeError,
         ValueError,
     ) as error:
-        logging.exception("News crawler run failed: %s", error)
+        logging.warning(
+            "News crawler source unavailable; staging status (%s).",
+            error,
+        )
         try:
             STAGED_DIRECTORY.mkdir(parents=True, exist_ok=True)
             edit_safety.write_text(
