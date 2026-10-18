@@ -96,6 +96,30 @@ class HubServerTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         response.close()
 
+    def test_assistant_assets_are_loaded_on_site_pages(self):
+        for page in (
+            "command-center.html",
+            "index.html",
+            "dossier.html",
+            "builder.html",
+            "dossier-builder.html",
+        ):
+            with self.subTest(page=page):
+                response = self.client.get(f"/{page}")
+                self.assertEqual(response.status_code, 200)
+                self.assertIn(b"webmaster-assistant.js", response.data)
+                self.assertIn(b"webmaster-assistant.css", response.data)
+                response.close()
+
+        self.assertEqual(
+            self.client.get("/js/webmaster-assistant.js").status_code,
+            200,
+        )
+        self.assertEqual(
+            self.client.get("/css/webmaster-assistant.css").status_code,
+            200,
+        )
+
     def test_execute_endpoint_routes_character_requests(self):
         dossier = hub_server.ROOT / "staged_updates" / "kaige_dossier.html"
         receipt = hub_server.ROOT / "staged_updates" / "kaige_receipt.txt"

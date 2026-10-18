@@ -55,8 +55,11 @@ previous file version is copied to `backups/` and the action, UTC timestamp,
 target, and snapshot path are appended to `edit_log.jsonl`. A rollback restores
 or removes the target of the latest logged write and itself creates an audited
 snapshot.
-The Command Center includes a compact assistant widget for submitting these
-requests when opened through the local server.
+The Command Center, show hub, dossier pages, and character builder include the
+assistant widget for submitting requests. The local-only backend must be
+running; access the interactive panel at `http://127.0.0.1:5000/command-center.html`.
+On pages covered by the existing maintenance or sign-in overlays, the widget
+remains behind the overlay until that page is unlocked.
 
 The browser JavaScript is built from the readable `js/command-center.js` source:
 
