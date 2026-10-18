@@ -20,6 +20,7 @@ OLLAMA_MODEL = "qwen2.5-coder:7b"
 UPDATE_SOURCE_URL = "https://dbxv2.bn-ent.net/"
 ALLOWED_SOURCE_HOSTS = {"dbxv2.bn-ent.net"}
 REQUEST_TIMEOUT_SECONDS = 30
+OLLAMA_TIMEOUT_SECONDS = 300
 MAX_PAGE_BYTES = 2_000_000
 MAX_SOURCE_CHARACTERS = 20_000
 MAX_DOSSIER_CHARACTERS = 12_000
@@ -72,7 +73,7 @@ def _ollama_generate(prompt: str, system: str) -> str:
             "prompt": prompt,
             "stream": False,
         },
-        timeout=REQUEST_TIMEOUT_SECONDS,
+        timeout=OLLAMA_TIMEOUT_SECONDS,
     )
     response.raise_for_status()
     payload = response.json()
