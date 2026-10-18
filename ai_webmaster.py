@@ -415,17 +415,47 @@ def _news_bulletin_html(pages: list[tuple[str, str, str]]) -> str:
     return str(card)
 
 
-def _append_crawler_receipt(pages: list[tuple[str, str, str]]) -> None:
+def _append_crawler_receipt(
+    status: str,
+    pages: list[tuple[str, str, str]],
+    error: str | None = None,
+) -> None:
     receipt = (
         f"Timestamp (UTC): {_timestamp().isoformat()}\n"
-        "Status: news bulletin staged\n"
+        f"Status: {status}\n"
         f"Output: {NEWS_OUTPUT.relative_to(ROOT)}\n"
         "Sources:\n"
-        + "\n".join(f"- {url}: {title}" for url, title, _ in pages)
-        + "\n\n"
+        + (
+            "\n".join(f"- {url}: {title}" for url, title, _ in pages)
+            if pages
+            else f"- {UPDATE_SOURCE_URL}\n"
+        )
+        + (f"Error: {error}\n" if error else "")
+        + "\n"
     )
     with NEWS_RECEIPT.open("a", encoding="utf-8") as receipt_file:
         receipt_file.write(receipt)
+
+
+def _news_unavailable_html(error: str) -> str:
+    soup = BeautifulSoup(
+        '<article class="bento-card news-card">'
+        '<div class="card-topline"><span class="card-index">'
+        'CRAWLER STATUS</span></div>'
+        '<h2 class="card-header">SOURCE UNAVAILABLE</h2>'
+        '<section class="metrics-section"><h3>UPDATE DETAILS</h3><p></p></section>'
+        '<section class="lore-section"><h3>SOURCE</h3><p></p></section>'
+        "</article>",
+        "html.parser",
+    )
+    soup.select_one(".metrics-section p").string = (
+        "No update content was staged because the official source could not "
+        "be reached."
+    )
+    soup.select_one(".lore-section p").string = (
+        f"{UPDATE_SOURCE_URL} — {error}"
+    )
+    return str(soup.article)
 
 
 def run_news_crawler() -> tuple[Path, Path] | None:
@@ -433,7 +463,7 @@ def run_news_crawler() -> tuple[Path, Path] | None:
         pages = _scrape_update_sources()
         STAGED_DIRECTORY.mkdir(parents=True, exist_ok=True)
         NEWS_OUTPUT.write_text(_news_bulletin_html(pages) + "\n", encoding="utf-8")
-        _append_crawler_receipt(pages)
+        _append_crawler_receipt("news bulletin staged", pages)
         logging.info("Staged news bulletin: %s", NEWS_OUTPUT)
         logging.info("Appended crawler receipt: %s", NEWS_RECEIPT)
         return NEWS_OUTPUT, NEWS_RECEIPT
@@ -444,7 +474,21 @@ def run_news_crawler() -> tuple[Path, Path] | None:
         ValueError,
     ) as error:
         logging.exception("News crawler run failed: %s", error)
-        return None
+        try:
+            STAGED_DIRECTORY.mkdir(parents=True, exist_ok=True)
+            NEWS_OUTPUT.write_text(
+                _news_unavailable_html(str(error)) + "\n",
+                encoding="utf-8",
+            )
+            _append_crawler_receipt(
+                "source unavailable; no news staged",
+                [],
+                str(error),
+            )
+            return NEWS_OUTPUT, NEWS_RECEIPT
+        except OSError:
+            logging.exception("Unable to write crawler failure status.")
+            return None
 
 
 def main() -> None:
