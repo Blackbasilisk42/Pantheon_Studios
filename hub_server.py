@@ -282,7 +282,7 @@ def execute_command():
         action, result = _dispatch_command(command)
     except ValueError as error:
         return jsonify({"error": str(error)}), 400
-    except (OSError, RuntimeError, UnicodeError):
+    except (OSError, requests.RequestException, RuntimeError, UnicodeError):
         app.logger.exception("Webmaster command failed.")
         return jsonify({"error": "Webmaster command failed."}), 500
 
