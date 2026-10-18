@@ -86,6 +86,9 @@ class AIWebmasterTests(unittest.TestCase):
 
         soup = BeautifulSoup(html_path.read_text(encoding="utf-8"), "html.parser")
         self.assertIsNotNone(soup.select_one(".bento-card"))
+        self.assertIsNotNone(soup.select_one(".card-header"))
+        self.assertIsNotNone(soup.select_one(".metrics-section"))
+        self.assertIsNotNone(soup.select_one(".lore-section"))
         self.assertIn("LEVEL 199 MAX", soup.get_text(" ", strip=True))
         self.assertIn("fallback template", receipt_path.read_text(encoding="utf-8"))
 

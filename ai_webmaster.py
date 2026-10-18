@@ -187,16 +187,17 @@ def _fallback_dossier_card() -> str:
         '<article class="bento-card dossier-main-panel">'
         '<div class="dossier-header-grid">'
         '<div class="big-avatar"></div>'
-        '<div class="hero-title-group"><h1></h1><div class="spec-tag"></div></div>'
+        '<div class="hero-title-group"><h1 class="card-header"></h1>'
+        '<div class="spec-tag"></div></div>'
         '<div class="power-rank-badge">'
         '<div class="power-rank-label">RECORDED POWER LEVEL</div>'
         '<div class="power-rank-value"></div></div></div>'
         '<div class="spec-grid">'
-        '<div class="spec-box"><div class="spec-box-title">'
+        '<div class="spec-box metrics-section"><div class="spec-box-title">'
         'COMBAT METRICS &amp; SPECS</div></div>'
         '<div class="spec-box"><div class="spec-box-title">'
         'EQUIPPED COMBAT SKILLS</div><div class="skill-chip-list"></div></div>'
-        '</div><div class="lore-box"><div class="lore-title">'
+        '</div><div class="lore-box lore-section"><div class="lore-title">'
         'TACTICAL DOSSIER &amp; LORE NOTES</div></div></article>',
         "html.parser",
     )
