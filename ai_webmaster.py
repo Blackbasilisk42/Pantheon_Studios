@@ -96,6 +96,15 @@ def _replace_contents(element: Tag, text: str) -> None:
     element.append(text)
 
 
+def _class_names(element: Tag) -> list[str]:
+    classes = element.get("class")
+    if isinstance(classes, str):
+        return classes.split()
+    if isinstance(classes, list):
+        return [name for name in classes if isinstance(name, str)]
+    return []
+
+
 def _template_markup(source: BeautifulSoup) -> str:
     scripts = "\n".join(
         script.get_text() for script in source.find_all("script")
@@ -173,13 +182,13 @@ def _relevant_styles(source: BeautifulSoup, card: Tag) -> str:
     classes = {
         class_name
         for element in card.find_all(True)
-        for class_name in element.get("class", [])
+        for class_name in _class_names(element)
     }
-    classes.update(card.get("class", []))
+    classes.update(_class_names(card))
     ids = {
-        element.get("id")
+        element_id
         for element in card.find_all(True)
-        if element.get("id")
+        if isinstance((element_id := element.get("id")), str)
     }
     rules = []
     for match in re.finditer(r"([^{}]+)\{([^{}]*)\}", style.get_text()):
@@ -215,13 +224,15 @@ def _fallback_dossier_card() -> str:
         'TACTICAL DOSSIER &amp; LORE NOTES</div></div></article>',
         "html.parser",
     )
-    card = soup.article
+    card = _require_tag(soup.article, "fallback dossier card")
     _inject_kaige(card)
     return str(card)
 
 
 def _inject_kaige(card: Tag) -> None:
-    card["class"] = list(dict.fromkeys([*card.get("class", []), "bento-card"]))
+    card["class"] = " ".join(
+        dict.fromkeys([*_class_names(card), "bento-card"])
+    )
     card.attrs.pop("id", None)
     avatar = card.select_one(".big-avatar")
     if avatar:
@@ -278,7 +289,7 @@ def _inject_kaige(card: Tag) -> None:
                 ).span,
                 "skill chip",
             )
-            chip["class"] = ["skill-chip", skill["type"]]
+            chip["class"] = f"skill-chip {skill['type']}"
             chip.string = skill["name"]
             skills.append(chip)
     lore_box = card.select_one(".lore-box")
