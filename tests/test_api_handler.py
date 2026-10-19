@@ -1,9 +1,10 @@
 import json
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import api_handler
 import context_builder
+from openai import OpenAIError
 
 
 class APIHandlerTests(unittest.TestCase):
@@ -32,13 +33,14 @@ class APIHandlerTests(unittest.TestCase):
             )
 
     @patch.dict("os.environ", {"API_KEY": "test-key"}, clear=True)
-    @patch("api_handler.OpenAI")
-    def test_answer_query_sends_context_and_uses_configured_client(self, client_type):
+    @patch("api_handler._client")
+    def test_answer_query_sends_context_and_uses_cloud_first(self, get_client):
         message = type("Message", (), {"content": '{"reply":"Kaige has high Ki blast stats.","redirect":null}'})
         choice = type("Choice", (), {"message": message})
         response = type("Response", (), {"choices": [choice]})
-        client = client_type.return_value
+        client = Mock()
         client.chat.completions.create.return_value = response
+        get_client.return_value = (client, "gemini-test")
         context = {
             "snippets": [{"source": "dossier.html", "text": "KI BLAST: 98 / 100"}],
             "navigation": context_builder.build_context("stats")["navigation"],
@@ -50,16 +52,120 @@ class APIHandlerTests(unittest.TestCase):
             result,
             {"reply": "Kaige has high Ki blast stats.", "redirect": None},
         )
-        client_type.assert_called_once()
+        get_client.assert_called_once()
         self.assertIn(
             "KI BLAST: 98 / 100",
             client.chat.completions.create.call_args.kwargs["messages"][1]["content"],
         )
 
+    @patch.dict("os.environ", {"API_KEY": "test-key"}, clear=True)
+    @patch("api_handler._local_answer_query")
+    @patch("api_handler._request_answer", side_effect=OpenAIError("rate limited"))
+    @patch("api_handler._client", return_value=(object(), "gemini-test"))
+    def test_cloud_rate_limit_falls_back_to_ollama(
+        self,
+        get_client,
+        request_answer,
+        local_answer,
+    ):
+        local_answer.return_value = {
+            "reply": "Local fallback response.",
+            "redirect": None,
+        }
+        context = {"snippets": [], "navigation": {}}
+
+        result = api_handler.answer_query("What is on the site?", context)
+
+        self.assertEqual(
+            result,
+            {"reply": "Local fallback response.", "redirect": None},
+        )
+        request_answer.assert_called_once()
+        local_answer.assert_called_once()
+        self.assertEqual(local_answer.call_args.args[0], "What is on the site?")
+
     @patch.dict("os.environ", {}, clear=True)
-    def test_answer_query_requires_api_key(self):
-        with self.assertRaises(api_handler.APIConfigurationError):
-            api_handler.answer_query("What is on the site?", {"snippets": [], "navigation": {}})
+    @patch("api_handler._local_answer_query")
+    def test_missing_cloud_key_uses_ollama(self, local_answer):
+        local_answer.return_value = {
+            "reply": "Answered offline.",
+            "redirect": "index.html#dossier-container",
+        }
+
+        result = api_handler.answer_query(
+            "Show me the roster",
+            {"snippets": [], "navigation": {}},
+        )
+
+        self.assertEqual(result["reply"], "Answered offline.")
+        self.assertEqual(
+            result["redirect"],
+            "index.html#dossier-container",
+        )
+        local_answer.assert_called_once()
+
+    @patch.dict(
+        "os.environ",
+        {
+            "API_KEY": "test-key",
+            "OLLAMA_BASE_URL": "http://localhost:11434/v1",
+            "OLLAMA_MODEL": "phi3",
+        },
+        clear=True,
+    )
+    @patch("api_handler.OpenAI")
+    def test_local_fallback_uses_configured_ollama_endpoint(self, openai_client):
+        result_message = type(
+            "Message",
+            (),
+            {"content": '{"reply":"Offline answer.","redirect":null}'},
+        )
+        choice = type("Choice", (), {"message": result_message})
+        response = type("Response", (), {"choices": [choice]})
+        client = openai_client.return_value
+        client.chat.completions.create.return_value = response
+
+        result = api_handler._local_answer_query(
+            "Question?",
+            '{"snippets":[],"navigation":{}}',
+        )
+
+        self.assertEqual(result["reply"], "Offline answer.")
+        openai_client.assert_called_once_with(
+            api_key="ollama",
+            base_url="http://localhost:11434/v1",
+            timeout=60,
+            max_retries=0,
+        )
+        self.assertEqual(
+            client.chat.completions.create.call_args.kwargs["model"],
+            "phi3",
+        )
+
+    @patch.dict("os.environ", {"API_KEY": "test-key"}, clear=True)
+    @patch(
+        "api_handler._local_answer_query",
+        side_effect=api_handler.APIRequestError("Ollama is offline."),
+    )
+    @patch(
+        "api_handler._request_answer",
+        side_effect=OpenAIError("cloud unavailable"),
+    )
+    @patch("api_handler._client", return_value=(object(), "gemini-test"))
+    def test_reports_cloud_and_local_errors_if_both_providers_fail(
+        self,
+        get_client,
+        request_answer,
+        local_answer,
+    ):
+        with self.assertRaisesRegex(
+            api_handler.APIRequestError,
+            "Cloud request failed .* local fallback failed: Ollama is offline",
+        ):
+            api_handler.answer_query(
+                "Question?",
+                {"snippets": [], "navigation": {}},
+            )
 
 
 if __name__ == "__main__":
