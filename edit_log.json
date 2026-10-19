@@ -1,0 +1,74 @@
+[
+  {
+    "timestamp": "2026-10-18T19:26:36.129492+00:00",
+    "action": "generate character dossier",
+    "target": "staged_updates/kaige_dossier.html",
+    "backup": "backups/20261018T192636122197Z_e77191bc/staged_updates/kaige_dossier.html"
+  },
+  {
+    "timestamp": "2026-10-18T19:26:36.143504+00:00",
+    "action": "write dossier generation receipt",
+    "target": "staged_updates/kaige_receipt.txt",
+    "backup": "backups/20261018T192636132494Z_8125c2f4/staged_updates/kaige_receipt.txt"
+  },
+  {
+    "timestamp": "2026-10-18T19:26:36.576012+00:00",
+    "action": "stage crawler unavailable status",
+    "target": "staged_updates/news_bulletin.html",
+    "backup": "backups/20261018T192636565365Z_9bd8efab/staged_updates/news_bulletin.html"
+  },
+  {
+    "timestamp": "2026-10-18T19:26:36.590742+00:00",
+    "action": "append news crawler receipt",
+    "target": "staged_updates/crawler_receipt.txt",
+    "backup": "backups/20261018T192636579717Z_ee2b22b5/staged_updates/crawler_receipt.txt"
+  },
+  {
+    "timestamp": "2026-10-18T19:30:05.142230+00:00",
+    "action": "generate character dossier",
+    "target": "staged_updates/kaige_dossier.html",
+    "backup": "backups/20261018T193005140226Z_0cb4eefd/staged_updates/kaige_dossier.html"
+  },
+  {
+    "timestamp": "2026-10-18T19:30:05.159080+00:00",
+    "action": "write dossier generation receipt",
+    "target": "staged_updates/kaige_receipt.txt",
+    "backup": "backups/20261018T193005146239Z_b8b7a179/staged_updates/kaige_receipt.txt"
+  },
+  {
+    "timestamp": "2026-10-18T19:30:05.425190+00:00",
+    "action": "stage crawler unavailable status",
+    "target": "staged_updates/news_bulletin.html",
+    "backup": "backups/20261018T193005420787Z_fa8f7e18/staged_updates/news_bulletin.html"
+  },
+  {
+    "timestamp": "2026-10-18T19:30:05.443742+00:00",
+    "action": "append news crawler receipt",
+    "target": "staged_updates/crawler_receipt.txt",
+    "backup": "backups/20261018T193005428193Z_6c9287dd/staged_updates/crawler_receipt.txt"
+  },
+  {
+    "timestamp": "2026-10-19T19:12:21.399905+00:00",
+    "action": "generate character dossier",
+    "target": "staged_updates/kaige_dossier.html",
+    "backup": "backups/20261019T191221397902Z_80b587ee_staged_updates__kaige_dossier.html"
+  },
+  {
+    "timestamp": "2026-10-19T19:12:21.406105+00:00",
+    "action": "write dossier generation receipt",
+    "target": "staged_updates/kaige_receipt.txt",
+    "backup": "backups/20261019T191221405474Z_8623d5e3_staged_updates__kaige_receipt.txt"
+  },
+  {
+    "timestamp": "2026-10-19T19:12:21.732848+00:00",
+    "action": "stage crawler unavailable status",
+    "target": "staged_updates/news_bulletin.html",
+    "backup": "backups/20261019T191221722738Z_9a5b754c_staged_updates__news_bulletin.html"
+  },
+  {
+    "timestamp": "2026-10-19T19:12:21.747199+00:00",
+    "action": "append news crawler receipt",
+    "target": "staged_updates/crawler_receipt.txt",
+    "backup": "backups/20261019T191221745197Z_9e9971f8_staged_updates__crawler_receipt.txt"
+  }
+]
