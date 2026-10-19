@@ -71,7 +71,7 @@
                 body: JSON.stringify({ command: command })
             });
             if (response.status === 404) {
-                throw new Error("Local Webmaster API unavailable. Start hub_server.py.");
+                throw new Error("Local Webmaster API unavailable. Start server.py.");
             }
             const payload = await response.json();
             if (!payload || typeof payload !== "object") {
@@ -86,11 +86,23 @@
             }
 
             status.textContent = "Completed: " + payload.action;
-            result.textContent = JSON.stringify(payload.result, null, 2);
+            result.textContent = typeof payload.message === "string"
+                ? payload.message
+                : JSON.stringify(payload.result, null, 2);
+            if (
+                payload.navigation &&
+                payload.navigation.type === "navigate" &&
+                typeof payload.navigation.target === "string"
+            ) {
+                const navigationLink = document.createElement("a");
+                navigationLink.href = payload.navigation.target;
+                navigationLink.textContent = "Open " + payload.navigation.target;
+                result.append(document.createTextNode("\n"), navigationLink);
+            }
             result.hidden = false;
         } catch (error) {
             status.textContent = error instanceof TypeError
-                ? "Unable to reach the local engine. Start hub_server.py."
+                ? "Unable to reach the local engine. Start server.py."
                 : error instanceof Error
                     ? error.message
                     : String(error);

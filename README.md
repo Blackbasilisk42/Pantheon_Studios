@@ -18,10 +18,14 @@ They are not a production API for the public GitHub Pages site.
    Discord requires a bot token and guild ID (the guild must expose its
    preview/presence data); Meta requires a Graph API access token with permission
    to read the configured Page's follower count and the Page ID.
-3. Start the server and visit `http://127.0.0.1:5000/`:
+3. Optionally set `API_KEY`, `API_BASE_URL`, and `API_MODEL` in `.env` to
+   enable conversational site questions. The defaults use Google AI Studio's
+   OpenAI-compatible endpoint; Groq can be selected by setting its
+   OpenAI-compatible base URL and model.
+4. Start the server and visit `http://127.0.0.1:5000/`:
 
    ```powershell
-   python hub_server.py
+   python server.py
    ```
 
 The server binds only to `127.0.0.1`. `/api/metrics` returns a fixed JSON shape
@@ -30,10 +34,10 @@ logging credentials and produce HTTP 502. Missing credentials leave that
 provider disconnected. Keep `.env` private and rotate any credential that was
 ever committed or shared.
 
-The server also runs the Webmaster's dossier and news routines in a background
-scheduler. It generates a dossier and runs a news crawl at startup, refreshes
-news every three hours, and regenerates the dossier daily. The threaded Flask
-server remains available while those jobs run.
+The persistent Flask service also runs the Webmaster's dossier and news
+routines in a background scheduler. It generates a dossier and runs a news
+crawl at startup, refreshes news every three hours, and regenerates the dossier
+daily. The threaded server remains available while those jobs run.
 
 `POST /api/execute` accepts a JSON `command` and routes recognized requests to
 the dossier generator, news crawler, deterministic official-source formatter,
@@ -46,15 +50,20 @@ Invoke-RestMethod -Method Post -Uri http://127.0.0.1:5000/api/execute `
   -Body '{"command":"Check for broken elements"}'
 ```
 
-The endpoint dispatches only these known routines; it does not interpret
-requests as Python or shell commands. An "official source" staging command
-scrapes the allowlisted publisher, uses its first heading and text as-is, and
-does not call an external text-generation service. `/api/health` runs the
-local-reference check directly. Before Webmaster output files are changed, the
-previous file version is copied to `backups/` and the action, UTC timestamp,
-target, and snapshot path are appended to `edit_log.jsonl`. A rollback restores
-or removes the target of the latest logged write and itself creates an audited
-snapshot.
+The endpoint dispatches exact maintenance commands locally and does not
+interpret requests as Python or shell commands. An "official source" staging
+command scrapes the allowlisted publisher, uses its first heading and text
+as-is, and does not call an external text-generation service. Open-ended
+questions use local TF-IDF retrieval over site pages, project Markdown, and
+site logs before calling the configured OpenAI-compatible API. The model can
+request navigation only to targets in the local site map; the console presents
+that target as a link. `/api/health` runs the local-reference check directly.
+Before Webmaster output files are changed, the previous file version is copied
+to `backups/` under a timestamped filename. Actions, UTC timestamps, targets,
+and snapshot paths are stored in `edit_log.json`; existing `edit_log.jsonl`
+history is retained and imported when the JSON log is first written. A
+rollback restores or removes the target of the latest logged write and itself
+creates an audited snapshot.
 The Command Center, show hub, dossier pages, and character builder include the
 assistant widget for submitting requests. The local-only backend must be
 running; access the interactive panel at `http://127.0.0.1:5000/command-center.html`.
