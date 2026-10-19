@@ -93,11 +93,19 @@ def _plain_text(path: Path) -> str:
             ["h1", "h2", "h3", "h4", "p", "li", "label", "button"]
         )
         if blocks:
-            return "\n\n".join(
-                text
-                for block in blocks
-                if (text := block.get_text(" ", strip=True))
-            )
+            paragraphs = []
+            headings = []
+            for block in blocks:
+                text = block.get_text(" ", strip=True)
+                if not text:
+                    continue
+                if block.name in {"h1", "h2", "h3", "h4"}:
+                    headings.append(text)
+                    continue
+                paragraphs.append(" ".join([*headings, text]))
+                headings.clear()
+            paragraphs.extend(headings)
+            return "\n\n".join(paragraphs)
         return content_root.get_text(" ", strip=True)
     return content
 
