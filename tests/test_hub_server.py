@@ -144,6 +144,90 @@ class HubServerTests(unittest.TestCase):
         )
         generate.assert_called_once()
 
+    def test_exact_news_command_bypasses_context_and_cloud_api(self):
+        bulletin = hub_server.ROOT / "staged_updates" / "news_bulletin.html"
+        receipt = hub_server.ROOT / "staged_updates" / "crawler_receipt.txt"
+        with (
+            patch(
+                "hub_server.ai_webmaster.run_news_crawler",
+                return_value=(bulletin, receipt),
+            ) as run_news,
+            patch("hub_server.context_builder.build_context") as build_context,
+            patch("hub_server.api_handler.answer_query") as answer_query,
+        ):
+            response = self.client.post(
+                "/api/execute",
+                json={"command": "NEWS UPDATE"},
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json()["action"], "run_news_crawler")
+        run_news.assert_called_once()
+        build_context.assert_not_called()
+        answer_query.assert_not_called()
+
+    def test_open_ended_question_returns_reply_and_navigation_event(self):
+        context = {"snippets": [], "navigation": {}}
+        answer = {
+            "reply": "The character builder is available.",
+            "redirect": "builder.html#hero-builder-form",
+        }
+        with (
+            patch(
+                "hub_server.context_builder.build_context",
+                return_value=context,
+            ) as build_context,
+            patch(
+                "hub_server.api_handler.answer_query",
+                return_value=answer,
+            ) as answer_query,
+        ):
+            response = self.client.post(
+                "/api/execute",
+                json={"command": "Where can I build a character?"},
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.get_json()["message"],
+            "The character builder is available.",
+        )
+        self.assertEqual(
+            response.get_json()["navigation"],
+            {
+                "type": "navigate",
+                "target": "builder.html#hero-builder-form",
+            },
+        )
+        build_context.assert_called_once_with(
+            "Where can I build a character?",
+            hub_server.ROOT,
+        )
+        answer_query.assert_called_once_with(
+            "Where can I build a character?",
+            context,
+        )
+
+    def test_navigation_request_is_sent_to_context_api(self):
+        with (
+            patch(
+                "hub_server.context_builder.build_context",
+                return_value={"snippets": [], "navigation": {}},
+            ) as build_context,
+            patch(
+                "hub_server.api_handler.answer_query",
+                return_value={"reply": "Opening the hub.", "redirect": None},
+            ) as answer_query,
+        ):
+            response = self.client.post(
+                "/api/execute",
+                json={"command": "Go to the hub"},
+            )
+
+        self.assertEqual(response.status_code, 200)
+        build_context.assert_called_once()
+        answer_query.assert_called_once()
+
     def test_execute_endpoint_routes_health_requests(self):
         with patch(
             "hub_server.site_health.inspect_site",
