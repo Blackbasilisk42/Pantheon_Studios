@@ -18,10 +18,16 @@ They are not a production API for the public GitHub Pages site.
    Discord requires a bot token and guild ID (the guild must expose its
    preview/presence data); Meta requires a Graph API access token with permission
    to read the configured Page's follower count and the Page ID.
-3. Optionally set `API_KEY`, `API_BASE_URL`, and `API_MODEL` in `.env` to
-   enable conversational site questions. The defaults use Google AI Studio's
-   OpenAI-compatible endpoint; Groq can be selected by setting its
-   OpenAI-compatible base URL and model.
+3. Set `API_KEY`, `API_BASE_URL`, and `API_MODEL` in `.env` for primary
+   conversational site answers. The defaults use Google AI Studio's
+   OpenAI-compatible endpoint and Gemini Flash; Groq can be selected by
+   setting its compatible base URL, model, and API key. The cloud API is tried
+   first. If it is unconfigured, times out, cannot connect, rate limits, or
+   returns a failed response, the handler automatically tries Ollama locally.
+   Install and start Ollama, then pull the configured model (default
+   `llama3.1`). `OLLAMA_BASE_URL` defaults to
+   `http://localhost:11434/v1`; `OLLAMA_API_KEY` is optional for local Ollama
+   and defaults to a placeholder value.
 4. Start the server and visit `http://127.0.0.1:5000/`:
 
    ```powershell
@@ -55,9 +61,13 @@ interpret requests as Python or shell commands. An "official source" staging
 command scrapes the allowlisted publisher, uses its first heading and text
 as-is, and does not call an external text-generation service. Open-ended
 questions use local TF-IDF retrieval over site pages, project Markdown, and
-site logs before calling the configured OpenAI-compatible API. The model can
-request navigation only to targets in the local site map; the console presents
-that target as a link. `/api/health` runs the local-reference check directly.
+site logs before calling the configured OpenAI-compatible cloud API, with an
+automatic OpenAI-compatible Ollama fallback for unavailable, timed-out,
+rate-limited, or failed cloud requests. Cloud is primary; Ollama is only used
+for the fallback. Both providers receive the same retrieved context and
+restricted navigation map. Responses are validated so navigation can target
+only known local pages; the console presents approved targets as links.
+`/api/health` runs the local-reference check directly.
 Before Webmaster output files are changed, the previous file version is copied
 to `backups/` under a timestamped filename. Actions, UTC timestamps, targets,
 and snapshot paths are stored in `edit_log.json`; existing `edit_log.jsonl`
