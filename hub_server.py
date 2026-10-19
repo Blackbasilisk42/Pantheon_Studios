@@ -13,6 +13,8 @@ from flask import Flask, jsonify, request, send_from_directory
 
 import ai_webmaster
 import webmaster
+import api_handler
+import context_builder
 from modules import edit_safety, site_health
 
 
@@ -225,20 +227,57 @@ def stop_scheduler() -> None:
 
 
 def _dispatch_command(command: str) -> tuple[str, object]:
-    normalized = re.sub(r"\s+", " ", command.strip().lower())
-    if re.search(r"\b(rollback|revert|restore)\b", normalized):
+    normalized = re.sub(
+        r"[^a-z0-9]+",
+        " ",
+        command.strip().lower(),
+    ).strip()
+    if normalized in {
+        "rollback",
+        "rollback latest edit",
+        "revert",
+        "restore",
+        "restore latest edit",
+    }:
         return "rollback", edit_safety.rollback_latest(ROOT)
-    if re.search(
-        r"\b(health|diagnostic|diagnostics|broken|site check|check site)\b",
-        normalized,
-    ):
+    if normalized in {
+        "health",
+        "diagnostic",
+        "diagnostics",
+        "site check",
+        "check site",
+        "run site check",
+        "check for broken elements",
+    }:
         return "site_health_check", site_health.inspect_site(ROOT)
-    if re.search(r"\b(kaige|character|dossier)\b", normalized):
+    if normalized in {
+        "dossier",
+        "kaige dossier",
+        "update kaige dossier",
+        "update kaige s dossier",
+        "update kaige stats",
+        "update kaige s stats",
+        "generate character dossier",
+    }:
         return "generate_character_dossier", ai_webmaster.generate_character_dossier()
-    if re.search(
-        r"\b(stage|generate|scrape)\b.*\b(official|source|update)\b",
-        normalized,
-    ):
+    if normalized in {
+        "news update",
+        "run news update",
+        "update news",
+        "news",
+        "run news crawler",
+        "maintenance",
+        "run maintenance",
+    }:
+        result = ai_webmaster.run_news_crawler()
+        if result is None:
+            raise RuntimeError("News crawler could not write its results.")
+        return "run_news_crawler", result
+    if normalized in {
+        "stage official source update",
+        "stage official update",
+        "scrape official update",
+    }:
         source_url, source_text = webmaster.scrape_source(
             webmaster.DEFAULT_SOURCE_URL
         )
@@ -247,14 +286,20 @@ def _dispatch_command(command: str) -> tuple[str, object]:
             source_url,
             update,
         )
-    if re.search(r"\b(news|crawler|update|maintenance)\b", normalized):
-        result = ai_webmaster.run_news_crawler()
-        if result is None:
-            raise RuntimeError("News crawler could not write its results.")
-        return "run_news_crawler", result
+    if command.strip().endswith("?") or re.match(
+        r"^(what|who|where|when|why|how|which|can|could|would|should|"
+        r"is|are|do|does|did|tell me|explain)\b",
+        command.strip(),
+        re.IGNORECASE,
+    ):
+        context = context_builder.build_context(command, ROOT)
+        return "site_knowledge_answer", api_handler.answer_query(
+            command,
+            context,
+        )
     raise ValueError(
-        "Command is not supported. Try a dossier update, news update, "
-        "official-source staging, site health check, or rollback."
+        "Command is not supported. Use a maintenance command or ask a site "
+        "question."
     )
 
 
@@ -280,6 +325,11 @@ def execute_command():
 
     try:
         action, result = _dispatch_command(command)
+    except api_handler.APIConfigurationError as error:
+        return jsonify({"error": str(error)}), 503
+    except api_handler.APIHandlerError as error:
+        app.logger.warning("Site question failed: %s", str(error))
+        return jsonify({"error": str(error)}), 502
     except ValueError as error:
         return jsonify({"error": str(error)}), 400
     except (OSError, requests.RequestException, RuntimeError, UnicodeError):
@@ -294,7 +344,22 @@ def execute_command():
         serialized_result = result.relative_to(ROOT).as_posix()
     else:
         serialized_result = result
-    return jsonify({"action": action, "result": serialized_result})
+    response_payload: dict[str, object] = {
+        "action": action,
+        "result": serialized_result,
+    }
+    if action == "site_knowledge_answer" and isinstance(result, dict):
+        message = result.get("reply")
+        redirect = result.get("redirect")
+        if isinstance(message, str):
+            response_payload["message"] = message
+        if isinstance(redirect, str):
+            response_payload["redirect"] = redirect
+            response_payload["navigation"] = {
+                "type": "navigate",
+                "target": redirect,
+            }
+    return jsonify(response_payload)
 
 
 @app.get("/")
