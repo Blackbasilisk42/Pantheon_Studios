@@ -21,10 +21,12 @@ class EditSafetyTests(unittest.TestCase):
             )
 
             events = [
-                json.loads(line)
-                for line in (root / edit_safety.EDIT_LOG_NAME)
-                .read_text(encoding="utf-8")
-                .splitlines()
+                event
+                for event in json.loads(
+                    (root / edit_safety.EDIT_LOG_NAME).read_text(
+                        encoding="utf-8"
+                    )
+                )
             ]
             self.assertEqual(len(events), 1)
             self.assertEqual(events[0]["action"], "update dossier")
@@ -32,6 +34,7 @@ class EditSafetyTests(unittest.TestCase):
             self.assertTrue(events[0]["timestamp"])
             backup = root / events[0]["backup"]
             self.assertEqual(backup.read_text(encoding="utf-8"), "before")
+            self.assertRegex(backup.name, r"^\d{8}T\d{12}Z_[0-9a-f]{8}_")
             self.assertEqual(target.read_text(encoding="utf-8"), "after")
 
     def test_rollback_restores_previous_content_and_is_audited(self):
@@ -46,10 +49,12 @@ class EditSafetyTests(unittest.TestCase):
             self.assertEqual(restored, target)
             self.assertEqual(target.read_text(encoding="utf-8"), "known good")
             events = [
-                json.loads(line)
-                for line in (root / edit_safety.EDIT_LOG_NAME)
-                .read_text(encoding="utf-8")
-                .splitlines()
+                event
+                for event in json.loads(
+                    (root / edit_safety.EDIT_LOG_NAME).read_text(
+                        encoding="utf-8"
+                    )
+                )
             ]
             self.assertEqual(events[-1]["action"], "rollback builder.html")
 
@@ -63,12 +68,38 @@ class EditSafetyTests(unittest.TestCase):
 
             self.assertFalse(target.exists())
             events = [
-                json.loads(line)
-                for line in (root / edit_safety.EDIT_LOG_NAME)
-                .read_text(encoding="utf-8")
-                .splitlines()
+                event
+                for event in json.loads(
+                    (root / edit_safety.EDIT_LOG_NAME).read_text(
+                        encoding="utf-8"
+                    )
+                )
             ]
             self.assertEqual(events[-1]["action"], "rollback news.html")
+
+    def test_write_imports_legacy_jsonl_history_into_json_log(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            target = root / "builder.html"
+            target.write_text("before", encoding="utf-8")
+            legacy_event = {
+                "timestamp": "2026-01-01T00:00:00+00:00",
+                "action": "legacy action",
+                "target": "builder.html",
+                "backup": None,
+            }
+            (root / edit_safety.LEGACY_EDIT_LOG_NAME).write_text(
+                json.dumps(legacy_event) + "\n",
+                encoding="utf-8",
+            )
+
+            edit_safety.write_text(target, "after", "new action", root)
+
+            events = json.loads(
+                (root / edit_safety.EDIT_LOG_NAME).read_text(encoding="utf-8")
+            )
+            self.assertEqual(events[0], legacy_event)
+            self.assertEqual(events[1]["action"], "new action")
 
     def test_write_rejects_targets_outside_workspace(self):
         with tempfile.TemporaryDirectory() as temporary:
