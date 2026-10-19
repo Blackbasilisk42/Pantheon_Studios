@@ -87,7 +87,18 @@ def _source_files(root: Path) -> list[Path]:
 def _plain_text(path: Path) -> str:
     content = path.read_text(encoding="utf-8")
     if path.suffix.lower() in {".html", ".htm"}:
-        return BeautifulSoup(content, "html.parser").get_text(" ", strip=True)
+        soup = BeautifulSoup(content, "html.parser")
+        content_root = soup.find(["main", "article"]) or soup.body or soup
+        blocks = content_root.find_all(
+            ["h1", "h2", "h3", "h4", "p", "li", "label", "button"]
+        )
+        if blocks:
+            return "\n\n".join(
+                text
+                for block in blocks
+                if (text := block.get_text(" ", strip=True))
+            )
+        return content_root.get_text(" ", strip=True)
     return content
 
 

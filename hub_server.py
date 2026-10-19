@@ -288,7 +288,8 @@ def _dispatch_command(command: str) -> tuple[str, object]:
         )
     if command.strip().endswith("?") or re.match(
         r"^(what|who|where|when|why|how|which|can|could|would|should|"
-        r"is|are|do|does|did|tell me|explain)\b",
+        r"is|are|do|does|did|tell me|explain|go to|open|view|"
+        r"show me|take me to|navigate to)\b",
         command.strip(),
         re.IGNORECASE,
     ):
