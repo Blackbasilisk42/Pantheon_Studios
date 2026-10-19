@@ -7,7 +7,8 @@ from uuid import uuid4
 
 
 BACKUP_DIRECTORY_NAME = "backups"
-EDIT_LOG_NAME = "edit_log.jsonl"
+EDIT_LOG_NAME = "edit_log.json"
+LEGACY_EDIT_LOG_NAME = "edit_log.jsonl"
 _EDIT_LOCK = threading.RLock()
 
 
@@ -25,7 +26,10 @@ def _resolve_target(target: Path, root: Path) -> tuple[Path, Path]:
         relative_target.parts
         and relative_target.parts[0].casefold()
         == BACKUP_DIRECTORY_NAME.casefold()
-    ) or resolved_target == resolved_root / EDIT_LOG_NAME:
+    ) or resolved_target in {
+        resolved_root / EDIT_LOG_NAME,
+        resolved_root / LEGACY_EDIT_LOG_NAME,
+    }:
         raise ValueError("Backup and edit-log files cannot be write targets.")
     return resolved_target, relative_target
 
@@ -38,11 +42,11 @@ def _backup_existing(
     if not target.is_file():
         return None
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
+    target_name = relative_target.as_posix().replace("/", "__")
     backup = (
         root
         / BACKUP_DIRECTORY_NAME
-        / f"{timestamp}_{uuid4().hex[:8]}"
-        / relative_target
+        / f"{timestamp}_{uuid4().hex[:8]}_{target_name}"
     )
     backup.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(target, backup)
@@ -62,8 +66,42 @@ def _record_edit(
         "backup": backup.relative_to(root).as_posix() if backup else None,
     }
     log_path = root / EDIT_LOG_NAME
-    with log_path.open("a", encoding="utf-8") as edit_log:
-        edit_log.write(json.dumps(event, ensure_ascii=True) + "\n")
+    if log_path.is_file():
+        events = json.loads(log_path.read_text(encoding="utf-8"))
+        if not isinstance(events, list):
+            raise ValueError("The edit log must contain a JSON array.")
+    else:
+        legacy_log = root / LEGACY_EDIT_LOG_NAME
+        events = (
+            [
+                json.loads(line)
+                for line in legacy_log.read_text(encoding="utf-8").splitlines()
+                if line.strip()
+            ]
+            if legacy_log.is_file()
+            else []
+        )
+    events.append(event)
+    log_path.write_text(
+        json.dumps(events, ensure_ascii=True, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+
+def _read_edit_events(log_path: Path, root: Path) -> list[dict[str, object]]:
+    if log_path.is_file():
+        events = json.loads(log_path.read_text(encoding="utf-8"))
+        if not isinstance(events, list):
+            raise ValueError("The edit log must contain a JSON array.")
+        return events
+    legacy_log = root / LEGACY_EDIT_LOG_NAME
+    if not legacy_log.is_file():
+        raise FileNotFoundError("No edit history is available to roll back.")
+    return [
+        json.loads(line)
+        for line in legacy_log.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
 
 
 def write_text(
@@ -166,15 +204,8 @@ def delete_file(target: Path, action: str, root: Path) -> Path:
 def rollback_latest(root: Path) -> Path:
     resolved_root = Path(root).resolve()
     log_path = resolved_root / EDIT_LOG_NAME
-    if not log_path.is_file():
-        raise FileNotFoundError("No edit history is available to roll back.")
-
     with _EDIT_LOCK:
-        events = [
-            json.loads(line)
-            for line in log_path.read_text(encoding="utf-8").splitlines()
-            if line.strip()
-        ]
+        events = _read_edit_events(log_path, resolved_root)
         for event in reversed(events):
             target_name = event.get("target")
             if not isinstance(target_name, str):
