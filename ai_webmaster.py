@@ -12,6 +12,7 @@ from urllib.parse import urljoin, urlparse
 import requests
 import schedule
 from bs4 import BeautifulSoup
+from bs4.element import Tag
 
 from modules import edit_safety
 
@@ -84,7 +85,13 @@ def _timestamp() -> datetime:
     return datetime.now(timezone.utc)
 
 
-def _replace_contents(element, text: str) -> None:
+def _require_tag(element: Tag | None, description: str) -> Tag:
+    if element is None:
+        raise ValueError(f"Required HTML element was not found: {description}")
+    return element
+
+
+def _replace_contents(element: Tag, text: str) -> None:
     element.clear()
     element.append(text)
 
@@ -127,7 +134,7 @@ def _template_markup(source: BeautifulSoup) -> str:
     return markup
 
 
-def _append_lore_sections(lore_box) -> None:
+def _append_lore_sections(lore_box: Tag) -> None:
     title = lore_box.select_one(".lore-title")
     lore_box.clear()
     if title:
@@ -139,21 +146,27 @@ def _append_lore_sections(lore_box) -> None:
         ("COUNTER TACTICS", KAIGE["lore"]["counters"]),
     ):
         if content is None:
-            section_title = BeautifulSoup(
-                '<div class="lore-title"></div>', "html.parser"
-            ).div
+            section_title = _require_tag(
+                BeautifulSoup(
+                    '<div class="lore-title"></div>', "html.parser"
+                ).div,
+                "lore section heading",
+            )
             section_title.string = heading
             lore_box.append(section_title)
             continue
-        section = BeautifulSoup(
-            '<p class="lore-section"></p>', "html.parser"
-        ).p
-        section.append(BeautifulSoup("", "html.parser").new_string(heading + ": "))
-        section.append(BeautifulSoup("", "html.parser").new_string(content))
+        section = _require_tag(
+            BeautifulSoup(
+                '<p class="lore-section"></p>', "html.parser"
+            ).p,
+            "lore section",
+        )
+        section.append(heading + ": ")
+        section.append(content)
         lore_box.append(section)
 
 
-def _relevant_styles(source: BeautifulSoup, card) -> str:
+def _relevant_styles(source: BeautifulSoup, card: Tag) -> str:
     style = source.find("style")
     if not style:
         return ""
@@ -207,42 +220,64 @@ def _fallback_dossier_card() -> str:
     return str(card)
 
 
-def _inject_kaige(card) -> None:
+def _inject_kaige(card: Tag) -> None:
     card["class"] = list(dict.fromkeys([*card.get("class", []), "bento-card"]))
     card.attrs.pop("id", None)
     avatar = card.select_one(".big-avatar")
     if avatar:
         _replace_contents(avatar, "K")
-    _replace_contents(card.select_one(".hero-title-group h1"), KAIGE["name"])
-    _replace_contents(card.select_one(".spec-tag"), KAIGE["subtitle"])
-    _replace_contents(card.select_one(".power-rank-value"), KAIGE["power_level"])
-    metric_values = {
-        metric.select_one(".stat-name").get_text(" ", strip=True):
-        metric.select_one(".stat-val-num")
-        for metric in card.select(".stat-line")
-        if metric.select_one(".stat-name")
-        and metric.select_one(".stat-val-num")
-    }
+    _replace_contents(
+        _require_tag(card.select_one(".hero-title-group h1"), "dossier name"),
+        KAIGE["name"],
+    )
+    _replace_contents(
+        _require_tag(card.select_one(".spec-tag"), "dossier subtitle"),
+        KAIGE["subtitle"],
+    )
+    _replace_contents(
+        _require_tag(card.select_one(".power-rank-value"), "power level"),
+        KAIGE["power_level"],
+    )
+    metric_values: dict[str, Tag] = {}
+    for metric in card.select(".stat-line"):
+        name = metric.select_one(".stat-name")
+        value = metric.select_one(".stat-val-num")
+        if name is not None and value is not None:
+            metric_values[name.get_text(" ", strip=True)] = value
     for label, value in KAIGE["metrics"].items():
         value_element = metric_values.get(label)
         if value_element is None:
-            metric = BeautifulSoup(
-                '<div class="stat-line"><span class="stat-name"></span>'
-                '<span class="stat-val-num"></span></div>',
-                "html.parser",
-            ).div
-            _replace_contents(metric.select_one(".stat-name"), label)
-            _replace_contents(metric.select_one(".stat-val-num"), value)
-            card.select_one(".spec-box").append(metric)
+            metric = _require_tag(
+                BeautifulSoup(
+                    '<div class="stat-line"><span class="stat-name"></span>'
+                    '<span class="stat-val-num"></span></div>',
+                    "html.parser",
+                ).div,
+                "new stat row",
+            )
+            _replace_contents(
+                _require_tag(metric.select_one(".stat-name"), "stat name"),
+                label,
+            )
+            _replace_contents(
+                _require_tag(metric.select_one(".stat-val-num"), "stat value"),
+                value,
+            )
+            _require_tag(card.select_one(".spec-box"), "stats section").append(
+                metric
+            )
         else:
             _replace_contents(value_element, value)
     skills = card.select_one(".skill-chip-list")
     if skills:
         skills.clear()
         for skill in KAIGE["skills"]:
-            chip = BeautifulSoup(
-                '<span class="skill-chip"></span>', "html.parser"
-            ).span
+            chip = _require_tag(
+                BeautifulSoup(
+                    '<span class="skill-chip"></span>', "html.parser"
+                ).span,
+                "skill chip",
+            )
             chip["class"] = ["skill-chip", skill["type"]]
             chip.string = skill["name"]
             skills.append(chip)
@@ -276,7 +311,7 @@ def generate_character_dossier() -> tuple[Path, Path]:
         source_html = DOSSIER_FILE.read_text(encoding="utf-8")
         source = BeautifulSoup(source_html, "html.parser")
         source_card = source.select_one(".dossier-main-panel")
-        if source_card:
+        if source_card is not None:
             template = BeautifulSoup(_template_markup(source), "html.parser")
             cloned_card = copy.deepcopy(source_card)
             cloned_card.clear()
@@ -344,11 +379,10 @@ def _extract_source_text(soup: BeautifulSoup) -> tuple[str, str]:
     for element in soup(["script", "style", "noscript", "svg"]):
         element.decompose()
     heading = soup.find(["h1", "h2", "h3"])
+    title_element = heading or soup.find("title")
     title = (
-        heading.get_text(" ", strip=True)
-        if heading
-        else soup.title.get_text(" ", strip=True)
-        if soup.title
+        title_element.get_text(" ", strip=True)
+        if title_element is not None
         else "Dragon Ball / Xenoverse Update"
     )
     content = soup.find(["main", "article"]) or soup.body or soup
@@ -364,7 +398,10 @@ def _scrape_update_sources() -> list[tuple[str, str, str]]:
     homepage = _fetch_page(UPDATE_SOURCE_URL)
     candidates = []
     for anchor in homepage.find_all("a", href=True):
-        destination = urljoin(UPDATE_SOURCE_URL, anchor["href"])
+        href = anchor.get("href")
+        if not isinstance(href, str):
+            continue
+        destination = urljoin(UPDATE_SOURCE_URL, href)
         label = anchor.get_text(" ", strip=True)
         if not UPDATE_LINK_PATTERN.search(f"{label} {destination}"):
             continue
@@ -404,11 +441,17 @@ def _news_bulletin_html(pages: list[tuple[str, str, str]]) -> str:
         "</article>",
         "html.parser",
     )
-    card = soup.article
+    card = _require_tag(soup.article, "news bulletin")
     first_title = pages[0][1]
-    card.select_one(".card-header").string = first_title
-    details = card.select_one(".metrics-section ul")
-    sources = card.select_one(".lore-section ul")
+    _require_tag(card.select_one(".card-header"), "news title").string = first_title
+    details = _require_tag(
+        card.select_one(".metrics-section ul"),
+        "news details list",
+    )
+    sources = _require_tag(
+        card.select_one(".lore-section ul"),
+        "news sources list",
+    )
     for source_url, title, text in pages:
         if title and title != first_title:
             heading = soup.new_tag("li")
@@ -464,14 +507,20 @@ def _news_unavailable_html(error: str) -> str:
         "</article>",
         "html.parser",
     )
-    soup.select_one(".metrics-section p").string = (
+    _require_tag(
+        soup.select_one(".metrics-section p"),
+        "crawler status details",
+    ).string = (
         "No update content was staged because the official source could not "
         "be reached."
     )
-    soup.select_one(".lore-section p").string = (
+    _require_tag(
+        soup.select_one(".lore-section p"),
+        "crawler status source",
+    ).string = (
         f"{UPDATE_SOURCE_URL} — {error}"
     )
-    return str(soup.article)
+    return str(_require_tag(soup.article, "crawler status"))
 
 
 def run_news_crawler() -> tuple[Path, Path] | None:
