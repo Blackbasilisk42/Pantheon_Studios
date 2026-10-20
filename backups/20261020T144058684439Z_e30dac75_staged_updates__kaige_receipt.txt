@@ -1,0 +1,37 @@
+Pantheon Studios deterministic dossier receipt
+Timestamp (UTC): 2026-10-20T14:34:39.209690+00:00
+Status: cloned dossier.html template
+Output: staged_updates\kaige_dossier.html
+Character payload injected:
+{
+  "name": "KAIGE",
+  "subtitle": "Frieza-Race // Elite Patroller",
+  "power_level": "LEVEL 199 MAX",
+  "metrics": {
+    "MAX HEALTH": "85 / 100",
+    "MAX KI SPECS": "100 / 100",
+    "MAX STAMINA": "88 / 100",
+    "STRIKE SUPER POWER": "75 / 100",
+    "KI BLAST SUPER POWER": "98 / 100"
+  },
+  "skills": [
+    {
+      "name": "KI BLAST SPECIALIST",
+      "type": "ki"
+    },
+    {
+      "name": "SHADOW CRUSHER",
+      "type": "strike"
+    },
+    {
+      "name": "BACKFLIP",
+      "type": "strike"
+    }
+  ],
+  "lore": {
+    "title": "Ki-Blast Specialist and Orbital Zoner",
+    "attributes": "Features a tall, original solid black body design with green eyes—a legacy design predating the Black Frieza form by over half a decade—wreathed in a dark emerald green aura. Operates on a pure Ki-blast primary combat build, utilizing the 'Center of Gravity' (COG) technique to maintain precise orbital positioning relative to locked-on targets.",
+    "evasive": "Relies heavily on maintaining spatial advantage. Instead of engaging in close-quarters brawling, utilizes skills like Backflip to instantly create distance, forcing opponents into optimal zoning range where overwhelming Ki-blast damage dictates the pace.",
+    "counters": "Proficient in punishing adversaries who attempt to close the gap. Employs secondary Strike counters like Shadow Crusher to break incoming momentum, allowing immediate repositioning to resume high-damage energy assaults."
+  }
+}
