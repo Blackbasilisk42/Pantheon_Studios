@@ -412,6 +412,8 @@ def home():
 @app.get("/<path:filename>")
 def public_file(filename: str):
     path = PurePosixPath(filename)
+    if path.parts and path.parts[0].lower() == "api":
+        return _json_error("Not found", 404)
     if (
         path.suffix.lower() not in PUBLIC_SUFFIXES
         or any(part.startswith(".") or part.lower() in PRIVATE_DIRECTORIES
