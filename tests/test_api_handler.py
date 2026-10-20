@@ -14,7 +14,7 @@ class APIHandlerTests(unittest.TestCase):
         client, model = api_handler._client()
 
         self.assertIs(client, openai_client.return_value)
-        self.assertEqual(model, "gemini-3.8-flash")
+        self.assertEqual(model, "gemini-3.5-flash-lite")
         openai_client.assert_called_once_with(
             api_key="test-key",
             base_url=api_handler.DEFAULT_API_BASE_URL,
@@ -119,11 +119,16 @@ class APIHandlerTests(unittest.TestCase):
     ):
         timeout_error = OpenAIError("The cloud API timed out.")
         timeout_error.status_code = 503
+        timeout_error.body = {
+            "error": {
+                "message": "This model is temporarily unavailable.",
+            }
+        }
         request_answer.side_effect = timeout_error
 
         with self.assertRaisesRegex(
             api_handler.APIRequestError,
-            "HTTP 503 OpenAIError",
+            "HTTP 503 OpenAIError.*This model is temporarily unavailable",
         ):
             api_handler.answer_query(
                 "Question?",

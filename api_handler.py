@@ -9,7 +9,7 @@ from context_builder import ALLOWED_NAVIGATION_TARGETS
 
 
 DEFAULT_API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai/"
-DEFAULT_API_MODEL = "gemini-3.8-flash"
+DEFAULT_API_MODEL = "gemini-3.5-flash-lite"
 API_REQUEST_TIMEOUT_SECONDS = 45
 SYSTEM_PROMPT = (
     "You are the Pantheon Studios assistant. Answer general questions using "
@@ -47,6 +47,15 @@ def _provider_error_label(error: OpenAIError) -> str:
     if isinstance(status_code, int):
         return f"HTTP {status_code} {type(error).__name__}"
     return type(error).__name__
+
+
+def _provider_error_message(error: OpenAIError) -> str | None:
+    body = getattr(error, "body", None)
+    details = body.get("error", body) if isinstance(body, dict) else None
+    message = details.get("message") if isinstance(details, dict) else None
+    if isinstance(message, str) and message.strip():
+        return message.strip()[:500]
+    return None
 
 
 def _client() -> tuple[OpenAI, str]:
@@ -162,6 +171,9 @@ def answer_query(query: str, context: dict[str, object]) -> dict[str, str | None
             f"The cloud API returned an invalid response: {error}"
         ) from error
     except OpenAIError as error:
+        provider_message = _provider_error_message(error)
+        detail = f": {provider_message}" if provider_message else ""
         raise APIRequestError(
-            f"The cloud API request failed ({_provider_error_label(error)})."
+            f"The cloud API request failed ({_provider_error_label(error)})"
+            f"{detail}"
         ) from error
