@@ -77,6 +77,10 @@ creates an audited snapshot.
 The Command Center, show hub, dossier pages, and character builder include the
 assistant widget for submitting requests. The local-only backend must be
 running; access the interactive panel at `http://127.0.0.1:5000/command-center.html`.
+The widget sends requests to the same origin as the page, so do not open the
+page as a local file, through VS Code Live Server, or from GitHub Pages; those
+hosts do not provide the local `/api/execute` endpoint. Start the backend with
+`.\.venv\Scripts\python.exe server.py` and use the local address above.
 On pages covered by the existing maintenance or sign-in overlays, the widget
 remains behind the overlay until that page is unlocked.
 
