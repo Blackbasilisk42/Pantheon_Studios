@@ -71,6 +71,10 @@ class APIHandlerTests(unittest.TestCase):
             "KI BLAST: 98 / 100",
             client.chat.completions.create.call_args.kwargs["messages"][1]["content"],
         )
+        self.assertIn(
+            "current_datetime_utc",
+            client.chat.completions.create.call_args.kwargs["messages"][1]["content"],
+        )
 
     @patch.dict("os.environ", {"API_KEY": "test-key"}, clear=True)
     @patch("api_handler._local_answer_query")

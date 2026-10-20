@@ -330,79 +330,40 @@ class HubServerTests(unittest.TestCase):
             {"title": "Patch notes", "summary": "Balance changes"},
         )
 
-    def test_execute_endpoint_rejects_invalid_and_unrecognized_requests(self):
+    def test_execute_endpoint_rejects_invalid_request_payload(self):
         missing_command = self.client.post("/api/execute", json={})
-        unsupported = self.client.post(
-            "/api/execute",
-            json={"command": "run arbitrary Python"},
-        )
 
         self.assertEqual(missing_command.status_code, 400)
-        self.assertEqual(unsupported.status_code, 400)
-        self.assertEqual(unsupported.mimetype, "application/json")
-        self.assertEqual(
-            unsupported.get_json(),
-            {
-                "status": "error",
-                "message": (
-                    "Command is not supported. Use a maintenance command or "
-                    "ask a site question."
-                ),
-                "error": (
-                    "Command is not supported. Use a maintenance command or "
-                    "ask a site question."
-                )
-            },
-        )
 
-    def test_greeting_returns_local_result_without_calling_answer_provider(self):
-        with patch("hub_server.api_handler.answer_query") as answer_query:
-            response = self.client.post(
-                "/api/execute",
-                json={"command": "hello"},
-            )
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.mimetype, "application/json")
-        self.assertEqual(response.get_json()["action"], "greeting")
-        self.assertIn("Hello!", response.get_json()["message"])
-        answer_query.assert_not_called()
-
-    def test_eastern_time_question_is_answered_locally(self):
-        with patch("hub_server.api_handler.answer_query") as answer_query:
-            response = self.client.post(
-                "/api/execute",
-                json={
-                    "command": "what time is it in eastern daylight savings"
-                },
-            )
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            response.get_json()["action"],
-            "local_time_answer",
-        )
-        self.assertRegex(
-            response.get_json()["message"],
-            r"It is \d{1,2}:\d{2} [AP]M (EDT|EST) on .+ in Eastern Time\.",
-        )
-        answer_query.assert_not_called()
-
-    def test_indiana_time_question_returns_both_zones_without_provider_call(self):
-        with patch("hub_server.api_handler.answer_query") as answer_query:
+    def test_arbitrary_language_request_is_sent_to_cloud_answer_provider(self):
+        context = {"snippets": [], "navigation": {}}
+        answer = {"reply": "Here is the answer.", "redirect": None}
+        with (
+            patch(
+                "hub_server.context_builder.build_context",
+                return_value=context,
+            ) as build_context,
+            patch(
+                "hub_server.api_handler.answer_query",
+                return_value=answer,
+            ) as answer_query,
+        ):
             response = self.client.post(
                 "/api/execute",
                 json={"command": "what time is it in indiana"},
             )
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.get_json()["action"], "local_time_answer")
-        message = response.get_json()["message"]
-        self.assertIn("Most of the state (Eastern):", message)
-        self.assertIn("northwest and southwest Indiana (Central):", message)
-        self.assertRegex(message, r"\d{1,2}:\d{2} [AP]M EDT")
-        self.assertRegex(message, r"\d{1,2}:\d{2} [AP]M CDT")
-        answer_query.assert_not_called()
+        self.assertEqual(response.get_json()["action"], "site_knowledge_answer")
+        self.assertEqual(response.get_json()["message"], "Here is the answer.")
+        build_context.assert_called_once_with(
+            "what time is it in indiana",
+            hub_server.ROOT,
+        )
+        answer_query.assert_called_once_with(
+            "what time is it in indiana",
+            context,
+        )
 
     def test_execute_endpoint_returns_json_for_unexpected_backend_errors(self):
         with patch(

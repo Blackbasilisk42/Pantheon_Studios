@@ -3,10 +3,8 @@ import os
 import re
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime
 from pathlib import Path, PurePosixPath
 from typing import Callable
-from zoneinfo import ZoneInfo
 
 import requests
 from dotenv import load_dotenv
@@ -253,37 +251,6 @@ def _dispatch_command(command: str) -> tuple[str, object]:
         " ",
         command.strip().lower(),
     ).strip()
-    asks_for_time = re.search(
-        r"\bwhat time is it\b|\bcurrent time\b|\btime is it\b",
-        normalized,
-    )
-    if asks_for_time and re.search(r"\bindiana\b", normalized):
-        eastern_now = datetime.now(ZoneInfo("America/Indiana/Indianapolis"))
-        central_now = datetime.now(ZoneInfo("America/Indiana/Knox"))
-        eastern_label = eastern_now.strftime("%I:%M %p %Z").lstrip("0")
-        central_label = central_now.strftime("%I:%M %p %Z").lstrip("0")
-        return (
-            "local_time_answer",
-            "Indiana has two time zones. Most of the state (Eastern): "
-            f"{eastern_label}; northwest and southwest Indiana (Central): "
-            f"{central_label}.",
-        )
-    if asks_for_time and re.search(
-        r"\b(eastern|edt|est|new york)\b",
-        normalized,
-    ):
-        current_time = datetime.now(ZoneInfo("America/New_York"))
-        time_label = current_time.strftime("%I:%M %p %Z").lstrip("0")
-        date_label = current_time.strftime("%A, %B %d, %Y")
-        return (
-            "local_time_answer",
-            f"It is {time_label} on {date_label} in Eastern Time.",
-        )
-    if normalized in {"hello", "hi", "hey", "hello there"}:
-        return (
-            "greeting",
-            "Hello! Try SITE CHECK, DOSSIER, NEWS UPDATE, or ask a site question.",
-        )
     if normalized in {
         "rollback",
         "rollback latest edit",
@@ -338,21 +305,10 @@ def _dispatch_command(command: str) -> tuple[str, object]:
             source_url,
             update,
         )
-    if command.strip().endswith("?") or re.match(
-        r"^(what|who|where|when|why|how|which|can|could|would|should|"
-        r"is|are|do|does|did|tell me|explain|go to|open|view|"
-        r"show me|take me to|navigate to)\b",
-        command.strip(),
-        re.IGNORECASE,
-    ):
-        context = context_builder.build_context(command, ROOT)
-        return "site_knowledge_answer", api_handler.answer_query(
-            command,
-            context,
-        )
-    raise ValueError(
-        "Command is not supported. Use a maintenance command or ask a site "
-        "question."
+    context = context_builder.build_context(command, ROOT)
+    return "site_knowledge_answer", api_handler.answer_query(
+        command,
+        context,
     )
 
 
@@ -415,8 +371,6 @@ def _execute_command():
             "action": action,
             "result": serialized_result,
         }
-        if action in {"greeting", "local_time_answer"} and isinstance(result, str):
-            response_payload["message"] = result
         if action == "site_knowledge_answer" and isinstance(result, dict):
             message = result.get("reply")
             redirect = result.get("redirect")
