@@ -34,7 +34,7 @@ class HubServerTests(unittest.TestCase):
         response = self.client.options(
             "/api/execute",
             headers={
-                "Origin": "https://pantheoncore.studios",
+                "Origin": "https://pantheoncore.studio",
                 "Access-Control-Request-Method": "POST",
                 "Access-Control-Request-Headers": "content-type",
             },
@@ -43,7 +43,7 @@ class HubServerTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.headers.get("Access-Control-Allow-Origin"),
-            "https://pantheoncore.studios",
+            "https://pantheoncore.studio",
         )
         self.assertIn(
             "POST",
