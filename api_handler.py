@@ -46,7 +46,7 @@ def _is_quota_exhaustion(error: OpenAIError) -> bool:
     details = body.get("error", body) if isinstance(body, dict) else {}
     codes = {
         str(details.get(key, "")).strip().lower()
-        for key in ("code", "type")
+        for key in ("code", "type", "status")
         if isinstance(details, dict)
     }
     quota_codes = {

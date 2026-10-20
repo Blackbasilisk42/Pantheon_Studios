@@ -110,7 +110,7 @@ class APIHandlerTests(unittest.TestCase):
     @patch("api_handler._local_answer_query")
     @patch(
         "api_handler._request_answer",
-        side_effect=OpenAIError("The model was not found."),
+        side_effect=OpenAIError("The cloud API is temporarily unavailable."),
     )
     @patch("api_handler._client", return_value=(object(), "missing-model"))
     def test_non_quota_cloud_failure_does_not_fall_back_to_ollama(
@@ -119,9 +119,10 @@ class APIHandlerTests(unittest.TestCase):
         request_answer,
         local_answer,
     ):
+        request_answer.side_effect.status_code = 503
         with self.assertRaisesRegex(
             api_handler.APIRequestError,
-            "Ollama fallback is reserved for exhausted cloud quota",
+            "HTTP 503 OpenAIError.*Ollama fallback is reserved for exhausted cloud quota",
         ):
             api_handler.answer_query(
                 "Question?",
