@@ -30,10 +30,10 @@ class HubServerTests(unittest.TestCase):
         self.assertIn("/api/execute", rules)
         self.assertIn("POST", rules["/api/execute"])
 
-    def test_unknown_api_route_returns_json_error(self):
+    def test_unregistered_api_post_returns_json_error(self):
         response = self.client.post("/api/does-not-exist", json={})
 
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 405)
         self.assertEqual(response.mimetype, "application/json")
         self.assertEqual(response.get_json()["status"], "error")
         self.assertIn("message", response.get_json())
