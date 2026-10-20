@@ -22,14 +22,9 @@ They are not a production API for the public GitHub Pages site.
    conversational site answers. The defaults use Google AI Studio's
    OpenAI-compatible endpoint and Gemini Flash; Groq can be selected by
    setting its compatible base URL, model, and API key. The cloud API is tried
-   first. Ollama is used only when the cloud provider explicitly reports
-   exhausted quota or credits. Configuration errors, connection failures,
-   invalid models, and other API errors are returned without silently routing
-   the request to Ollama.
-   Install and start Ollama, then pull the configured model (default
-   `llama3.1`). `OLLAMA_BASE_URL` defaults to
-   `http://localhost:11434/v1`; `OLLAMA_API_KEY` is optional for local Ollama
-   and defaults to a placeholder value.
+   exclusively. Configuration errors, connection failures, quota exhaustion,
+   invalid models, and other API errors are returned directly; no local model
+   is called.
 4. Start the server and visit `http://127.0.0.1:5000/`:
 
    ```powershell
@@ -67,9 +62,9 @@ OpenAI-compatible cloud API, alongside local TF-IDF retrieval over site pages,
 project Markdown, and site logs. The model can answer general questions from
 its knowledge and use the supplied current UTC timestamp for date/time
 questions; Pantheon-specific answers remain grounded in retrieved site context.
-Ollama is an automatic fallback only when the cloud API reports exhausted
-quota or credits. Other cloud failures are reported directly. Both providers
-receive the same context and restricted navigation map. Responses are
+Only the configured cloud API is used for these answers. Cloud failures,
+including exhausted quota, are reported directly without a local-model
+fallback. Responses are
 validated so navigation can target only known local pages; the console
 presents approved targets as links.
 `/api/health` runs the local-reference check directly.
