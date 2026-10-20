@@ -297,6 +297,29 @@ class HubServerTests(unittest.TestCase):
 
         self.assertEqual(missing_command.status_code, 400)
         self.assertEqual(unsupported.status_code, 400)
+        self.assertEqual(unsupported.mimetype, "application/json")
+        self.assertEqual(
+            unsupported.get_json(),
+            {
+                "error": (
+                    "Command is not supported. Use a maintenance command or "
+                    "ask a site question."
+                )
+            },
+        )
+
+    def test_greeting_returns_local_result_without_calling_answer_provider(self):
+        with patch("hub_server.api_handler.answer_query") as answer_query:
+            response = self.client.post(
+                "/api/execute",
+                json={"command": "hello"},
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.mimetype, "application/json")
+        self.assertEqual(response.get_json()["action"], "greeting")
+        self.assertIn("Hello!", response.get_json()["message"])
+        answer_query.assert_not_called()
 
     def test_execute_endpoint_returns_json_for_unexpected_backend_errors(self):
         with patch(
