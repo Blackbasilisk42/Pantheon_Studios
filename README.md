@@ -22,8 +22,10 @@ They are not a production API for the public GitHub Pages site.
    conversational site answers. The defaults use Google AI Studio's
    OpenAI-compatible endpoint and Gemini Flash; Groq can be selected by
    setting its compatible base URL, model, and API key. The cloud API is tried
-   first. If it is unconfigured, times out, cannot connect, rate limits, or
-   returns a failed response, the handler automatically tries Ollama locally.
+   first. Ollama is used only when the cloud provider explicitly reports
+   exhausted quota or credits. Configuration errors, connection failures,
+   invalid models, and other API errors are returned without silently routing
+   the request to Ollama.
    Install and start Ollama, then pull the configured model (default
    `llama3.1`). `OLLAMA_BASE_URL` defaults to
    `http://localhost:11434/v1`; `OLLAMA_API_KEY` is optional for local Ollama
@@ -62,11 +64,11 @@ command scrapes the allowlisted publisher, uses its first heading and text
 as-is, and does not call an external text-generation service. Open-ended
 questions use local TF-IDF retrieval over site pages, project Markdown, and
 site logs before calling the configured OpenAI-compatible cloud API, with an
-automatic OpenAI-compatible Ollama fallback for unavailable, timed-out,
-rate-limited, or failed cloud requests. Cloud is primary; Ollama is only used
-for the fallback. Both providers receive the same retrieved context and
-restricted navigation map. Responses are validated so navigation can target
-only known local pages; the console presents approved targets as links.
+automatic OpenAI-compatible Ollama fallback only when the cloud API reports
+that its quota or credits are exhausted. Other cloud failures are reported
+directly. Both providers receive the same retrieved context and restricted
+navigation map. Responses are validated so navigation can target only known
+local pages; the console presents approved targets as links.
 `/api/health` runs the local-reference check directly.
 Before Webmaster output files are changed, the previous file version is copied
 to `backups/` under a timestamped filename. Actions, UTC timestamps, targets,
