@@ -9,7 +9,7 @@ from context_builder import ALLOWED_NAVIGATION_TARGETS
 
 
 DEFAULT_API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai/"
-DEFAULT_API_MODEL = "gemini-3.5-flash-lite"
+DEFAULT_API_MODEL = "gemini-flash-lite-latest"
 API_REQUEST_TIMEOUT_SECONDS = 60
 API_MAX_RESPONSE_TOKENS = 512
 SYSTEM_PROMPT = (
@@ -52,6 +52,8 @@ def _provider_error_label(error: OpenAIError) -> str:
 
 def _provider_error_message(error: OpenAIError) -> str | None:
     body = getattr(error, "body", None)
+    if isinstance(body, list) and len(body) == 1:
+        body = body[0]
     details = body.get("error", body) if isinstance(body, dict) else None
     message = details.get("message") if isinstance(details, dict) else None
     if isinstance(message, str) and message.strip():

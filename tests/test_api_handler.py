@@ -14,7 +14,7 @@ class APIHandlerTests(unittest.TestCase):
         client, model = api_handler._client()
 
         self.assertIs(client, openai_client.return_value)
-        self.assertEqual(model, "gemini-3.5-flash-lite")
+        self.assertEqual(model, "gemini-flash-lite-latest")
         openai_client.assert_called_once_with(
             api_key="test-key",
             base_url=api_handler.DEFAULT_API_BASE_URL,
@@ -141,6 +141,21 @@ class APIHandlerTests(unittest.TestCase):
 
         get_client.assert_called_once()
         request_answer.assert_called_once()
+
+    def test_provider_error_message_handles_list_error_body(self):
+        error = OpenAIError("Service unavailable.")
+        error.body = [
+            {
+                "error": {
+                    "message": "This model is temporarily unavailable.",
+                }
+            }
+        ]
+
+        self.assertEqual(
+            api_handler._provider_error_message(error),
+            "This model is temporarily unavailable.",
+        )
 
     @patch.dict("os.environ", {}, clear=True)
     def test_missing_cloud_key_raises_configuration_error(self):
