@@ -70,18 +70,11 @@
                 },
                 body: JSON.stringify({ command: command })
             });
-            if (response.status === 404) {
-                throw new Error(
-                    "The local Webmaster API is unavailable. Run " +
-                    ".\\.venv\\Scripts\\python.exe server.py, then open " +
-                    "http://127.0.0.1:5000/command-center.html."
-                );
-            }
             const contentType = response.headers.get("content-type") || "";
             if (!contentType.toLowerCase().includes("json")) {
                 throw new Error(
-                    "The request reached a web server that returned HTML, " +
-                    "not the local Webmaster API. Run " +
+                    "The server returned HTML instead of a JSON API response. " +
+                    "Run " +
                     ".\\.venv\\Scripts\\python.exe server.py, then open " +
                     "http://127.0.0.1:5000/command-center.html."
                 );
@@ -92,8 +85,10 @@
             }
             if (!response.ok) {
                 throw new Error(
-                    typeof payload.error === "string"
-                        ? payload.error
+                    typeof payload.message === "string"
+                        ? payload.message
+                        : typeof payload.error === "string"
+                            ? payload.error
                         : "The Webmaster returned HTTP " + response.status
                 );
             }
