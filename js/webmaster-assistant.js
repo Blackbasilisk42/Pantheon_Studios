@@ -8,7 +8,7 @@
                 <summary>LOCAL WEBMASTER</summary>
                 <div class="webmaster-panel">
                     <h2>Execution Console</h2>
-                    <p>Send a request to the local Webmaster engine.</p>
+                    <p>Requests go through this PC's backend. General questions use the configured cloud AI.</p>
                     <div class="webmaster-suggestions" aria-label="Example requests">
                         <button type="button" data-webmaster-command="Update Kaige's dossier">DOSSIER</button>
                         <button type="button" data-webmaster-command="Run news update">NEWS UPDATE</button>
@@ -19,7 +19,7 @@
                         <input id="webmaster-command" name="command" type="text" maxlength="1000" required autocomplete="off">
                         <button class="webmaster-submit" type="submit">RUN REQUEST</button>
                     </form>
-                    <p id="webmaster-status" role="status" aria-live="polite">Ready to send a local request.</p>
+                    <p id="webmaster-status" role="status" aria-live="polite">Ready. General questions use the configured cloud AI.</p>
                     <pre id="webmaster-result" aria-live="polite" hidden></pre>
                 </div>
             </details>
@@ -57,7 +57,7 @@
         }
 
         submit.disabled = true;
-        status.textContent = "Sending request to the local engine...";
+        status.textContent = "Sending request to the Pantheon backend...";
         result.hidden = true;
         result.textContent = "";
 
@@ -110,7 +110,7 @@
             result.hidden = false;
         } catch (error) {
             status.textContent = error instanceof TypeError
-                ? "Unable to reach the local engine. Start server.py."
+                ? "Unable to reach the Pantheon backend. Start server.py."
                 : error instanceof Error
                     ? error.message
                     : String(error);
