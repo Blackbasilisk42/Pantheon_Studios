@@ -142,5 +142,29 @@
     "action": "append news crawler receipt",
     "target": "staged_updates/crawler_receipt.txt",
     "backup": "backups/20261020T131827577628Z_439a4d48_staged_updates__crawler_receipt.txt"
+  },
+  {
+    "timestamp": "2026-10-20T13:33:08.198671+00:00",
+    "action": "generate character dossier",
+    "target": "staged_updates/kaige_dossier.html",
+    "backup": "backups/20261020T133308196667Z_5377d5b1_staged_updates__kaige_dossier.html"
+  },
+  {
+    "timestamp": "2026-10-20T13:33:08.220018+00:00",
+    "action": "write dossier generation receipt",
+    "target": "staged_updates/kaige_receipt.txt",
+    "backup": "backups/20261020T133308211401Z_a0a31090_staged_updates__kaige_receipt.txt"
+  },
+  {
+    "timestamp": "2026-10-20T13:33:08.511098+00:00",
+    "action": "stage crawler unavailable status",
+    "target": "staged_updates/news_bulletin.html",
+    "backup": "backups/20261020T133308509166Z_83126524_staged_updates__news_bulletin.html"
+  },
+  {
+    "timestamp": "2026-10-20T13:33:08.536387+00:00",
+    "action": "append news crawler receipt",
+    "target": "staged_updates/crawler_receipt.txt",
+    "backup": "backups/20261020T133308521663Z_da4e1086_staged_updates__crawler_receipt.txt"
   }
 ]
