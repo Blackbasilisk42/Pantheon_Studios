@@ -21,6 +21,23 @@ class HubServerTests(unittest.TestCase):
     def setUp(self):
         self.client = hub_server.app.test_client()
 
+    def test_execute_route_is_registered_for_post(self):
+        rules = {
+            rule.rule: rule.methods
+            for rule in hub_server.app.url_map.iter_rules()
+        }
+
+        self.assertIn("/api/execute", rules)
+        self.assertIn("POST", rules["/api/execute"])
+
+    def test_unknown_api_route_returns_json_error(self):
+        response = self.client.post("/api/does-not-exist", json={})
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.mimetype, "application/json")
+        self.assertEqual(response.get_json()["status"], "error")
+        self.assertIn("message", response.get_json())
+
     @patch.dict(os.environ, {}, clear=True)
     def test_metrics_without_credentials_are_null_values(self):
         response = self.client.get("/api/metrics")
@@ -301,6 +318,11 @@ class HubServerTests(unittest.TestCase):
         self.assertEqual(
             unsupported.get_json(),
             {
+                "status": "error",
+                "message": (
+                    "Command is not supported. Use a maintenance command or "
+                    "ask a site question."
+                ),
                 "error": (
                     "Command is not supported. Use a maintenance command or "
                     "ask a site question."
@@ -335,7 +357,11 @@ class HubServerTests(unittest.TestCase):
         self.assertEqual(response.mimetype, "application/json")
         self.assertEqual(
             response.get_json(),
-            {"error": "Webmaster command failed."},
+            {
+                "status": "error",
+                "message": "Webmaster command failed.",
+                "error": "Webmaster command failed.",
+            },
         )
 
     def test_execute_endpoint_returns_json_for_result_serialization_errors(self):
@@ -352,7 +378,11 @@ class HubServerTests(unittest.TestCase):
         self.assertEqual(response.mimetype, "application/json")
         self.assertEqual(
             response.get_json(),
-            {"error": "Webmaster command failed."},
+            {
+                "status": "error",
+                "message": "Webmaster command failed.",
+                "error": "Webmaster command failed.",
+            },
         )
 
     def test_scheduler_runs_background_jobs_and_stays_active(self):

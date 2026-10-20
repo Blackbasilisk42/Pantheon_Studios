@@ -10,6 +10,7 @@ import requests
 from dotenv import load_dotenv
 import schedule
 from flask import Flask, jsonify, request, send_from_directory
+from werkzeug.exceptions import HTTPException
 
 import ai_webmaster
 import webmaster
@@ -58,6 +59,22 @@ webmaster_scheduler = schedule.Scheduler()
 _scheduler_stop = threading.Event()
 _scheduler_lock = threading.Lock()
 _scheduler_thread: threading.Thread | None = None
+
+
+def _json_error(message: str, status_code: int):
+    return jsonify({
+        "status": "error",
+        "message": message,
+        "error": message,
+    }), status_code
+
+
+@app.errorhandler(HTTPException)
+def handle_http_exception(error: HTTPException):
+    if request.path.startswith("/api/"):
+        message = error.description
+        return _json_error(message, error.code or 500)
+    return error
 
 
 class MetricProviderError(RuntimeError):
@@ -320,30 +337,38 @@ def site_health_status():
 
 @app.post("/api/execute")
 def execute_command():
+    try:
+        return _execute_command()
+    except Exception:
+        app.logger.exception("Unexpected Webmaster request failure.")
+        return _json_error("Webmaster command failed.", 500)
+
+
+def _execute_command():
     payload = request.get_json(silent=True)
     if not isinstance(payload, dict):
-        return jsonify({"error": "A JSON object with a command is required."}), 400
+        return _json_error("A JSON object with a command is required.", 400)
     command = payload.get("command")
     if not isinstance(command, str) or not command.strip():
-        return jsonify({"error": "Command must be a non-empty string."}), 400
+        return _json_error("Command must be a non-empty string.", 400)
     if len(command) > MAX_COMMAND_LENGTH:
-        return jsonify({"error": "Command exceeds the maximum length."}), 413
+        return _json_error("Command exceeds the maximum length.", 413)
 
     try:
         action, result = _dispatch_command(command)
     except api_handler.APIConfigurationError as error:
-        return jsonify({"error": str(error)}), 503
+        return _json_error(str(error), 503)
     except api_handler.APIHandlerError as error:
         app.logger.warning("Site question failed: %s", str(error))
-        return jsonify({"error": str(error)}), 502
+        return _json_error(str(error), 502)
     except ValueError as error:
-        return jsonify({"error": str(error)}), 400
+        return _json_error(str(error), 400)
     except (OSError, requests.RequestException, RuntimeError, UnicodeError):
         app.logger.exception("Webmaster command failed.")
-        return jsonify({"error": "Webmaster command failed."}), 500
+        return _json_error("Webmaster command failed.", 500)
     except Exception:
         app.logger.exception("Unexpected Webmaster command failure.")
-        return jsonify({"error": "Webmaster command failed."}), 500
+        return _json_error("Webmaster command failed.", 500)
 
     try:
         if isinstance(result, tuple) and all(
@@ -376,7 +401,7 @@ def execute_command():
         return jsonify(response_payload)
     except Exception:
         app.logger.exception("Unable to serialize Webmaster command result.")
-        return jsonify({"error": "Webmaster command failed."}), 500
+        return _json_error("Webmaster command failed.", 500)
 
 
 @app.get("/")

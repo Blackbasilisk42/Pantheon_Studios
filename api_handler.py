@@ -9,7 +9,7 @@ from context_builder import ALLOWED_NAVIGATION_TARGETS
 
 
 DEFAULT_API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai/"
-DEFAULT_API_MODEL = "gemini-2.0-flash"
+DEFAULT_API_MODEL = "gemini-3.8-flash"
 DEFAULT_OLLAMA_BASE_URL = "http://localhost:11434/v1"
 DEFAULT_OLLAMA_MODEL = "llama3.1"
 SYSTEM_PROMPT = (
