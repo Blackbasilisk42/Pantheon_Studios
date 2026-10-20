@@ -1,0 +1,167 @@
+<style>
+:root {
+            --bg-void: #060913;
+            --db-gold: #ffb700;
+            --db-orange: #ff5500;
+            --db-cyan: #00e5ff;
+            --db-ki: #00ff88;
+            --db-purple: #a100ff;
+            --db-red: #ff3333;
+            --panel-bg: rgba(12, 18, 32, 0.92);
+            --scouter-glow: 0 0 12px rgba(255, 183, 0, 0.35);
+            --font-mono: 'Courier New', Courier, monospace;
+        }
+/* DOSSIER DISPLAY PANEL */
+        .dossier-main-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--db-gold);
+            box-shadow: var(--scouter-glow);
+            padding: 25px;
+            clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+            margin-bottom: 30px;
+        }
+.dossier-header-grid {
+            display: grid;
+            grid-template-columns: 100px 1fr auto;
+            gap: 20px;
+            align-items: center;
+            border-bottom: 1px dashed rgba(255, 183, 0, 0.4);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+.big-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: 3px solid var(--db-gold);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            font-weight: 900;
+            color: #ffffff;
+            box-shadow: 0 0 15px rgba(255, 183, 0, 0.5);
+            background: #000;
+            overflow: hidden;
+        }
+.hero-title-group h1 {
+            margin: 0;
+            font-size: 2.2rem;
+            color: #ffffff;
+            letter-spacing: 2px;
+        }
+.hero-title-group .spec-tag {
+            color: var(--db-ki);
+            font-size: 0.9rem;
+            margin-top: 4px;
+            font-weight: bold;
+        }
+.power-rank-badge {
+            text-align: right;
+            border: 1px solid var(--db-orange);
+            padding: 10px 15px;
+            background: rgba(255, 85, 0, 0.1);
+        }
+.power-rank-label {
+            font-size: 0.65rem;
+            color: var(--db-orange);
+            letter-spacing: 1.5px;
+        }
+.power-rank-value {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: #ffffff;
+            margin-top: 2px;
+        }
+/* METRIC SPECIFICATION GRID */
+        .spec-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+.spec-box {
+            background: rgba(6, 9, 19, 0.85);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            padding: 18px;
+        }
+.spec-box-title {
+            color: var(--db-gold);
+            font-size: 0.85rem;
+            font-weight: bold;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+            letter-spacing: 1.5px;
+        }
+.stat-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+        }
+.stat-name { color: #8a9ba8; }
+.stat-val-num { color: var(--db-ki); font-weight: bold; }
+/* SKILL LOADOUT CHIPS */
+        .skill-chip-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+.skill-chip {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid var(--db-ki);
+            color: #ffffff;
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+.skill-chip.strike { border-color: var(--db-orange); color: var(--db-orange); background: rgba(255,85,0,0.1); }
+.skill-chip.ki { border-color: var(--db-cyan); color: var(--db-cyan); background: rgba(0,229,255,0.1); }
+/* NARRATIVE LORE BLOCK */
+        .lore-box {
+            background: rgba(6, 9, 19, 0.95);
+            border: 1px solid rgba(255, 183, 0, 0.4);
+            padding: 18px;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: #d0e0f0;
+        }
+.lore-title {
+            color: var(--db-gold);
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+</style>
+<div class="dossier-main-panel bento-card">
+<div class="dossier-header-grid">
+<div class="big-avatar">K</div>
+<div class="hero-title-group">
+<h1>KAIGE</h1>
+<div class="spec-tag">Frieza-Race // Elite Patroller</div>
+</div>
+<div class="power-rank-badge">
+<div class="power-rank-label">RECORDED POWER LEVEL</div>
+<div class="power-rank-value">LEVEL 199 MAX</div>
+</div>
+</div>
+<div class="spec-grid">
+<div class="spec-box">
+<div class="spec-box-title">COMBAT METRICS &amp; SPECS</div>
+<div class="stat-line"><span class="stat-name">MAX HEALTH</span><span class="stat-val-num">85 / 100</span></div>
+<div class="stat-line"><span class="stat-name">MAX KI SPECS</span><span class="stat-val-num">100 / 100</span></div>
+<div class="stat-line"><span class="stat-name">MAX STAMINA</span><span class="stat-val-num">88 / 100</span></div>
+<div class="stat-line"><span class="stat-name">STRIKE SUPER POWER</span><span class="stat-val-num">75 / 100</span></div>
+<div class="stat-line"><span class="stat-name">KI BLAST SUPER POWER</span><span class="stat-val-num">98 / 100</span></div>
+</div>
+<div class="spec-box">
+<div class="spec-box-title">EQUIPPED COMBAT SKILLS</div>
+<div class="skill-chip-list"><span class="skill-chip ki">KI BLAST SPECIALIST</span><span class="skill-chip strike">SHADOW CRUSHER</span><span class="skill-chip strike">BACKFLIP</span></div>
+</div>
+</div>
+<div class="lore-box"><div class="lore-title">TACTICAL DOSSIER &amp; LORE NOTES</div><div class="lore-title">Ki-Blast Specialist and Orbital Zoner</div><p class="lore-section">ATTRIBUTES: Features a tall, original solid black body design with green eyes—a legacy design predating the Black Frieza form by over half a decade—wreathed in a dark emerald green aura. Operates on a pure Ki-blast primary combat build, utilizing the 'Center of Gravity' (COG) technique to maintain precise orbital positioning relative to locked-on targets.</p><p class="lore-section">EVASIVE TACTICS: Relies heavily on maintaining spatial advantage. Instead of engaging in close-quarters brawling, utilizes skills like Backflip to instantly create distance, forcing opponents into optimal zoning range where overwhelming Ki-blast damage dictates the pace.</p><p class="lore-section">COUNTER TACTICS: Proficient in punishing adversaries who attempt to close the gap. Employs secondary Strike counters like Shadow Crusher to break incoming momentum, allowing immediate repositioning to resume high-damage energy assaults.</p></div>
+</div>
