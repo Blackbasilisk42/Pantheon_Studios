@@ -10,6 +10,7 @@ from context_builder import ALLOWED_NAVIGATION_TARGETS
 
 DEFAULT_API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai/"
 DEFAULT_API_MODEL = "gemini-3.8-flash"
+API_REQUEST_TIMEOUT_SECONDS = 45
 DEFAULT_OLLAMA_BASE_URL = "http://localhost:11434/v1"
 DEFAULT_OLLAMA_MODEL = "llama3.1"
 SYSTEM_PROMPT = (
@@ -101,7 +102,7 @@ def _client() -> tuple[OpenAI, str]:
     return OpenAI(
         api_key=api_key,
         base_url=base_url,
-        timeout=15,
+        timeout=API_REQUEST_TIMEOUT_SECONDS,
         max_retries=0,
     ), model
 

@@ -18,7 +18,7 @@ class APIHandlerTests(unittest.TestCase):
         openai_client.assert_called_once_with(
             api_key="test-key",
             base_url=api_handler.DEFAULT_API_BASE_URL,
-            timeout=15,
+            timeout=api_handler.API_REQUEST_TIMEOUT_SECONDS,
             max_retries=0,
         )
 

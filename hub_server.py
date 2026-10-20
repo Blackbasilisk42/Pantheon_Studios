@@ -3,8 +3,10 @@ import os
 import re
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime
 from pathlib import Path, PurePosixPath
 from typing import Callable
+from zoneinfo import ZoneInfo
 
 import requests
 from dotenv import load_dotenv
@@ -251,6 +253,17 @@ def _dispatch_command(command: str) -> tuple[str, object]:
         " ",
         command.strip().lower(),
     ).strip()
+    if (
+        re.search(r"\bwhat time is it\b|\bcurrent time\b", normalized)
+        and re.search(r"\b(eastern|edt|est|new york)\b", normalized)
+    ):
+        current_time = datetime.now(ZoneInfo("America/New_York"))
+        time_label = current_time.strftime("%I:%M %p %Z").lstrip("0")
+        date_label = current_time.strftime("%A, %B %d, %Y")
+        return (
+            "local_time_answer",
+            f"It is {time_label} on {date_label} in Eastern Time.",
+        )
     if normalized in {"hello", "hi", "hey", "hello there"}:
         return (
             "greeting",
@@ -387,7 +400,7 @@ def _execute_command():
             "action": action,
             "result": serialized_result,
         }
-        if action == "greeting" and isinstance(result, str):
+        if action in {"greeting", "local_time_answer"} and isinstance(result, str):
             response_payload["message"] = result
         if action == "site_knowledge_answer" and isinstance(result, dict):
             message = result.get("reply")

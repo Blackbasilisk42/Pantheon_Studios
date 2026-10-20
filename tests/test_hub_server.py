@@ -368,6 +368,26 @@ class HubServerTests(unittest.TestCase):
         self.assertIn("Hello!", response.get_json()["message"])
         answer_query.assert_not_called()
 
+    def test_eastern_time_question_is_answered_locally(self):
+        with patch("hub_server.api_handler.answer_query") as answer_query:
+            response = self.client.post(
+                "/api/execute",
+                json={
+                    "command": "what time is it in eastern daylight savings"
+                },
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.get_json()["action"],
+            "local_time_answer",
+        )
+        self.assertRegex(
+            response.get_json()["message"],
+            r"It is \d{1,2}:\d{2} [AP]M (EDT|EST) on .+ in Eastern Time\.",
+        )
+        answer_query.assert_not_called()
+
     def test_execute_endpoint_returns_json_for_unexpected_backend_errors(self):
         with patch(
             "hub_server._dispatch_command",
