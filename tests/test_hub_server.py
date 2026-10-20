@@ -30,13 +30,18 @@ class HubServerTests(unittest.TestCase):
         self.assertIn("/api/execute", rules)
         self.assertIn("POST", rules["/api/execute"])
 
-    def test_unregistered_api_post_returns_json_error(self):
-        response = self.client.post("/api/does-not-exist", json={})
+    def test_unregistered_api_routes_return_json_errors(self):
+        for method, path, expected_status in (
+            ("get", "/api/does-not-exist", 404),
+            ("post", "/api/does-not-exist", 405),
+        ):
+            with self.subTest(method=method):
+                response = getattr(self.client, method)(path, json={})
 
-        self.assertEqual(response.status_code, 405)
-        self.assertEqual(response.mimetype, "application/json")
-        self.assertEqual(response.get_json()["status"], "error")
-        self.assertIn("message", response.get_json())
+                self.assertEqual(response.status_code, expected_status)
+                self.assertEqual(response.mimetype, "application/json")
+                self.assertEqual(response.get_json()["status"], "error")
+                self.assertIn("message", response.get_json())
 
     @patch.dict(os.environ, {}, clear=True)
     def test_metrics_without_credentials_are_null_values(self):
@@ -361,6 +366,29 @@ class HubServerTests(unittest.TestCase):
                 "status": "error",
                 "message": "Webmaster command failed.",
                 "error": "Webmaster command failed.",
+            },
+        )
+
+    def test_execute_endpoint_returns_json_for_provider_errors(self):
+        with patch(
+            "hub_server._dispatch_command",
+            side_effect=hub_server.api_handler.APIRequestError(
+                "The configured model was not found."
+            ),
+        ):
+            response = self.client.post(
+                "/api/execute",
+                json={"command": "Where is the character builder?"},
+            )
+
+        self.assertEqual(response.status_code, 502)
+        self.assertEqual(response.mimetype, "application/json")
+        self.assertEqual(
+            response.get_json(),
+            {
+                "status": "error",
+                "message": "The configured model was not found.",
+                "error": "The configured model was not found.",
             },
         )
 
