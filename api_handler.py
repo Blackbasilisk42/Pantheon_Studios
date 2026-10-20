@@ -41,6 +41,51 @@ class APIResponseError(APIHandlerError):
     pass
 
 
+def _is_quota_exhaustion(error: OpenAIError) -> bool:
+    body = getattr(error, "body", None)
+    details = body.get("error", body) if isinstance(body, dict) else {}
+    codes = {
+        str(details.get(key, "")).strip().lower()
+        for key in ("code", "type")
+        if isinstance(details, dict)
+    }
+    quota_codes = {
+        "insufficient_quota",
+        "quota_exceeded",
+        "resource_exhausted",
+        "billing_hard_limit_reached",
+        "credits_exhausted",
+        "free_tier_exhausted",
+        "usage_limit_exceeded",
+    }
+    if codes & quota_codes:
+        return True
+
+    messages = [str(error)]
+    if isinstance(details, dict):
+        message = details.get("message")
+        if isinstance(message, str):
+            messages.append(message)
+    quota_indicators = (
+        "quota",
+        "credit balance",
+        "credits exhausted",
+        "billing hard limit",
+        "free tier limit",
+        "free-tier limit",
+        "usage limit",
+    )
+    combined_message = " ".join(messages).lower()
+    return any(indicator in combined_message for indicator in quota_indicators)
+
+
+def _provider_error_label(error: OpenAIError) -> str:
+    status_code = getattr(error, "status_code", None)
+    if isinstance(status_code, int):
+        return f"HTTP {status_code} {type(error).__name__}"
+    return type(error).__name__
+
+
 def _client() -> tuple[OpenAI, str]:
     api_key = os.getenv("API_KEY", "").strip()
     if not api_key:
@@ -170,31 +215,41 @@ def answer_query(query: str, context: dict[str, object]) -> dict[str, str | None
         ensure_ascii=False,
     )
 
-    cloud_failure = "cloud API is not configured"
     try:
         client, model = _client()
     except APIConfigurationError as error:
-        cloud_failure = str(error)
-    else:
-        try:
-            return _request_answer(
-                client,
-                model,
-                query,
-                context_payload,
-                "cloud API",
-            )
-        except (OpenAIError, APIResponseError) as error:
-            cloud_failure = type(error).__name__
+        raise error
+
+    try:
+        return _request_answer(
+            client,
+            model,
+            query,
+            context_payload,
+            "cloud API",
+        )
+    except APIResponseError as error:
+        raise APIRequestError(
+            "The cloud API returned an invalid response; Ollama fallback is "
+            "reserved for exhausted cloud quota."
+        ) from error
+    except OpenAIError as error:
+        if not _is_quota_exhaustion(error):
+            raise APIRequestError(
+                "The cloud API request failed "
+                f"({_provider_error_label(error)}); Ollama fallback is "
+                "reserved for exhausted cloud quota."
+            ) from error
+        cloud_failure = _provider_error_label(error)
 
     logger.warning(
-        "Cloud site-answer request failed (%s); trying local Ollama.",
+        "Cloud site-answer quota exhausted (%s); trying local Ollama.",
         cloud_failure,
     )
     try:
         return _local_answer_query(query, context_payload)
     except APIHandlerError as error:
         raise APIRequestError(
-            f"Cloud request failed ({cloud_failure}); local fallback failed: "
+            f"Cloud quota exhausted ({cloud_failure}); local fallback failed: "
             f"{error}"
         ) from error
