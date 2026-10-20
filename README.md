@@ -20,7 +20,7 @@ They are not a production API for the public GitHub Pages site.
    to read the configured Page's follower count and the Page ID.
 3. Set `API_KEY`, `API_BASE_URL`, and `API_MODEL` in `.env` for primary
    conversational site answers. The defaults use Google AI Studio's
-   OpenAI-compatible endpoint and Gemini Flash; Groq can be selected by
+   OpenAI-compatible endpoint and `gemini-3.5-flash-lite`; Groq can be selected by
    setting its compatible base URL, model, and API key. The cloud API is tried
    exclusively. Configuration errors, connection failures, quota exhaustion,
    invalid models, and other API errors are returned directly; no local model
