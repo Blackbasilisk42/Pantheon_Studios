@@ -112,7 +112,7 @@ class APIHandlerTests(unittest.TestCase):
     @patch.dict("os.environ", {"API_KEY": "test-key"}, clear=True)
     @patch("api_handler._request_answer")
     @patch("api_handler._client", return_value=(object(), "gemini-test"))
-    def test_cloud_timeout_returns_error_without_retry_or_fallback(
+    def test_cloud_provider_failure_returns_error_after_single_request(
         self,
         get_client,
         request_answer,
