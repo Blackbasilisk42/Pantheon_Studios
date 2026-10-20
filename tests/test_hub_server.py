@@ -30,6 +30,26 @@ class HubServerTests(unittest.TestCase):
         self.assertIn("/api/execute", rules)
         self.assertIn("POST", rules["/api/execute"])
 
+    def test_execute_route_allows_production_console_origin(self):
+        response = self.client.options(
+            "/api/execute",
+            headers={
+                "Origin": "https://pantheoncore.studios",
+                "Access-Control-Request-Method": "POST",
+                "Access-Control-Request-Headers": "content-type",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.headers.get("Access-Control-Allow-Origin"),
+            "https://pantheoncore.studios",
+        )
+        self.assertIn(
+            "POST",
+            response.headers.get("Access-Control-Allow-Methods", ""),
+        )
+
     def test_unregistered_api_routes_return_json_errors(self):
         for method, path, expected_status in (
             ("get", "/api/does-not-exist", 404),

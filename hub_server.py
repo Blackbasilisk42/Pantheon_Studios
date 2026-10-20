@@ -9,6 +9,7 @@ from typing import Callable
 import requests
 from dotenv import load_dotenv
 import schedule
+from flask_cors import CORS
 from flask import Flask, jsonify, request, send_from_directory
 from werkzeug.exceptions import HTTPException
 
@@ -54,6 +55,16 @@ PRIVATE_DIRECTORIES = {
 load_dotenv(ROOT / ".env")
 
 app = Flask(__name__, static_folder=None)
+CORS(
+    app,
+    resources={
+        r"/api/*": {
+            "origins": ["https://pantheoncore.studios"],
+            "methods": ["GET", "POST", "OPTIONS"],
+            "allow_headers": ["Content-Type"],
+        }
+    },
+)
 app.logger.setLevel(logging.INFO)
 webmaster_scheduler = schedule.Scheduler()
 _scheduler_stop = threading.Event()
