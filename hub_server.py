@@ -336,31 +336,40 @@ def execute_command():
     except (OSError, requests.RequestException, RuntimeError, UnicodeError):
         app.logger.exception("Webmaster command failed.")
         return jsonify({"error": "Webmaster command failed."}), 500
+    except Exception:
+        app.logger.exception("Unexpected Webmaster command failure.")
+        return jsonify({"error": "Webmaster command failed."}), 500
 
-    if isinstance(result, tuple) and all(isinstance(path, Path) for path in result):
-        serialized_result = [
-            path.relative_to(ROOT).as_posix() for path in result
-        ]
-    elif isinstance(result, Path):
-        serialized_result = result.relative_to(ROOT).as_posix()
-    else:
-        serialized_result = result
-    response_payload: dict[str, object] = {
-        "action": action,
-        "result": serialized_result,
-    }
-    if action == "site_knowledge_answer" and isinstance(result, dict):
-        message = result.get("reply")
-        redirect = result.get("redirect")
-        if isinstance(message, str):
-            response_payload["message"] = message
-        if isinstance(redirect, str):
-            response_payload["redirect"] = redirect
-            response_payload["navigation"] = {
-                "type": "navigate",
-                "target": redirect,
-            }
-    return jsonify(response_payload)
+    try:
+        if isinstance(result, tuple) and all(
+            isinstance(path, Path) for path in result
+        ):
+            serialized_result = [
+                path.relative_to(ROOT).as_posix() for path in result
+            ]
+        elif isinstance(result, Path):
+            serialized_result = result.relative_to(ROOT).as_posix()
+        else:
+            serialized_result = result
+        response_payload: dict[str, object] = {
+            "action": action,
+            "result": serialized_result,
+        }
+        if action == "site_knowledge_answer" and isinstance(result, dict):
+            message = result.get("reply")
+            redirect = result.get("redirect")
+            if isinstance(message, str):
+                response_payload["message"] = message
+            if isinstance(redirect, str):
+                response_payload["redirect"] = redirect
+                response_payload["navigation"] = {
+                    "type": "navigate",
+                    "target": redirect,
+                }
+        return jsonify(response_payload)
+    except Exception:
+        app.logger.exception("Unable to serialize Webmaster command result.")
+        return jsonify({"error": "Webmaster command failed."}), 500
 
 
 @app.get("/")

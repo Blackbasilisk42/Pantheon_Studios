@@ -298,6 +298,40 @@ class HubServerTests(unittest.TestCase):
         self.assertEqual(missing_command.status_code, 400)
         self.assertEqual(unsupported.status_code, 400)
 
+    def test_execute_endpoint_returns_json_for_unexpected_backend_errors(self):
+        with patch(
+            "hub_server._dispatch_command",
+            side_effect=TypeError("unexpected backend failure"),
+        ):
+            response = self.client.post(
+                "/api/execute",
+                json={"command": "Check for broken elements"},
+            )
+
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.mimetype, "application/json")
+        self.assertEqual(
+            response.get_json(),
+            {"error": "Webmaster command failed."},
+        )
+
+    def test_execute_endpoint_returns_json_for_result_serialization_errors(self):
+        with patch(
+            "hub_server._dispatch_command",
+            return_value=("test_action", object()),
+        ):
+            response = self.client.post(
+                "/api/execute",
+                json={"command": "Check for broken elements"},
+            )
+
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.mimetype, "application/json")
+        self.assertEqual(
+            response.get_json(),
+            {"error": "Webmaster command failed."},
+        )
+
     def test_scheduler_runs_background_jobs_and_stays_active(self):
         dossier_ran = threading.Event()
         news_ran = threading.Event()
