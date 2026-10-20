@@ -74,7 +74,7 @@ class APIHandlerTests(unittest.TestCase):
 
     @patch.dict("os.environ", {"API_KEY": "test-key"}, clear=True)
     @patch("api_handler._local_answer_query")
-    @patch("api_handler._request_answer", side_effect=OpenAIError("rate limited"))
+    @patch("api_handler._request_answer")
     @patch("api_handler._client", return_value=(object(), "gemini-test"))
     def test_cloud_rate_limit_falls_back_to_ollama(
         self,
@@ -82,6 +82,14 @@ class APIHandlerTests(unittest.TestCase):
         request_answer,
         local_answer,
     ):
+        quota_error = OpenAIError("Quota exceeded for this project.")
+        quota_error.body = {
+            "error": {
+                "code": "insufficient_quota",
+                "message": "Quota exceeded for this project.",
+            }
+        }
+        request_answer.side_effect = quota_error
         local_answer.return_value = {
             "reply": "Local fallback response.",
             "redirect": None,
@@ -98,25 +106,41 @@ class APIHandlerTests(unittest.TestCase):
         local_answer.assert_called_once()
         self.assertEqual(local_answer.call_args.args[0], "What is on the site?")
 
+    @patch.dict("os.environ", {"API_KEY": "test-key"}, clear=True)
+    @patch("api_handler._local_answer_query")
+    @patch(
+        "api_handler._request_answer",
+        side_effect=OpenAIError("The model was not found."),
+    )
+    @patch("api_handler._client", return_value=(object(), "missing-model"))
+    def test_non_quota_cloud_failure_does_not_fall_back_to_ollama(
+        self,
+        get_client,
+        request_answer,
+        local_answer,
+    ):
+        with self.assertRaisesRegex(
+            api_handler.APIRequestError,
+            "Ollama fallback is reserved for exhausted cloud quota",
+        ):
+            api_handler.answer_query(
+                "Question?",
+                {"snippets": [], "navigation": {}},
+            )
+
+        request_answer.assert_called_once()
+        local_answer.assert_not_called()
+
     @patch.dict("os.environ", {}, clear=True)
     @patch("api_handler._local_answer_query")
-    def test_missing_cloud_key_uses_ollama(self, local_answer):
-        local_answer.return_value = {
-            "reply": "Answered offline.",
-            "redirect": "index.html#dossier-container",
-        }
+    def test_missing_cloud_key_does_not_use_ollama(self, local_answer):
+        with self.assertRaises(api_handler.APIConfigurationError):
+            api_handler.answer_query(
+                "Show me the roster",
+                {"snippets": [], "navigation": {}},
+            )
 
-        result = api_handler.answer_query(
-            "Show me the roster",
-            {"snippets": [], "navigation": {}},
-        )
-
-        self.assertEqual(result["reply"], "Answered offline.")
-        self.assertEqual(
-            result["redirect"],
-            "index.html#dossier-container",
-        )
-        local_answer.assert_called_once()
+        local_answer.assert_not_called()
 
     @patch.dict(
         "os.environ",
@@ -161,10 +185,7 @@ class APIHandlerTests(unittest.TestCase):
         "api_handler._local_answer_query",
         side_effect=api_handler.APIRequestError("Ollama is offline."),
     )
-    @patch(
-        "api_handler._request_answer",
-        side_effect=OpenAIError("cloud unavailable"),
-    )
+    @patch("api_handler._request_answer")
     @patch("api_handler._client", return_value=(object(), "gemini-test"))
     def test_reports_cloud_and_local_errors_if_both_providers_fail(
         self,
@@ -172,9 +193,17 @@ class APIHandlerTests(unittest.TestCase):
         request_answer,
         local_answer,
     ):
+        quota_error = OpenAIError("Insufficient quota.")
+        quota_error.body = {
+            "error": {
+                "code": "insufficient_quota",
+                "message": "Insufficient quota.",
+            }
+        }
+        request_answer.side_effect = quota_error
         with self.assertRaisesRegex(
             api_handler.APIRequestError,
-            "Cloud request failed .* local fallback failed: Ollama is offline",
+            "Cloud quota exhausted .* local fallback failed: Ollama is offline",
         ):
             api_handler.answer_query(
                 "Question?",

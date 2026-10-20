@@ -215,10 +215,7 @@ def answer_query(query: str, context: dict[str, object]) -> dict[str, str | None
         ensure_ascii=False,
     )
 
-    try:
-        client, model = _client()
-    except APIConfigurationError as error:
-        raise error
+    client, model = _client()
 
     try:
         return _request_answer(
