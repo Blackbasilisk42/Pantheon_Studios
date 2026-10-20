@@ -232,6 +232,11 @@ def _dispatch_command(command: str) -> tuple[str, object]:
         " ",
         command.strip().lower(),
     ).strip()
+    if normalized in {"hello", "hi", "hey", "hello there"}:
+        return (
+            "greeting",
+            "Hello! Try SITE CHECK, DOSSIER, NEWS UPDATE, or ask a site question.",
+        )
     if normalized in {
         "rollback",
         "rollback latest edit",
@@ -355,6 +360,8 @@ def execute_command():
             "action": action,
             "result": serialized_result,
         }
+        if action == "greeting" and isinstance(result, str):
+            response_payload["message"] = result
         if action == "site_knowledge_answer" and isinstance(result, dict):
             message = result.get("reply")
             redirect = result.get("redirect")
