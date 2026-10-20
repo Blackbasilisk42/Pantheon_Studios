@@ -79,6 +79,10 @@ class APIHandlerTests(unittest.TestCase):
             "general questions using your general knowledge",
             client.chat.completions.create.call_args.kwargs["messages"][0]["content"],
         )
+        self.assertEqual(
+            client.chat.completions.create.call_args.kwargs["max_tokens"],
+            api_handler.API_MAX_RESPONSE_TOKENS,
+        )
 
     @patch.dict("os.environ", {"API_KEY": "test-key"}, clear=True)
     @patch("api_handler._request_answer")

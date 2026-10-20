@@ -10,7 +10,8 @@ from context_builder import ALLOWED_NAVIGATION_TARGETS
 
 DEFAULT_API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai/"
 DEFAULT_API_MODEL = "gemini-3.5-flash-lite"
-API_REQUEST_TIMEOUT_SECONDS = 45
+API_REQUEST_TIMEOUT_SECONDS = 60
+API_MAX_RESPONSE_TOKENS = 512
 SYSTEM_PROMPT = (
     "You are the Pantheon Studios assistant. Answer general questions using "
     "your general knowledge and the supplied runtime context. For questions "
@@ -131,6 +132,7 @@ def _request_answer(
                 },
             ],
             response_format={"type": "json_object"},
+            max_tokens=API_MAX_RESPONSE_TOKENS,
         )
         content = response.choices[0].message.content
     except OpenAIError:
