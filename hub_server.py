@@ -253,9 +253,24 @@ def _dispatch_command(command: str) -> tuple[str, object]:
         " ",
         command.strip().lower(),
     ).strip()
-    if (
-        re.search(r"\bwhat time is it\b|\bcurrent time\b", normalized)
-        and re.search(r"\b(eastern|edt|est|new york)\b", normalized)
+    asks_for_time = re.search(
+        r"\bwhat time is it\b|\bcurrent time\b|\btime is it\b",
+        normalized,
+    )
+    if asks_for_time and re.search(r"\bindiana\b", normalized):
+        eastern_now = datetime.now(ZoneInfo("America/Indiana/Indianapolis"))
+        central_now = datetime.now(ZoneInfo("America/Indiana/Knox"))
+        eastern_label = eastern_now.strftime("%I:%M %p %Z").lstrip("0")
+        central_label = central_now.strftime("%I:%M %p %Z").lstrip("0")
+        return (
+            "local_time_answer",
+            "Indiana has two time zones. Most of the state (Eastern): "
+            f"{eastern_label}; northwest and southwest Indiana (Central): "
+            f"{central_label}.",
+        )
+    if asks_for_time and re.search(
+        r"\b(eastern|edt|est|new york)\b",
+        normalized,
     ):
         current_time = datetime.now(ZoneInfo("America/New_York"))
         time_label = current_time.strftime("%I:%M %p %Z").lstrip("0")

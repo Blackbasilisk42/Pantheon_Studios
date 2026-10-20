@@ -388,6 +388,22 @@ class HubServerTests(unittest.TestCase):
         )
         answer_query.assert_not_called()
 
+    def test_indiana_time_question_returns_both_zones_without_provider_call(self):
+        with patch("hub_server.api_handler.answer_query") as answer_query:
+            response = self.client.post(
+                "/api/execute",
+                json={"command": "what time is it in indiana"},
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json()["action"], "local_time_answer")
+        message = response.get_json()["message"]
+        self.assertIn("Most of the state (Eastern):", message)
+        self.assertIn("northwest and southwest Indiana (Central):", message)
+        self.assertRegex(message, r"\d{1,2}:\d{2} [AP]M EDT")
+        self.assertRegex(message, r"\d{1,2}:\d{2} [AP]M CDT")
+        answer_query.assert_not_called()
+
     def test_execute_endpoint_returns_json_for_unexpected_backend_errors(self):
         with patch(
             "hub_server._dispatch_command",
