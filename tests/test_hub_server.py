@@ -335,9 +335,10 @@ class HubServerTests(unittest.TestCase):
 
         self.assertEqual(missing_command.status_code, 400)
 
-    def test_arbitrary_language_request_is_sent_to_cloud_answer_provider(self):
+    def test_unrecognized_natural_language_is_sent_to_cloud_answer_provider(self):
         context = {"snippets": [], "navigation": {}}
         answer = {"reply": "Here is the answer.", "redirect": None}
+        command = "Could you explain the local clock across Indiana?"
         with (
             patch(
                 "hub_server.context_builder.build_context",
@@ -350,18 +351,18 @@ class HubServerTests(unittest.TestCase):
         ):
             response = self.client.post(
                 "/api/execute",
-                json={"command": "what time is it in indiana"},
+                json={"command": command},
             )
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get_json()["action"], "site_knowledge_answer")
         self.assertEqual(response.get_json()["message"], "Here is the answer.")
         build_context.assert_called_once_with(
-            "what time is it in indiana",
+            command,
             hub_server.ROOT,
         )
         answer_query.assert_called_once_with(
-            "what time is it in indiana",
+            command,
             context,
         )
 

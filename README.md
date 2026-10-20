@@ -61,14 +61,17 @@ Invoke-RestMethod -Method Post -Uri http://127.0.0.1:5000/api/execute `
 The endpoint dispatches exact maintenance commands locally and does not
 interpret requests as Python or shell commands. An "official source" staging
 command scrapes the allowlisted publisher, uses its first heading and text
-as-is, and does not call an external text-generation service. Open-ended
-questions use local TF-IDF retrieval over site pages, project Markdown, and
-site logs before calling the configured OpenAI-compatible cloud API, with an
-automatic OpenAI-compatible Ollama fallback only when the cloud API reports
-that its quota or credits are exhausted. Other cloud failures are reported
-directly. Both providers receive the same retrieved context and restricted
-navigation map. Responses are validated so navigation can target only known
-local pages; the console presents approved targets as links.
+as-is, and does not call an external text-generation service. Any request
+that is not a recognized local maintenance action is sent to the configured
+OpenAI-compatible cloud API, alongside local TF-IDF retrieval over site pages,
+project Markdown, and site logs. The model can answer general questions from
+its knowledge and use the supplied current UTC timestamp for date/time
+questions; Pantheon-specific answers remain grounded in retrieved site context.
+Ollama is an automatic fallback only when the cloud API reports exhausted
+quota or credits. Other cloud failures are reported directly. Both providers
+receive the same context and restricted navigation map. Responses are
+validated so navigation can target only known local pages; the console
+presents approved targets as links.
 `/api/health` runs the local-reference check directly.
 Before Webmaster output files are changed, the previous file version is copied
 to `backups/` under a timestamped filename. Actions, UTC timestamps, targets,

@@ -75,6 +75,10 @@ class APIHandlerTests(unittest.TestCase):
             "current_datetime_utc",
             client.chat.completions.create.call_args.kwargs["messages"][1]["content"],
         )
+        self.assertIn(
+            "general questions using your general knowledge",
+            client.chat.completions.create.call_args.kwargs["messages"][0]["content"],
+        )
 
     @patch.dict("os.environ", {"API_KEY": "test-key"}, clear=True)
     @patch("api_handler._local_answer_query")
