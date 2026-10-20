@@ -8,6 +8,20 @@ from openai import OpenAIError
 
 
 class APIHandlerTests(unittest.TestCase):
+    @patch.dict("os.environ", {"API_KEY": "test-key"}, clear=True)
+    @patch("api_handler.OpenAI")
+    def test_default_client_uses_current_gemini_flash_model(self, openai_client):
+        client, model = api_handler._client()
+
+        self.assertIs(client, openai_client.return_value)
+        self.assertEqual(model, "gemini-3.8-flash")
+        openai_client.assert_called_once_with(
+            api_key="test-key",
+            base_url=api_handler.DEFAULT_API_BASE_URL,
+            timeout=15,
+            max_retries=0,
+        )
+
     def test_parse_response_accepts_only_known_navigation_targets(self):
         payload = api_handler._parse_response(
             json.dumps(
